@@ -21,6 +21,8 @@ See also: [`product-vision.md`](./product-vision.md),
 | R-05 | Install manifest written (no secrets) per orchestration-compliance §6 | 1 |
 | R-06 | Apex shell lists installed apps with SSOT labels where applicable | 1 |
 | R-07 | Add app to existing suite (incremental install) | 2 |
+| R-08 | Append-only `suite_audit_events` with `before_json` / `after_json` for every mutating orchestration action per [`audit-trail.md`](./audit-trail.md) | 1 |
+| R-09 | Suite control database (`nene_suite`) separate from sibling app databases | 1 |
 
 ---
 

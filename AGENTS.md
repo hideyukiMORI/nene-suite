@@ -17,6 +17,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Terminology (binding — exact spellings):** `docs/explanation/terminology.md`
 - **Disclaimer (binding):** `docs/explanation/disclaimer.md` — no business or legal warranty
 - **Orchestration compliance (binding):** `docs/explanation/orchestration-compliance.md` — SSOT / DB / 士業 review (ADR 0005)
+- **Audit trail (binding):** `docs/explanation/audit-trail.md` — before/after for all suite mutations (ADR 0007)
 - **Requirements:** `docs/explanation/requirements.md`
 - **Suite env contract (binding):** `docs/explanation/suite-environment-contract.md` — ADR 0004
 - **Product vision:** `docs/explanation/product-vision.md`

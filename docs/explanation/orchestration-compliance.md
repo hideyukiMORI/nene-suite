@@ -40,6 +40,10 @@ See also: [`scope-contract.md`](./scope-contract.md), [`terminology.md`](./termi
 5. **Single installer manifest.** Every suite install **MUST** produce one
    tamper-evident install manifest (§6) so professionals can see what was
    configured without inferring from scattered `.env` files alone.
+6. **Append-only orchestration audit.** Every mutating suite operator action
+   **MUST** record before/after sanitized state in the suite control database
+   (§6, [`audit-trail.md`](./audit-trail.md), ADR 0007) — not only the final
+   manifest snapshot.
 
 ---
 
@@ -128,7 +132,9 @@ apps automatically. Suite **MUST NOT** label `external_id` as "法人番号" or
 
 ---
 
-## 6. Install manifest and audit — MUST (Phase 1+)
+## 6. Install manifest and audit trail — MUST (Phase 1+)
+
+### 6.1 Install manifest (snapshot)
 
 Each completed install **MUST** write a manifest file (path documented in
 installer ADR) including at minimum:
@@ -141,6 +147,29 @@ installer ADR) including at minimum:
 
 Manifest **MUST NOT** contain: passwords, JWT secrets, service tokens, or full
 `.env` dumps. Operators store secrets separately.
+
+### 6.2 Orchestration audit trail (history)
+
+Every **mutating** suite operator action **MUST** append one row to
+`suite_audit_events` in the **`nene_suite` control database** with
+**`before_json` and `after_json`** sanitized snapshots, per binding spec
+[`audit-trail.md`](./audit-trail.md) and [ADR 0007](../adr/0007-suite-audit-trail-before-after.md).
+
+Minimum Phase 1 coverage:
+
+- install session lifecycle (started / completed / failed)
+- app selection changes and disclaimer acceptance
+- non-secret env / URL wiring written by the installer
+- per-app database provisioning (names only)
+- integration enable/disable (e.g. Clear → Invoice)
+- manifest create/update
+
+Audit rows **MUST NOT** contain secrets (same redaction rules as manifest).
+Audit storage is **append-only** — no updates or deletes to historical rows.
+
+The manifest is a **point-in-time snapshot**; the audit trail is the **full
+chronological record** professionals use to see *what changed when* during and
+after install.
 
 ---
 

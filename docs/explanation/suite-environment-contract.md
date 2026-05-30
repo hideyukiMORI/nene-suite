@@ -28,6 +28,12 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 | `NENE_SUITE_ORG_NAME` | `Example KK` | Initial org display name |
 | `NENE_SUITE_INSTALLED_APPS` | `nene-invoice,nene-clear` | Subset of catalog ids |
 
+### Suite control database (Phase 1+)
+
+| Variable | Example | Notes |
+| --- | --- | --- |
+| `NENE_SUITE_CONTROL_DATABASE_URL` | `mysql://nene_suite:***@db/nene_suite` | **Suite only** — `suite_audit_events` + manifest metadata; not sibling app data |
+
 ---
 
 ## Sibling URL variables

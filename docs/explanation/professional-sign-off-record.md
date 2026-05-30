@@ -26,7 +26,8 @@ This template is **not legal advice**. It records engineering process only.
 - [ ] Federation / `external_id` semantics (§4)
 - [ ] Installer disclaimer and operator copy (disclaimer.md, installer-disclaimer-copy.md)
 - [ ] HTTP integration wiring defaults (§5)
-- [ ] Install manifest requirements (§6)
+- [ ] Install manifest requirements (§6.1)
+- [ ] Orchestration audit trail — before/after, no secrets (§6.2, audit-trail.md)
 - [ ] Other: _______________
 
 ---

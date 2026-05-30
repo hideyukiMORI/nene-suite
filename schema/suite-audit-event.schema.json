@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nene-suite.dev/schemas/suite-audit-event.json",
+  "title": "SuiteAuditEvent",
+  "description": "One append-only audit row for a NeNe Suite orchestration mutation. Binding field names match docs/explanation/audit-trail.md and ADR 0007.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "suite_id",
+    "action",
+    "entity_type",
+    "entity_id",
+    "created_at",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "ULID primary key"
+    },
+    "suite_id": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "Matches NENE_SUITE_ID and install manifest suite_id"
+    },
+    "org_external_id": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "actor_user_id": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "actor_label": {
+      "type": ["string", "null"],
+      "maxLength": 320,
+      "description": "Display fallback only; no secrets"
+    },
+    "action": {
+      "type": "string",
+      "pattern": "^[a-z_]+\\.[a-z_]+$",
+      "description": "entity.verb e.g. app_selection.changed"
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "install_session",
+        "app_selection",
+        "disclaimer_acknowledgment",
+        "suite_env_config",
+        "app_database",
+        "integration_wiring",
+        "install_manifest",
+        "suite_org_profile",
+        "catalog_pin"
+      ]
+    },
+    "entity_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "before_json": {
+      "type": ["object", "null"],
+      "description": "Sanitized state before mutation; null on create"
+    },
+    "after_json": {
+      "type": ["object", "null"],
+      "description": "Sanitized state after mutation; null only if policy allows"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["installer_ui", "installer_cli", "apex_admin", "system", "api"]
+    },
+    "request_id": {
+      "type": ["string", "null"],
+      "maxLength": 128
+    },
+    "install_session_id": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "metadata_json": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "description": "Event-specific extras; must obey audit-trail.md sanitization rules"
+    }
+  }
+}

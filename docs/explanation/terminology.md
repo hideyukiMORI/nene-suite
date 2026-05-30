@@ -212,7 +212,27 @@ SSOT labels describe **sibling products**, not NeNe Suite itself. Suite is never
 
 ---
 
-## 9. Install manifest fields (Phase 1+)
+## 9. Suite audit trail (Phase 1+)
+
+| Term | Canonical | Never |
+| --- | --- | --- |
+| Audit store table | **`suite_audit_events`** | `audit_logs`, `audit_log` (suite context) |
+| Control database | **`nene_suite` control database** | shared app DB, domain DB |
+| Before snapshot column | **`before_json`** | `old_value`, `previous` |
+| After snapshot column | **`after_json`** | `new_value`, `next` |
+| Action naming | **`{entity}.{verb}`** | free-form strings, `ACTION_*` enums without docs |
+| Recorder abstraction | **`SuiteAuditRecorder`** | `AuditLogger`, ad-hoc `file_put_contents` |
+| Control DB env var | **`NENE_SUITE_CONTROL_DATABASE_URL`** | `SUITE_DB_URL`, `AUDIT_DATABASE_URL` |
+| Install grouping key | **`install_session_id`** | `session_id` (alone), `wizard_id` |
+| Redacted placeholder | **`"[REDACTED]"`** | empty string, `***`, `null` for known secret keys |
+
+Event types and `entity_type` values are registered in
+[`audit-trail.md`](./audit-trail.md) §4. Do not add actions in code without
+updating that section and [`schema/suite-audit-event.schema.json`](../../schema/suite-audit-event.schema.json).
+
+---
+
+## 10. Install manifest fields (Phase 1+)
 
 | Field | Canonical | Never |
 | --- | --- | --- |
@@ -223,12 +243,14 @@ SSOT labels describe **sibling products**, not NeNe Suite itself. Suite is never
 | Federation UUID | `org_external_id` | `external_id` (in manifest — use full name) |
 | Enabled integrations | `enabled_integrations` | `integrations`, `wiring` |
 
+| Control DB URL env | `NENE_SUITE_CONTROL_DATABASE_URL` | `SUITE_DB_URL`, `AUDIT_DATABASE_URL` |
+
 Manifest field names are registered when the installer ADR lands; until then,
 do not invent manifest keys in code without updating this section.
 
 ---
 
-## 10. Tier labels
+## 11. Tier labels
 
 | Label | Canonical | Never |
 | --- | --- | --- |
@@ -237,7 +259,7 @@ do not invent manifest keys in code without updating this section.
 
 ---
 
-## 11. Forbidden marketing phrases (exact strings to avoid)
+## 12. Forbidden marketing phrases (exact strings to avoid)
 
 These strings **MUST NOT** appear in repository docs or installer English copy:
 
@@ -254,7 +276,7 @@ Permitted alternatives: see [`disclaimer.md`](./disclaimer.md) and
 
 ---
 
-## 12. How to change this registry
+## 13. How to change this registry
 
 1. Open an Issue explaining the new term or correction.
 2. Update this file in the same PR as the first use.
