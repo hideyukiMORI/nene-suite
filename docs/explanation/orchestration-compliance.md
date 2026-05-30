@@ -16,7 +16,7 @@ obligations that apply when a Japan SMB deploys multiple NeNe apps through one
 installer. Where interpretation is unclear, **stop and consult a licensed 税理士 /
 公認会計士 / 弁護士** — record the resolution in an ADR and update this document.
 
-See also: [`scope-contract.md`](./scope-contract.md), [`disclaimer.md`](./disclaimer.md),
+See also: [`scope-contract.md`](./scope-contract.md), [`terminology.md`](./terminology.md), [`disclaimer.md`](./disclaimer.md),
 [`suite-environment-contract.md`](./suite-environment-contract.md),
 [`../integrations/sibling-products.md`](../integrations/sibling-products.md),
 [`../review/compliance.md`](../review/compliance.md),

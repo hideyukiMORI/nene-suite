@@ -2,7 +2,7 @@
 
 NeNe Suite uses Conventional Commits, inherited from
 [NENE2](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/commit-conventions.md)
-and aligned with [NeNe Records](../nene-records/docs/development/commit-conventions.md).
+and aligned with [NeNe Records](https://github.com/hideyukiMORI/nene-records/blob/main/docs/development/commit-conventions.md).
 
 ## Format
 
@@ -47,4 +47,4 @@ Use the body when the reason is not obvious from the subject. Explain why the ch
 
 Use `!` or a `BREAKING CHANGE:` footer when installer contracts, catalog schema, environment variable names, or documented behavior changes incompatibly.
 
-Catalog or env contract changes must update `catalog/apps.json` and the relevant ADR or integration doc in the same PR when possible.
+Catalog or env contract changes must update `catalog/apps.json`, [`terminology.md`](../explanation/terminology.md), and the relevant ADR or integration doc in the same PR when possible.

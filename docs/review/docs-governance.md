@@ -8,6 +8,7 @@ Use before merging docs-only or governance PRs.
 - [ ] No product domain logic described as in-scope for this repo.
 - [ ] No business, legal, tax, or compliance **guarantee** language (see `docs/explanation/disclaimer.md`).
 - [ ] SSOT / DB / federation rules in `docs/explanation/orchestration-compliance.md` respected if install or catalog touched.
+- [ ] Identifiers match `docs/explanation/terminology.md` (ADR 0006); [`docs/review/terminology.md`](terminology.md) when terms touched.
 - [ ] Standalone + suite dual mode still documented if touched.
 
 ## Workflow

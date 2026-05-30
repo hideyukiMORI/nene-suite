@@ -2,6 +2,9 @@
 
 This document defines what NeNe Suite **is** and **is not**. Implementation and PR review must respect it.
 
+> **Terminology:** All identifiers and product names **MUST** match
+> [`terminology.md`](./terminology.md) exactly (ADR 0006).
+
 > **No business or legal warranty.** Suite assists with technical installation and
 > configuration only. See [`disclaimer.md`](./disclaimer.md) (binding) and
 > [ADR 0003](../adr/0003-installer-disclaimer-no-business-warranty.md).

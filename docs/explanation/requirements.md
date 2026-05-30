@@ -4,6 +4,7 @@ Functional requirements for NeNe Suite. MVP maps to **Phase 1** (Tier B installe
 unless noted.
 
 See also: [`product-vision.md`](./product-vision.md),
+[`terminology.md`](./terminology.md) (binding spellings),
 [`orchestration-compliance.md`](./orchestration-compliance.md) (binding),
 [`scope-contract.md`](./scope-contract.md).
 
