@@ -10,9 +10,9 @@ while each product remains independently installable.
 
 ## Phase 0: Governance and Foundation
 
-- Governance docs, ADR 0001–0002, catalog stub 🔲 Issue #1
-- Suite env contract ADR (`NENE_SUITE_*`) 🔲
-- Self-review + CI stub 🔲
+- Governance docs, ADR 0001–0005, catalog stub ✅
+- Orchestration compliance (士業 review pattern) ✅ Issue #8
+- 税理士 / 公認会計士 + 弁護士 sign-off on binding docs 🔲
 
 ## Phase 1: Tier B Installer MVP
 
