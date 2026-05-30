@@ -1,12 +1,13 @@
 import { SignInForm } from '@/features/sign-in'
 import { useTranslation } from '@/shared/i18n'
+import { LocaleSwitcher, PageHeader } from '@/shared/ui'
 
 export function LoginPage() {
   const { t } = useTranslation()
 
   return (
     <main>
-      <h1>{t('suite.nav.appTitle')}</h1>
+      <PageHeader title={t('suite.nav.appTitle')} actions={<LocaleSwitcher />} />
       <SignInForm />
     </main>
   )

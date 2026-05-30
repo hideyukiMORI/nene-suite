@@ -1,4 +1,5 @@
 import { useTranslation } from '@/shared/i18n'
+import { ErrorState, LoadingState } from '@/shared/ui'
 import { useAuditViewer } from '../hooks/use-audit-viewer'
 
 export function AuditEventsTable() {
@@ -6,11 +7,11 @@ export function AuditEventsTable() {
   const { events, isLoading, isError, hasMore, isLoadingMore, loadMore } = useAuditViewer()
 
   if (isLoading) {
-    return <p>{t('common.state.loading')}</p>
+    return <LoadingState label={t('common.state.loading')} />
   }
 
   if (isError) {
-    return <p role="alert">{t('common.state.error')}</p>
+    return <ErrorState label={t('common.state.error')} />
   }
 
   if (events.length === 0) {
