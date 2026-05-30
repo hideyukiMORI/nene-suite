@@ -30,6 +30,7 @@ violations **block merge to `main`**. Exceptions require an ADR.
 | [Components](#component-and-hook-patterns) | React rules |
 | [API access](#api-and-data-access) | client, TanStack Query, errors |
 | [Installer wizard UX](#installer-wizard-ux) | Step flow, disclaimer gate |
+| [Internationalization](#internationalization) | Message catalogs — **all UI strings** |
 | [Testing](#testing) | Vitest + MSW |
 | [Security](#security) | Client baseline |
 | [CI](#commands-and-ci) | npm scripts |
@@ -47,6 +48,7 @@ violations **block merge to `main`**. Exceptions require an ADR.
 | **Strict TypeScript** | `strict` + guards in `tsconfig.json` |
 | **No magic styling** | Design tokens in `shared/ui/theme/` — no raw hex/spacing in features |
 | **Fail closed** | 401 → login; disclaimer gate before install complete — no silent bypass |
+| **i18n by catalog** | Every user-visible string via `t('key')` — no JSX literals ([`i18n.md`](./i18n.md)) |
 
 ---
 
@@ -258,6 +260,23 @@ Binding UX rules (compliance):
 4. **No compliance marketing** — forbidden strings from [`terminology.md`](../explanation/terminology.md) §12.
 
 Wizard **does not** write `.env` or secrets in browser storage.
+
+---
+
+## Internationalization
+
+**Binding:** [`i18n.md`](./i18n.md) (ADR 0009).
+
+- All apex and installer UI copy lives in `frontend/src/shared/i18n/messages/en.ts` (source of truth).
+- Components use `useTranslation()` → `t('suite.install.apps.title')` only.
+- **`ja.ts` must include every `en` key** before UI PR merge (Vitest enforced).
+- Locale switch via header selector; persistence key `nene-suite-locale`.
+- Disclaimer text: align with [`installer-disclaimer-copy.md`](../explanation/installer-disclaimer-copy.md) — English in `en.ts`, Japanese in `ja.ts`.
+- API Problem Details titles stay English; map to UI via `mapProblemDetailsToMessageKey`.
+
+**Forbidden:** hardcoded user-facing strings in `features/`, `pages/`, `shared/ui/`.
+
+Reference: nene-records `frontend/src/shared/i18n/`.
 
 ---
 

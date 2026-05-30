@@ -9,6 +9,7 @@ dedicated documents below** — this file is the index.
 | **React / TypeScript apex & wizard UI** | [`frontend-standards.md`](./frontend-standards.md) |
 | **Naming (PHP + TypeScript + JSON)** | [`naming-conventions.md`](./naming-conventions.md) |
 | **JSON Schema & catalog** | [`schema-conventions.md`](./schema-conventions.md) |
+| **UI i18n message catalogs** | [`i18n.md`](./i18n.md) |
 | **NENE2 inheritance map** | [`../inheritance-from-nene2.md`](../inheritance-from-nene2.md) |
 
 **Framework baseline:**

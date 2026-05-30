@@ -27,6 +27,7 @@ Local copies live in this repository so agents and contributors do not guess.
 | Coding standards index | `docs/development/coding-standards.md` |
 | Backend placement & layering | `docs/development/backend-standards.md` |
 | Frontend placement & data flow | `docs/development/frontend-standards.md` |
+| UI i18n message catalogs | `docs/development/i18n.md` |
 | Naming (PHP + TypeScript) | `docs/development/naming-conventions.md` |
 | JSON Schema conventions | `docs/development/schema-conventions.md` |
 | Self-review before PR | `docs/development/self-review.md`, `docs/review/` |

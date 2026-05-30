@@ -13,6 +13,8 @@ Sources: [`../development/frontend-standards.md`](../development/frontend-standa
 - [ ] TanStack Query in `queries.ts` / `mutations.ts`; mappers inside entity hooks.
 - [ ] Components use model types — not raw DTOs or generated OpenAPI types in features.
 - [ ] Wizard disclaimer step server-confirmed before complete; no client-only bypass.
+- [ ] **All user-visible strings use `t('key')`** — none hardcoded in JSX ([`../development/i18n.md`](../development/i18n.md)).
+- [ ] New/changed keys added to `messages/en.ts`; **`ja.ts` updated with full parity**.
 - [ ] No forbidden marketing strings ([`../explanation/terminology.md`](../explanation/terminology.md) §12).
 - [ ] No secrets in env or browser storage; no JWT in `localStorage` without ADR.
 - [ ] Feature hook test with MSW for new features.

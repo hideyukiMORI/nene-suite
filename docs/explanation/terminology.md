@@ -284,8 +284,11 @@ Permitted alternatives: see [`disclaimer.md`](./disclaimer.md) and
 | Audit recorder class | **`SuiteAuditRecorder`** | `AuditLogger`, `AuditService` |
 | Problem Details base | **`https://nene-suite.dev/problems/`** | ad-hoc problem URLs |
 | API prefix | **`/api/v1/`** | `/api/`, unversioned public JSON |
+| Locale storage key | **`nene-suite-locale`** | `nene-locale`, `locale` |
+| Message key prefix | **`suite.{feature}.{element}`** or **`common.{element}`** | free-form strings in JSX |
 
 Full placement and naming: [`../development/naming-conventions.md`](../development/naming-conventions.md).
+Message catalogs: [`../development/i18n.md`](../development/i18n.md).
 
 ---
 

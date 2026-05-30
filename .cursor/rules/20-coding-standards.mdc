@@ -10,5 +10,6 @@ alwaysApply: true
 - **Frontend:** `app → pages → features → entities → shared`; TanStack Query in entities; no fetch outside `shared/api/client.ts`.
 - **Naming:** `docs/development/naming-conventions.md` + `docs/explanation/terminology.md` — violations block merge.
 - **Schema:** `catalog/` and `schema/` per `docs/development/schema-conventions.md`.
+- **i18n:** UI strings in `frontend/src/shared/i18n/messages/` per `docs/development/i18n.md`.
 - **PR:** run checklists from `docs/development/self-review.md`; name them in PR body.
 - **Do not** copy NENE2 framework trees into `src/`; **do not** add sibling domain logic.
