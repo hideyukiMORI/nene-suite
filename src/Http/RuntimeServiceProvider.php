@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace NeNeSuite\Http;
 
 use LogicException;
+use Nene2\Auth\LocalBearerTokenVerifier;
+use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Auth\TokenVerifierInterface;
 use Nene2\Config\AppConfig;
 use Nene2\Config\ConfigLoader;
 use Nene2\Database\DatabaseConnectionFactoryInterface;
@@ -48,6 +51,9 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
     /** Placeholder org federation id until the installer writes NENE_SUITE_ORG_EXTERNAL_ID. */
     private const DEV_ORG_EXTERNAL_ID = '01J8XRDEV0FED0000000000ZAB';
+
+    /** Dev-only JWT secret used until the installer writes NENE_SUITE_JWT_SECRET. */
+    private const DEV_JWT_SECRET = 'nene-suite-dev-secret';
 
     /** Suite Problem Details base (docs/explanation/terminology.md §13). */
     private const PROBLEM_DETAILS_BASE_URL = 'https://nene-suite.dev/problems/';
@@ -128,6 +134,34 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
 
                     return new ProblemDetailsResponseFactory($responseFactory, $streamFactory, self::resolveProblemDetailsBaseUrl());
+                },
+            )
+            ->set(
+                LocalBearerTokenVerifier::class,
+                static fn (ContainerInterface $container): LocalBearerTokenVerifier => new LocalBearerTokenVerifier(self::env('NENE_SUITE_JWT_SECRET', self::DEV_JWT_SECRET)),
+            )
+            ->set(
+                TokenVerifierInterface::class,
+                static function (ContainerInterface $container): TokenVerifierInterface {
+                    $verifier = $container->get(LocalBearerTokenVerifier::class);
+
+                    if (!$verifier instanceof TokenVerifierInterface) {
+                        throw new LogicException('LocalBearerTokenVerifier service is invalid.');
+                    }
+
+                    return $verifier;
+                },
+            )
+            ->set(
+                TokenIssuerInterface::class,
+                static function (ContainerInterface $container): TokenIssuerInterface {
+                    $issuer = $container->get(LocalBearerTokenVerifier::class);
+
+                    if (!$issuer instanceof TokenIssuerInterface) {
+                        throw new LogicException('LocalBearerTokenVerifier service is invalid.');
+                    }
+
+                    return $issuer;
                 },
             )
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
