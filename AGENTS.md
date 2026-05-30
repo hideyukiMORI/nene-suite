@@ -15,6 +15,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
 - **Disclaimer (binding):** `docs/explanation/disclaimer.md` — no business or legal warranty
+- **Suite env contract (binding):** `docs/explanation/suite-environment-contract.md` — ADR 0004
 - **Product vision:** `docs/explanation/product-vision.md`
 - **Installable apps:** `docs/integrations/sibling-products.md`
 - **App catalog:** `catalog/apps.json`

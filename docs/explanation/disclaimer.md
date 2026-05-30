@@ -115,4 +115,17 @@ When implementing installer UI, docs, or examples:
 
 ---
 
+## Review status
+
+| Field | Value |
+| --- | --- |
+| **Document status** | Engineering draft (binding within this private repo) |
+| **Public release** | Blocked until [ADR 0003 professional review gate](../adr/0003-installer-disclaimer-no-business-warranty.md#professional-review-gate-before-public-release) is satisfied |
+| **Legal review** | Not yet performed |
+| **Tax/accounting review** | Not yet performed (recommended before public marketing) |
+
+Update this table when reviews complete (via PR linked to the gate checklist).
+
+---
+
 Last updated: 2026-05-29
