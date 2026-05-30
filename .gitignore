@@ -1,0 +1,14 @@
+/vendor/
+/node_modules/
+/.env
+/.env.local
+/.env.*.local
+/var/
+/build/
+/dist/
+/.phpunit.result.cache
+/.phpunit.cache/
+/.phpstan.cache/
+/.php-cs-fixer.cache
+/suite-state/
+/releases/*.zip
