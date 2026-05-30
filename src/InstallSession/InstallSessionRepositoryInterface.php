@@ -11,4 +11,6 @@ interface InstallSessionRepositoryInterface
     public function update(InstallSession $session): void;
 
     public function findById(string $id): ?InstallSession;
+
+    public function findLatestCompleted(): ?InstallSession;
 }

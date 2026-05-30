@@ -10,8 +10,10 @@ installer orchestration, and suite control database. Sibling product domain logi
 resolution (✅ `src/AppSelection/`), disclaimer-acceptance + fail + complete
 (✅ `src/InstallSession/`) with install manifest (✅ `src/InstallManifest/`,
 ADR 0010), apex auth session (✅ `src/Auth/`), authenticated audit read
-(✅ `src/SuiteAudit/` reader), then env generation, per-app provisioning, the
-installed-apps launcher endpoint — following these rules from the first commit.
+(✅ `src/SuiteAudit/` reader), installed-apps launcher (✅ `src/InstalledApps/` +
+`src/SuiteEnv/` URL reader). **All Phase 1 OpenAPI operations are implemented.**
+Remaining work is env/DB provisioning (write side) and the Tier B installer —
+following these rules from the first commit.
 
 **Framework reference:** `vendor/hideyukimori/nene2/docs/` after `composer install`;
 sibling checkout at `../NENE2`.
@@ -221,8 +223,9 @@ src/InstallSession/
 | `SuiteEnv/` | Generate sanitized `NENE_SUITE_*` maps (secrets handled separately) |
 | `IntegrationWiring/` | Enable/disable documented HTTP integrations |
 | `InstallManifest/` | Manifest create/update; no secrets |
-| `SuiteAudit/` | `SuiteAuditRecorder`, event persistence, sanitization presenters |
+| `SuiteAudit/` | `SuiteAuditRecorder`, event persistence, sanitization presenters; audit read |
 | `Auth/` | Apex operator identity, password hashing, JWT session (login / current / logout) |
+| `InstalledApps/` | Apex launcher — installed apps from the latest completed session (read) |
 | `DatabaseProvision/` | Per-app DB **name** provisioning metadata (not sibling schema) |
 
 New domains require Issue + update this table + `naming-conventions.md`.

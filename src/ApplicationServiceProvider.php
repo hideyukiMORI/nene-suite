@@ -16,6 +16,8 @@ use NeNeSuite\Auth\AuthRouteRegistrar;
 use NeNeSuite\Auth\AuthServiceProvider;
 use NeNeSuite\Auth\InvalidCredentialsExceptionHandler;
 use NeNeSuite\Auth\UnauthorizedExceptionHandler;
+use NeNeSuite\InstalledApps\InstalledAppsRouteRegistrar;
+use NeNeSuite\InstalledApps\InstalledAppsServiceProvider;
 use NeNeSuite\InstallManifest\InstallManifestServiceProvider;
 use NeNeSuite\InstallSession\InstallSessionConflictExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
@@ -24,6 +26,7 @@ use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
+use NeNeSuite\SuiteEnv\SuiteEnvServiceProvider;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -45,7 +48,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new InstallManifestServiceProvider())
             ->addProvider(new InstallSessionServiceProvider())
             ->addProvider(new AppSelectionServiceProvider())
-            ->addProvider(new AuthServiceProvider());
+            ->addProvider(new AuthServiceProvider())
+            ->addProvider(new SuiteEnvServiceProvider())
+            ->addProvider(new InstalledAppsServiceProvider());
 
         $builder
             ->set(
@@ -56,6 +61,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $appSelection = $container->get('nene-suite.route_registrar.app_selection');
                     $auth = $container->get('nene-suite.route_registrar.auth');
                     $suiteAudit = $container->get('nene-suite.route_registrar.suite_audit');
+                    $installedApps = $container->get('nene-suite.route_registrar.installed_apps');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -77,12 +83,17 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Suite audit route registrar service is invalid.');
                     }
 
+                    if (!$installedApps instanceof InstalledAppsRouteRegistrar) {
+                        throw new LogicException('Installed apps route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
                         $installSession,
                         $appSelection,
                         $auth,
                         $suiteAudit,
+                        $installedApps,
                     ];
                 },
             )

@@ -36,6 +36,7 @@ final class OpenApiContractTest extends TestCase
         'getAuthSession',
         'deleteAuthSession',
         'listSuiteAuditEvents',
+        'listInstalledApps',
     ];
 
     public function testEveryServedApiRouteIsDocumentedWithOperationId(): void

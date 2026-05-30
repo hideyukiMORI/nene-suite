@@ -6,6 +6,7 @@ namespace NeNeSuite\Tests\InstallSession;
 
 use NeNeSuite\InstallSession\InstallSession;
 use NeNeSuite\InstallSession\InstallSessionRepositoryInterface;
+use NeNeSuite\InstallSession\InstallSessionStatus;
 
 final class InMemoryInstallSessionRepository implements InstallSessionRepositoryInterface
 {
@@ -25,5 +26,19 @@ final class InMemoryInstallSessionRepository implements InstallSessionRepository
     public function findById(string $id): ?InstallSession
     {
         return $this->sessions[$id] ?? null;
+    }
+
+    public function findLatestCompleted(): ?InstallSession
+    {
+        $completed = null;
+        foreach ($this->sessions as $session) {
+            if ($session->status === InstallSessionStatus::Completed) {
+                if ($completed === null || $session->completedAt > $completed->completedAt) {
+                    $completed = $session;
+                }
+            }
+        }
+
+        return $completed;
     }
 }
