@@ -5,9 +5,16 @@ declare(strict_types=1);
 namespace NeNeSuite\Http;
 
 use LogicException;
+use Nene2\Config\AppConfig;
+use Nene2\Config\ConfigLoader;
+use Nene2\Database\DatabaseConnectionFactoryInterface;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\PdoConnectionFactory;
+use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
+use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
@@ -32,11 +39,98 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 {
     public const PROJECT_ROOT = 'nene-suite.project_root';
 
+    public const SUITE_ID = 'nene-suite.suite_id';
+
+    /** Stable placeholder suite id used until the installer writes NENE_SUITE_ID. */
+    private const DEV_SUITE_ID = '01J8XRDEV000000000000000ZA';
+
+    /** Suite Problem Details base (docs/explanation/terminology.md §13). */
+    private const PROBLEM_DETAILS_BASE_URL = 'https://nene-suite.dev/problems/';
+
     public function register(ContainerBuilder $builder): void
     {
         $builder->addProvider(new ApplicationServiceProvider());
 
         $builder
+            ->set(
+                self::SUITE_ID,
+                static function (ContainerInterface $container): string {
+                    $fromEnv = getenv('NENE_SUITE_ID');
+
+                    return is_string($fromEnv) && $fromEnv !== '' ? $fromEnv : self::DEV_SUITE_ID;
+                },
+            )
+            ->set(
+                ConfigLoader::class,
+                static function (ContainerInterface $container): ConfigLoader {
+                    $projectRoot = $container->get(self::PROJECT_ROOT);
+
+                    if (!is_string($projectRoot) || $projectRoot === '') {
+                        throw new LogicException('Project root service is invalid.');
+                    }
+
+                    return new ConfigLoader($projectRoot);
+                },
+            )
+            ->set(
+                AppConfig::class,
+                static function (ContainerInterface $container): AppConfig {
+                    $loader = $container->get(ConfigLoader::class);
+
+                    if (!$loader instanceof ConfigLoader) {
+                        throw new LogicException('Config loader service is invalid.');
+                    }
+
+                    return $loader->load();
+                },
+            )
+            ->set(
+                DatabaseConnectionFactoryInterface::class,
+                static function (ContainerInterface $container): DatabaseConnectionFactoryInterface {
+                    $config = $container->get(AppConfig::class);
+
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('Application config service is invalid.');
+                    }
+
+                    return new PdoConnectionFactory($config->database);
+                },
+            )
+            ->set(
+                DatabaseQueryExecutorInterface::class,
+                static function (ContainerInterface $container): DatabaseQueryExecutorInterface {
+                    $connectionFactory = $container->get(DatabaseConnectionFactoryInterface::class);
+
+                    if (!$connectionFactory instanceof DatabaseConnectionFactoryInterface) {
+                        throw new LogicException('Database connection factory service is invalid.');
+                    }
+
+                    return new PdoDatabaseQueryExecutor($connectionFactory);
+                },
+            )
+            ->set(
+                ProblemDetailsResponseFactory::class,
+                static function (ContainerInterface $container): ProblemDetailsResponseFactory {
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
+                    $streamFactory = $container->get(StreamFactoryInterface::class);
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    if (!$streamFactory instanceof StreamFactoryInterface) {
+                        throw new LogicException('Stream factory service is invalid.');
+                    }
+
+                    // Problem Details `type` MUST use the suite base (terminology §13);
+                    // honour an explicit PROBLEM_DETAILS_BASE_URL override, else default
+                    // to the suite base rather than the NENE2 framework default.
+                    $override = $_SERVER['PROBLEM_DETAILS_BASE_URL'] ?? $_ENV['PROBLEM_DETAILS_BASE_URL'] ?? null;
+                    $baseUrl = is_string($override) && $override !== '' ? $override : self::PROBLEM_DETAILS_BASE_URL;
+
+                    return new ProblemDetailsResponseFactory($responseFactory, $streamFactory, $baseUrl);
+                },
+            )
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
             ->set(
                 ResponseFactoryInterface::class,
