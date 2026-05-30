@@ -83,4 +83,35 @@ final class PdoInstallSessionRepositoryTest extends TestCase
 
         self::assertNull($repository->findById('01J8XR4ZS6Q9V2H7K3N5M0B8TC'));
     }
+
+    public function testUpdatePersistsChangedSelection(): void
+    {
+        $repository = new PdoInstallSessionRepository($this->executor);
+
+        $session = new InstallSession(
+            id: '01J8XR4ZS6Q9V2H7K3N5M0B8TC',
+            suiteId: '01J8XRDEV000000000000000ZA',
+            status: InstallSessionStatus::InProgress,
+            tier: InstallTier::B,
+            catalogRevision: 1,
+            selectedApps: [],
+            disclaimerAccepted: false,
+            disclaimerAcceptedAt: null,
+            orgExternalId: null,
+            orgDisplayName: null,
+            installManifestId: null,
+            failureCode: null,
+            createdAt: '2026-05-30T09:48:46Z',
+            updatedAt: '2026-05-30T09:48:46Z',
+            completedAt: null,
+        );
+        $repository->save($session);
+
+        $repository->update($session->withSelectedApps(['nene-invoice', 'nene-clear'], '2026-05-30T10:00:00Z'));
+
+        $found = $repository->findById('01J8XR4ZS6Q9V2H7K3N5M0B8TC');
+        self::assertNotNull($found);
+        self::assertSame(['nene-invoice', 'nene-clear'], $found->selectedApps);
+        self::assertSame('2026-05-30T10:00:00Z', $found->updatedAt);
+    }
 }
