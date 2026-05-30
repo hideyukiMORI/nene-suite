@@ -26,7 +26,8 @@
 - [x] Issue #40: OpenAPI contract — apex auth session — merged (PR #41)
 - [x] Issue #42: Backend slice 7 — apex Auth domain (operator + JWT session) — merged (PR #43)
 - [x] Issue #44: Backend slice 8 — suite-audit-events read (R-08, paginated, authenticated) — merged (PR #45)
-- [x] Issue #46: Backend slice 9 — SuiteEnv URL reader + installed-apps launcher (R-06) — PR pending
+- [x] Issue #46: Backend slice 9 — SuiteEnv URL reader + installed-apps launcher (R-06) — merged (PR #47)
+- [x] Issue #48: Backend slice 10 — populate install manifest apps[] (SuiteEnv URLs + DatabaseProvision names) — PR pending
 
 ## Phase 1 OpenAPI: all 13 operations implemented ✅
 
@@ -36,7 +37,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] **Provisioning (write side)**: `SuiteEnv` env generation + `DatabaseProvision` → write per-app DB names / public URLs; populate manifest `apps[]` / `app_versions`; audit `env_config.written` / `database.provisioned`
+- [ ] **Provisioning (write side)**: `SuiteEnv` env **generation** + `DatabaseProvision` actual DB creation (Tier B); `app_versions` pinning; audit `env_config.written` / `database.provisioned` (manifest `apps[]` now populated — #48)
 - [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — calls the same use cases; **blocked on professional sign-off** per Blockers
 - [ ] Operator provisioning — first apex operator created by the installer / org-admin flow
 - [ ] Shared apex auth middleware (≥2 endpoints now authenticate via `BearerTokenAuthenticator`)

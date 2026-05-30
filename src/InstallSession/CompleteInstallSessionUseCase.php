@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace NeNeSuite\InstallSession;
 
+use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
+use NeNeSuite\InstallManifest\InstallManifestApp;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
 use NeNeSuite\SuiteAudit\RecordSuiteAuditEventCommand;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderInterface;
+use NeNeSuite\SuiteEnv\SuiteAppUrlReaderInterface;
 
 /**
  * Finalizes an install session (R-04, R-05, R-08): enforces preconditions,
@@ -22,6 +25,8 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
         private InstallManifestRepositoryInterface $manifests,
         private InstallManifestFactory $manifestFactory,
         private SuiteAuditRecorderInterface $audit,
+        private SuiteAppUrlReaderInterface $urls,
+        private AppDatabaseNamer $databaseNamer,
         private string $suiteId,
         private string $orgExternalId,
     ) {
@@ -60,6 +65,7 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
             $this->orgExternalId,
             $session->orgDisplayName,
             $session->disclaimerAcceptedAt,
+            $this->manifestApps($session->selectedApps),
         );
         $this->manifests->save($manifest);
 
@@ -95,5 +101,28 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
         ));
 
         return new CompleteInstallSessionOutput($completed);
+    }
+
+    /**
+     * Builds manifest apps[] for selected apps that have a configured public URL.
+     * Apps without a URL are omitted (their entry is added once the env is wired).
+     *
+     * @param list<string> $selectedApps
+     *
+     * @return list<InstallManifestApp>
+     */
+    private function manifestApps(array $selectedApps): array
+    {
+        $apps = [];
+        foreach ($selectedApps as $catalogId) {
+            $publicUrl = $this->urls->publicUrl($catalogId);
+            if ($publicUrl === null) {
+                continue;
+            }
+
+            $apps[] = new InstallManifestApp($catalogId, $publicUrl, $this->databaseNamer->databaseName($catalogId));
+        }
+
+        return $apps;
     }
 }

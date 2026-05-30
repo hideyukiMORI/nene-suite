@@ -42,10 +42,12 @@ The audit trail already records the full chronological history
    `install-manifest.schema.json` using only data available at completion:
    `suite_id`, `installed_at`, `org_external_id` (from `NENE_SUITE_ORG_EXTERNAL_ID`),
    `org_display_name`, `enabled_integrations` (`[]`), `app_versions` (`{}` until
-   version pinning lands), and `disclaimer_accepted_at`. The optional `apps[]`
-   array (`public_url`, `database_name`) is **omitted until provisioning slices
-   populate it** — the selected catalog ids remain fully auditable via
-   `app_selection.changed` and the completed-session `after` snapshot.
+   version pinning lands), and `disclaimer_accepted_at`. The `apps[]` array
+   (`catalog_id`, `public_url`, `database_name`) is populated at completion
+   (Issue #48) for each selected app with a configured `NENE_SUITE_APP_*_URL`:
+   `public_url` from `SuiteEnv`, `database_name` derived by `DatabaseProvision`
+   convention (catalog id hyphens → underscores). Apps without a configured URL
+   are omitted; their selection stays auditable via `app_selection.changed`.
 
 4. **No secrets** in the manifest body (R-05, audit-trail §5). A
    `manifest_content_hash` (SHA-256 of the canonical body) is stored for audit

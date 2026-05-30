@@ -12,10 +12,12 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\AppCatalog\CatalogAppRepositoryInterface;
+use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderInterface;
+use NeNeSuite\SuiteEnv\SuiteAppUrlReaderInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class InstallSessionServiceProvider implements ServiceProviderInterface
@@ -234,6 +236,8 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                     $manifests = $container->get(InstallManifestRepositoryInterface::class);
                     $factory = $container->get(InstallManifestFactory::class);
                     $audit = $container->get(SuiteAuditRecorderInterface::class);
+                    $urls = $container->get(SuiteAppUrlReaderInterface::class);
+                    $databaseNamer = $container->get(AppDatabaseNamer::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
                     $orgExternalId = $container->get(RuntimeServiceProvider::SUITE_ORG_EXTERNAL_ID);
 
@@ -253,6 +257,14 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('Suite audit recorder service is invalid.');
                     }
 
+                    if (!$urls instanceof SuiteAppUrlReaderInterface) {
+                        throw new LogicException('Suite app URL reader service is invalid.');
+                    }
+
+                    if (!$databaseNamer instanceof AppDatabaseNamer) {
+                        throw new LogicException('App database namer service is invalid.');
+                    }
+
                     if (!is_string($suiteId) || $suiteId === '') {
                         throw new LogicException('Suite id service is invalid.');
                     }
@@ -261,7 +273,7 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('Suite org external id service is invalid.');
                     }
 
-                    return new CompleteInstallSessionUseCase($sessions, $manifests, $factory, $audit, $suiteId, $orgExternalId);
+                    return new CompleteInstallSessionUseCase($sessions, $manifests, $factory, $audit, $urls, $databaseNamer, $suiteId, $orgExternalId);
                 },
             )
             ->set(
