@@ -22,6 +22,7 @@ Provide a **selective multi-app installer and apex shell** for NeNe sibling prod
 - Generate and distribute suite environment variables (`NENE_SUITE_*`, shared org UUID, JWT issuer config) per [ADR 0004](../adr/0004-suite-environment-contract.md).
 - Provide apex login / app launcher UI (thin shell — not product domain UI).
 - Support **add app to existing suite** after initial install.
+- Record **append-only orchestration audit** with before/after snapshots for every mutating operator action ([`audit-trail.md`](./audit-trail.md), ADR 0007).
 - Document Tier B (Docker Compose) before Tier A web wizard.
 - Open Issues in sibling repos when federation requires product-side changes.
 

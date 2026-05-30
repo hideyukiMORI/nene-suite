@@ -8,7 +8,8 @@
 - [x] Issue #3: Installer disclaimer — PR #4
 - [x] Issue #5–#6: Review gate + env contract — PR #7
 - [x] Issue #8: Orchestration compliance — PR #9
-- [ ] Issue #10: Terminology registry — PR pending
+- [x] Issue #10: Terminology registry — PR #11
+- [x] Issue #12: Audit trail (before/after) — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
