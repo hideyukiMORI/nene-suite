@@ -136,6 +136,24 @@ Problem Details `type` URI: `https://nene-suite.dev/problems/{slug}`
 
 ---
 
+## Message catalog keys (i18n)
+
+| Kind | Pattern | Example |
+| --- | --- | --- |
+| Common UI | `common.{group}.{name}` | `common.actions.save` |
+| Suite UI | `suite.{feature}.{name}` | `suite.install.apps.title` |
+| Interpolation param | `{{camelCase}}` in string | `{{count}}`, `{{appName}}` |
+| Locale storage | `nene-suite-locale` | not `nene-locale` |
+
+Rules:
+
+- **`en.ts` is authoritative** — add keys there first.
+- **`ja.ts` full parity required** for UI PRs (Vitest).
+- No user-facing string in `.tsx` — use `t('key')`.
+- See [`i18n.md`](./i18n.md).
+
+---
+
 ## Installer CLI
 
 | Kind | Style | Example |

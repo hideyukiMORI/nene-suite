@@ -19,6 +19,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Frontend standards (binding):** `docs/development/frontend-standards.md`
 - **Naming conventions (binding):** `docs/development/naming-conventions.md`
 - **Schema conventions (binding):** `docs/development/schema-conventions.md`
+- **i18n / message catalogs (binding):** `docs/development/i18n.md` — ADR 0009
 - **Self-review:** `docs/development/self-review.md`, `docs/review/`
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
 - **Terminology (binding — exact spellings):** `docs/explanation/terminology.md`

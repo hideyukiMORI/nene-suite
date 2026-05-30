@@ -18,10 +18,12 @@ installer wizard, apex shell, and release notes. Full legal context:
 **Japanese (operator-facing UI — allowed in product UI only, not in repo docs body):**
 
 > NeNe Suite はアプリケーションのインストールと環境設定を支援するソフトウェアです。
-> 業務の結果、法令遵守、会計・税務の正確性を保証するものではありません。
-> 請求・消込・帳簿保存など各機能の法令上の要件は、インストールされた各アプリの
-> ドキュメントと、税理士・公認会計士等の専門家による確認に従ってください。
-> 導入後の利用方法および必要に応じた専門家への確認は、利用者ご自身の責任となります。
+> …（以下同文）
+
+**UI implementation:** canonical strings live in message catalogs —
+`frontend/src/shared/i18n/messages/en.ts` (English) and `ja.ts` (Japanese).
+Keys: `suite.disclaimer.shortNotice`, `suite.disclaimer.checkbox`, etc.
+See [`docs/development/i18n.md`](../development/i18n.md). Do not duplicate prose in JSX.
 
 ---
 

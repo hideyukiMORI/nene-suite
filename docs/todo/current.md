@@ -10,7 +10,8 @@
 - [x] Issue #8: Orchestration compliance — PR #9
 - [x] Issue #10: Terminology registry — PR #11
 - [x] Issue #12: Audit trail (before/after) — merged
-- [ ] Issue #14: NENE2 coding standards — PR pending
+- [x] Issue #14: NENE2 coding standards — merged
+- [ ] Issue #16: i18n message catalogs — PR pending
 
 ## Next (Phase 0 → Phase 1)
 

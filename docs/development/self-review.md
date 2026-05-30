@@ -11,6 +11,7 @@ Name the checklists in the PR body (example: `Self-review: backend-api, terminol
 | Compliance, installer, audit, manifest | [`../review/compliance.md`](../review/compliance.md) |
 | PHP API, use cases, repositories, installer runtime | [`../review/backend-api.md`](../review/backend-api.md) |
 | React apex / wizard UI | [`../review/frontend.md`](../review/frontend.md) |
+| i18n message catalogs | [`../development/i18n.md`](../development/i18n.md) |
 | JSON Schema, catalog structure | [`../review/schema.md`](../review/schema.md) |
 | OpenAPI paths and contracts | [`../review/openapi-contract.md`](../review/openapi-contract.md) |
 | Governance / ADR only | [`../review/docs-policy.md`](../review/docs-policy.md) |
