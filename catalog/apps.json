@@ -1,0 +1,84 @@
+{
+  "$schema": "./apps.schema.json",
+  "version": 1,
+  "apps": [
+    {
+      "id": "nene-invoice",
+      "name": "NeNe Invoice",
+      "repository": "hideyukiMORI/nene-invoice",
+      "path": "nene-invoice",
+      "status": "installable",
+      "requires": [],
+      "provides": ["billing-api"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_INVOICE_DB_"
+      }
+    },
+    {
+      "id": "nene-clear",
+      "name": "NeNe Clear",
+      "repository": "hideyukiMORI/nene-clear",
+      "path": "nene-clear",
+      "status": "installable",
+      "requires": ["nene-invoice"],
+      "provides": ["reconciliation-api"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_CLEAR_DB_"
+      }
+    },
+    {
+      "id": "nene-records",
+      "name": "NeNe Records",
+      "repository": "hideyukiMORI/nene-records",
+      "path": "nene-records",
+      "status": "installable",
+      "requires": [],
+      "provides": ["cms-api"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_RECORDS_DB_"
+      }
+    },
+    {
+      "id": "nene-vault",
+      "name": "NeNe Vault",
+      "repository": "hideyukiMORI/nene-vault",
+      "path": "nene-vault",
+      "status": "planned",
+      "requires": [],
+      "provides": ["archive-api"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_VAULT_DB_"
+      }
+    },
+    {
+      "id": "nene-profile",
+      "name": "NeNe Profile",
+      "repository": "hideyukiMORI/nene-profile",
+      "path": "nene-profile",
+      "status": "planned",
+      "requires": [],
+      "provides": ["standard-transaction-export"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_PROFILE_DB_"
+      }
+    },
+    {
+      "id": "nene-corpus",
+      "name": "NeNe Corpus",
+      "repository": null,
+      "path": "nene-corpus",
+      "status": "planned",
+      "requires": [],
+      "provides": ["corpus-api"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_CORPUS_DB_"
+      }
+    }
+  ]
+}

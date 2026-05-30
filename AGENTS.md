@@ -1,0 +1,40 @@
+# Agent / AI Guide
+
+Entry point for AI agents working on **NeNe Suite** (private repo `nene-suite`).
+
+## Purpose (read first)
+
+NeNe Suite is a **meta installer and orchestrator** — not a domain application.
+It installs selected sibling products, writes suite environment variables, and
+provides the apex login shell. Product APIs, schemas, and business rules stay in
+each product repository.
+
+See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
+
+## Read First
+
+- **Scope contract (binding):** `docs/explanation/scope-contract.md`
+- **Product vision:** `docs/explanation/product-vision.md`
+- **Installable apps:** `docs/integrations/sibling-products.md`
+- **App catalog:** `catalog/apps.json`
+- **Workflow:** `docs/workflow.md`
+- **Commit conventions:** `docs/development/commit-conventions.md`
+- **ADR policy:** `docs/development/adr.md`
+- **Current work:** `docs/todo/current.md`
+- **Roadmap:** `docs/roadmap.md`
+
+## Operating Rules
+
+- **Issue-driven** — create or reuse a GitHub Issue before substantive edits
+- **No direct commits to `main`** — branch `type/issue-number-summary`
+- **Conventional Commits** — English `type`/`scope`, Japanese description/body, `(#issue)` in subject
+- **Do not vendor sibling product source** into this repository
+- **Do not add product domain logic** (billing, CMS entities, document archive, etc.)
+- **Repository docs: English only**
+- **No secrets** — never commit `.env`, tokens, or production credentials
+
+## Framework boundary
+
+Runtime products inherit [NENE2](https://github.com/hideyukiMORI/NENE2).
+Suite may use PHP, shell, or Docker Compose for orchestration — choose per ADR when
+implementation starts. Suite must not become a second NENE2 application monolith.

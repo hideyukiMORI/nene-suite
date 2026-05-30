@@ -1,0 +1,13 @@
+---
+description: NeNe Suite project rules
+alwaysApply: true
+---
+
+# Project Rules
+
+- Canonical docs: `README.md`, `AGENTS.md`, `docs/explanation/scope-contract.md`, `docs/workflow.md`.
+- **NeNe Suite = installer/orchestrator only** (ADR 0002). Not a domain application.
+- Do NOT vendor sibling product source or merge product repos into this tree.
+- Do NOT add billing, CMS, archive, CSV, or reconciliation domain logic here.
+- Issue-driven workflow; English repository docs; no secrets in git.
+- When docs and Cursor rules conflict, update docs first and keep rules concise.
