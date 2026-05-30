@@ -2,6 +2,10 @@
 
 This document defines what NeNe Suite **is** and **is not**. Implementation and PR review must respect it.
 
+> **No business or legal warranty.** Suite assists with technical installation and
+> configuration only. See [`disclaimer.md`](./disclaimer.md) (binding) and
+> [ADR 0003](../adr/0003-installer-disclaimer-no-business-warranty.md).
+
 ## GOAL
 
 Provide a **selective multi-app installer and apex shell** for NeNe sibling products while preserving standalone installs and separate databases.
@@ -24,6 +28,7 @@ Provide a **selective multi-app installer and apex shell** for NeNe sibling prod
 - Break standalone install paths in sibling products.
 - Store production secrets in git.
 - Require suite mode for any product to function in isolation.
+- Claim or document **business, legal, tax, or compliance guarantees** (see `disclaimer.md`).
 
 ## Dual mode
 

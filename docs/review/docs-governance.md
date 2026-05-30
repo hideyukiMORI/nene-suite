@@ -6,6 +6,7 @@ Use before merging docs-only or governance PRs.
 
 - [ ] Change matches `docs/explanation/scope-contract.md` (orchestrator only).
 - [ ] No product domain logic described as in-scope for this repo.
+- [ ] No business, legal, tax, or compliance **guarantee** language (see `docs/explanation/disclaimer.md`).
 - [ ] Standalone + suite dual mode still documented if touched.
 
 ## Workflow

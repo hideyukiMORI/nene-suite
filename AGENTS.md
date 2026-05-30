@@ -14,6 +14,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 ## Read First
 
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
+- **Disclaimer (binding):** `docs/explanation/disclaimer.md` — no business or legal warranty
 - **Product vision:** `docs/explanation/product-vision.md`
 - **Installable apps:** `docs/integrations/sibling-products.md`
 - **App catalog:** `catalog/apps.json`
@@ -30,6 +31,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Conventional Commits** — English `type`/`scope`, Japanese description/body, `(#issue)` in subject
 - **Do not vendor sibling product source** into this repository
 - **Do not add product domain logic** (billing, CMS entities, document archive, etc.)
+- **Do not imply business, legal, or compliance guarantees** — see `docs/explanation/disclaimer.md`
 - **Repository docs: English only**
 - **No secrets** — never commit `.env`, tokens, or production credentials
 
