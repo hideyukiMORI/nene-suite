@@ -19,13 +19,15 @@
 - [x] Issue #26: Backend scaffold + first slice (AppCatalog read) — merged (PR #27)
 - [x] Issue #28: Backend slice 2 — control DB + SuiteAudit recorder + InstallSession start/get — merged (PR #29)
 - [x] Issue #30: Backend slice 3 — app-selection with dependency resolution — merged (PR #31)
-- [x] Issue #32: Problem Details base for framework errors → `nene-suite.dev` (NENE2 v1.5.328 / NENE2#1355) — PR pending
+- [x] Issue #32: Problem Details base for framework errors → `nene-suite.dev` (NENE2 v1.5.328 / NENE2#1355) — merged (PR #33)
+- [x] Issue #34: Backend slice 4 — install-session disclaimer-acceptance + fail — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] Backend slice 4: remaining InstallSession lifecycle — `disclaimer-acceptance` / `fail` (reuse `update()`), then `complete` (+ manifest), each with audit
+- [ ] Backend slice 5: `complete` (`completeInstallSession`) + `InstallManifest` domain — preconditions (disclaimer accepted, apps selected), write manifest (R-05), audit `install_session.completed` + `manifest.created`
+- [ ] Backend: `installed-apps` (R-06) + `suite-audit-events` read endpoints; `SuiteEnv` / `IntegrationWiring`
 - [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + `suite-audit-events` read endpoints
 - [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred from #28)
 - [ ] Docker Compose installer MVP (Invoice + Clear)

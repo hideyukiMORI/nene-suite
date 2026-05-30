@@ -55,4 +55,46 @@ final readonly class InstallSession
             completedAt: $this->completedAt,
         );
     }
+
+    public function withDisclaimerAccepted(string $acceptedAt, string $updatedAt): self
+    {
+        return new self(
+            id: $this->id,
+            suiteId: $this->suiteId,
+            status: $this->status,
+            tier: $this->tier,
+            catalogRevision: $this->catalogRevision,
+            selectedApps: $this->selectedApps,
+            disclaimerAccepted: true,
+            disclaimerAcceptedAt: $acceptedAt,
+            orgExternalId: $this->orgExternalId,
+            orgDisplayName: $this->orgDisplayName,
+            installManifestId: $this->installManifestId,
+            failureCode: $this->failureCode,
+            createdAt: $this->createdAt,
+            updatedAt: $updatedAt,
+            completedAt: $this->completedAt,
+        );
+    }
+
+    public function withFailure(string $failureCode, string $updatedAt): self
+    {
+        return new self(
+            id: $this->id,
+            suiteId: $this->suiteId,
+            status: InstallSessionStatus::Failed,
+            tier: $this->tier,
+            catalogRevision: $this->catalogRevision,
+            selectedApps: $this->selectedApps,
+            disclaimerAccepted: $this->disclaimerAccepted,
+            disclaimerAcceptedAt: $this->disclaimerAcceptedAt,
+            orgExternalId: $this->orgExternalId,
+            orgDisplayName: $this->orgDisplayName,
+            installManifestId: $this->installManifestId,
+            failureCode: $failureCode,
+            createdAt: $this->createdAt,
+            updatedAt: $updatedAt,
+            completedAt: $this->completedAt,
+        );
+    }
 }

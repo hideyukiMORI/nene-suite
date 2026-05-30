@@ -136,10 +136,90 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                 },
             )
             ->set(
+                AcceptDisclaimerUseCaseInterface::class,
+                static function (ContainerInterface $container): AcceptDisclaimerUseCaseInterface {
+                    $sessions = $container->get(InstallSessionRepositoryInterface::class);
+                    $audit = $container->get(SuiteAuditRecorderInterface::class);
+
+                    if (!$sessions instanceof InstallSessionRepositoryInterface) {
+                        throw new LogicException('Install session repository service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderInterface) {
+                        throw new LogicException('Suite audit recorder service is invalid.');
+                    }
+
+                    return new AcceptDisclaimerUseCase($sessions, $audit);
+                },
+            )
+            ->set(
+                AcceptDisclaimerHandler::class,
+                static function (ContainerInterface $container): AcceptDisclaimerHandler {
+                    $useCase = $container->get(AcceptDisclaimerUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    $requestIdHolder = $container->get(RequestIdHolder::class);
+
+                    if (!$useCase instanceof AcceptDisclaimerUseCaseInterface) {
+                        throw new LogicException('AcceptDisclaimer use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    if (!$requestIdHolder instanceof RequestIdHolder) {
+                        throw new LogicException('RequestIdHolder service is invalid.');
+                    }
+
+                    return new AcceptDisclaimerHandler($useCase, $response, $requestIdHolder);
+                },
+            )
+            ->set(
+                FailInstallSessionUseCaseInterface::class,
+                static function (ContainerInterface $container): FailInstallSessionUseCaseInterface {
+                    $sessions = $container->get(InstallSessionRepositoryInterface::class);
+                    $audit = $container->get(SuiteAuditRecorderInterface::class);
+
+                    if (!$sessions instanceof InstallSessionRepositoryInterface) {
+                        throw new LogicException('Install session repository service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderInterface) {
+                        throw new LogicException('Suite audit recorder service is invalid.');
+                    }
+
+                    return new FailInstallSessionUseCase($sessions, $audit);
+                },
+            )
+            ->set(
+                FailInstallSessionHandler::class,
+                static function (ContainerInterface $container): FailInstallSessionHandler {
+                    $useCase = $container->get(FailInstallSessionUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    $requestIdHolder = $container->get(RequestIdHolder::class);
+
+                    if (!$useCase instanceof FailInstallSessionUseCaseInterface) {
+                        throw new LogicException('FailInstallSession use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    if (!$requestIdHolder instanceof RequestIdHolder) {
+                        throw new LogicException('RequestIdHolder service is invalid.');
+                    }
+
+                    return new FailInstallSessionHandler($useCase, $response, $requestIdHolder);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.install_session',
                 static function (ContainerInterface $container): InstallSessionRouteRegistrar {
                     $start = $container->get(StartInstallSessionHandler::class);
                     $get = $container->get(GetInstallSessionHandler::class);
+                    $disclaimer = $container->get(AcceptDisclaimerHandler::class);
+                    $fail = $container->get(FailInstallSessionHandler::class);
 
                     if (!$start instanceof StartInstallSessionHandler) {
                         throw new LogicException('StartInstallSession handler service is invalid.');
@@ -149,7 +229,15 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('GetInstallSession handler service is invalid.');
                     }
 
-                    return new InstallSessionRouteRegistrar($start, $get);
+                    if (!$disclaimer instanceof AcceptDisclaimerHandler) {
+                        throw new LogicException('AcceptDisclaimer handler service is invalid.');
+                    }
+
+                    if (!$fail instanceof FailInstallSessionHandler) {
+                        throw new LogicException('FailInstallSession handler service is invalid.');
+                    }
+
+                    return new InstallSessionRouteRegistrar($start, $get, $disclaimer, $fail);
                 },
             );
     }
