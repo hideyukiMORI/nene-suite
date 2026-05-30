@@ -25,8 +25,8 @@ Schema drift **blocks merge**.
 
 | Artifact | Path | Validated by |
 | --- | --- | --- |
-| App catalog data | `catalog/apps.json` | `catalog/apps.schema.json` |
-| App catalog schema | `catalog/apps.schema.json` | CI `catalog:validate` |
+| App catalog data | `catalog/apps.json` | `tools/validate-catalog.sh` (schema + DAG) |
+| App catalog schema | `catalog/apps.schema.json` | `tools/validate-catalog.sh` |
 | Audit event shape | `schema/suite-audit-event.schema.json` | CI + manual review |
 | Install manifest shape | `schema/install-manifest.schema.json` | Phase 1+ CI |
 | SQL snapshots | `database/schema/{table}.sql` | Review vs Phinx migrations |
@@ -76,7 +76,7 @@ Authoritative: [`catalog/apps.schema.json`](../../catalog/apps.schema.json).
 | --- | --- |
 | `apps[].id` | Pattern `^nene-[a-z0-9-]+$`; registered in terminology |
 | `apps[].status` | `planned` \| `installable` \| `deprecated` |
-| `apps[].requires` | Array of catalog ids; must form DAG (validated in use case + optional script) |
+| `apps[].requires` | Array of catalog ids; must form DAG (validated by `tools/validate-catalog.sh` and, later, the install use case) |
 | `apps[].database.env_prefix` | Documents sibling env prefix — not suite `NENE_SUITE_*` |
 
 When adding catalog fields:
