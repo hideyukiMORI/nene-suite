@@ -62,6 +62,35 @@ changes should be reviewed by qualified counsel when the product ships publicly.
 - Implement disclaimer checkbox in Tier B / Tier A installer (Issue TBD).
 - Cross-link from sibling product suite-integration docs when `NENE_SUITE_MODE` lands.
 
+## Professional review gate (before public release)
+
+Until this gate is satisfied, treat `disclaimer.md` and installer copy as an
+**engineering draft** — sufficient for private development, **not** a substitute
+for qualified review before external operators rely on it.
+
+**Trigger** — the gate is **required** before any of:
+
+- changing this repository from private to **public**;
+- publishing suite installer ZIPs or containers to unauthenticated download endpoints;
+- marketing NeNe Suite to paying customers or hosted SaaS operators;
+- materially weakening disclaimer language without replacement counsel review.
+
+**Minimum checklist**
+
+| Step | Owner | Record |
+| --- | --- | --- |
+| Legal review of `disclaimer.md`, `DISCLAIMER.md`, and planned installer / Terms copy | Qualified **lawyer** (日本法に精通) | Date + summary in milestone or ADR amendment PR |
+| Optional: tax/accounting overclaim review if docs reference インボイス / 電帳法 / SMB back-office workflows | **税理士** or **公認会計士** | Date + "no overclaim" or required doc edits |
+| Engineering sign-off that UI surfaces disclaimer before install completes | Maintainer | Linked Issue / PR |
+
+**Out of scope for the gate**
+
+- Proving that installed sibling apps meet law — that remains each product's docs + operator + professionals.
+- Replacing operator duty to obtain ongoing advice.
+
+Updating this gate or disclaimer after public release requires the same review
+class as the triggering event (legal review at minimum).
+
 ## Related
 
 - Issue: `#3`

@@ -14,7 +14,7 @@ Provide a **selective multi-app installer and apex shell** for NeNe sibling prod
 
 - Maintain `catalog/apps.json` with id, dependency graph, install status, and env keys.
 - Orchestrate install, migrate, and initial admin/org provisioning for **selected** catalog entries.
-- Generate and distribute suite environment variables (`NENE_SUITE_*`, shared org UUID, JWT issuer config).
+- Generate and distribute suite environment variables (`NENE_SUITE_*`, shared org UUID, JWT issuer config) per [ADR 0004](../adr/0004-suite-environment-contract.md).
 - Provide apex login / app launcher UI (thin shell — not product domain UI).
 - Support **add app to existing suite** after initial install.
 - Document Tier B (Docker Compose) before Tier A web wizard.

@@ -35,6 +35,7 @@ installable standalone via their own git clone or release ZIP.
 | Agent entry | [`AGENTS.md`](./AGENTS.md) |
 | Scope contract (binding) | [`docs/explanation/scope-contract.md`](./docs/explanation/scope-contract.md) |
 | Disclaimer (binding) | [`docs/explanation/disclaimer.md`](./docs/explanation/disclaimer.md) |
+| Suite env contract (binding) | [`docs/explanation/suite-environment-contract.md`](./docs/explanation/suite-environment-contract.md) |
 | Product vision | [`docs/explanation/product-vision.md`](./docs/explanation/product-vision.md) |
 | Sibling / installable apps | [`docs/integrations/sibling-products.md`](./docs/integrations/sibling-products.md) |
 | App catalog | [`catalog/apps.json`](./catalog/apps.json) |
