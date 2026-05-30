@@ -31,6 +31,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Product vision:** `docs/explanation/product-vision.md`
 - **Installable apps:** `docs/integrations/sibling-products.md`
 - **App catalog:** `catalog/apps.json`
+- **API contract (Phase 1 SSOT):** `docs/openapi/openapi.yaml` — see `docs/review/openapi-contract.md`
 - **Workflow:** `docs/workflow.md`
 - **Commit conventions:** `docs/development/commit-conventions.md`
 - **ADR policy:** `docs/development/adr.md`

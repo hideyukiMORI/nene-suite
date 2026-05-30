@@ -11,7 +11,8 @@
 - [x] Issue #10: Terminology registry — PR #11
 - [x] Issue #12: Audit trail (before/after) — merged
 - [x] Issue #14: NENE2 coding standards — merged
-- [ ] Issue #16: i18n message catalogs — PR pending
+- [x] Issue #16: i18n message catalogs — merged (PR #17)
+- [ ] Issue #18: Phase 1 OpenAPI contract — PR pending (`docs/openapi/openapi.yaml`)
 
 ## Next (Phase 0 → Phase 1)
 
@@ -19,7 +20,9 @@
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
 - [ ] Issue #9: Catalog validation script
 - [ ] Issue #10: Docker Compose installer MVP (Invoice + Clear)
-- [ ] Issue #11: CI workflow (catalog schema + docs link check)
+- [ ] Issue #11: CI workflow (catalog schema + docs link check + `composer openapi`)
+- [ ] Backend scaffold (composer + NENE2 handlers) — consumes `docs/openapi/openapi.yaml` as SSOT (follow-up to #18)
+- [ ] Frontend codegen + `entities/` from OpenAPI (follow-up to #18)
 
 ## Blockers
 
@@ -32,4 +35,4 @@
 Private meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
 Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
-Last updated: 2026-05-29
+Last updated: 2026-05-30

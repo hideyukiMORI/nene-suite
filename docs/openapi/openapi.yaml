@@ -1,0 +1,1077 @@
+openapi: 3.1.0
+
+info:
+  title: NeNe Suite Apex / Installer API
+  version: 0.1.0
+  summary: Phase 1 minimal HTTP contract for the NeNe Suite orchestrator (apex shell + installer wizard).
+  description: |
+    Source-of-truth HTTP contract for **NeNe Suite** — the meta installer and
+    orchestrator for NeNe sibling products. This is the **API-first** artifact:
+    backend (PHP / NENE2) handlers and frontend `entities/` codegen derive from
+    this file. See `docs/development/backend-standards.md` § OpenAPI.
+
+    Scope is **orchestration only** (install sessions, app selection, disclaimer,
+    apex launcher, orchestration audit read). Sibling product domain APIs
+    (billing, reconciliation, CMS, archive) live in their own repositories and
+    are **out of scope** here — see
+    [ADR 0002](../adr/0002-orchestrator-not-application-monolith.md) and
+    `docs/explanation/scope-contract.md`.
+
+    ## No business or legal warranty
+    This API orchestrates **technical installation and configuration only**. It
+    does not certify tax, accounting, legal, or industry compliance. See
+    `docs/explanation/disclaimer.md` (binding) and
+    [ADR 0003](../adr/0003-installer-disclaimer-no-business-warranty.md).
+
+    ## Field-name mapping (HTTP camelCase ↔ DB / JSON Schema snake_case)
+    HTTP JSON request and response bodies use **camelCase**. Persisted columns,
+    the install manifest, the audit event store, and the JSON Schemas under
+    `schema/` use **snake_case** (binding — `docs/development/schema-conventions.md`).
+    A presenter / mapper in the backend converts between the two, e.g.:
+
+    | HTTP (camelCase) | Persisted / schema (snake_case) | Schema source |
+    | --- | --- | --- |
+    | `suiteId`          | `suite_id`          | `schema/suite-audit-event.schema.json`, `schema/install-manifest.schema.json` |
+    | `orgExternalId`    | `org_external_id`   | both schemas |
+    | `installSessionId` | `install_session_id`| `schema/suite-audit-event.schema.json` |
+    | `before` / `after` | `before_json` / `after_json` | `schema/suite-audit-event.schema.json` |
+    | `metadata`         | `metadata_json`     | `schema/suite-audit-event.schema.json` |
+    | `entityType`       | `entity_type`       | `schema/suite-audit-event.schema.json` |
+    | `databaseName`     | `database_name`     | `schema/install-manifest.schema.json` |
+    | `publicUrl`        | `public_url`        | `schema/install-manifest.schema.json` |
+    | `installEntry`     | `install_entry`     | `catalog/apps.json` |
+
+    The mapper **MUST NOT** widen the sanitized audit snapshot — secret-bearing
+    keys are already redacted as `"[REDACTED]"` before they reach this API
+    (`docs/explanation/audit-trail.md` §5).
+
+    ## Audit coverage
+    Every mutating operation below registers exactly one audit `action` from
+    `docs/explanation/audit-trail.md` §4. Read-only operations (`getHealth`,
+    `listCatalogApps`, `getInstallSession`, `listInstalledApps`,
+    `listSuiteAuditEvents`) emit **no** audit event (audit-trail §1).
+  contact:
+    name: NeNe Suite maintainers
+    url: https://github.com/hideyukiMORI/nene-suite
+  license:
+    name: MIT
+    url: https://github.com/hideyukiMORI/nene-suite/blob/main/LICENSE
+
+servers:
+  - url: /
+    description: Same-origin apex deployment (path-prefix or subdirectory per deployment guide).
+
+# Default: apex operator JWT. Installer wizard steps and smoke checks opt out with `security: []`.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Health
+    description: Operational smoke checks (unauthenticated).
+  - name: Catalog
+    description: Read the installable app catalog and dependency graph.
+  - name: Install session
+    description: Installer wizard lifecycle (pre-auth on the host during setup).
+  - name: Installed apps
+    description: Apex launcher — applications provisioned through the suite.
+  - name: Audit
+    description: Read-only orchestration audit trail (operator-authenticated).
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Liveness / readiness smoke check.
+      description: Unauthenticated. Used by operators and sibling `/health` aggregation (Phase 4).
+      security: []
+      responses:
+        '200':
+          description: Service is reachable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                suiteMode: true
+                time: '2026-05-30T09:48:46Z'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/catalog/apps:
+    get:
+      tags: [Catalog]
+      operationId: listCatalogApps
+      summary: List catalog apps with dependency graph (R-01).
+      description: |
+        Returns the authoritative catalog (`catalog/apps.json`) so the installer
+        wizard can present selectable apps and resolve dependency order. Read-only;
+        no audit event (audit-trail §1).
+      security: []
+      responses:
+        '200':
+          description: Catalog snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogAppList'
+              example:
+                version: 1
+                apps:
+                  - id: nene-invoice
+                    name: NeNe Invoice
+                    repository: hideyukiMORI/nene-invoice
+                    path: nene-invoice
+                    status: installable
+                    requires: []
+                    provides: [billing-api]
+                    installEntry: /install/index.php
+                    databaseEnvPrefix: NENE_INVOICE_DB_
+                  - id: nene-clear
+                    name: NeNe Clear
+                    repository: hideyukiMORI/nene-clear
+                    path: nene-clear
+                    status: installable
+                    requires: [nene-invoice]
+                    provides: [reconciliation-api]
+                    installEntry: /install/index.php
+                    databaseEnvPrefix: NENE_CLEAR_DB_
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/install-sessions:
+    post:
+      tags: [Install session]
+      operationId: startInstallSession
+      summary: Start a new install session (R-01, R-08).
+      description: |
+        Creates an install session in status `in_progress`. The wizard groups all
+        subsequent steps under `installSessionId`.
+
+        **Audit:** emits `install_session.started`
+        (`before_json` NULL → `after_json` session snapshot; includes tier and
+        catalog revision) per audit-trail §4.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartInstallSessionRequest'
+            example:
+              tier: B
+              selectedApps: [nene-invoice, nene-clear]
+              orgDisplayName: Example Organization
+      responses:
+        '201':
+          description: Session created.
+          headers:
+            Location:
+              description: Canonical URL of the created session.
+              schema:
+                type: string
+                format: uri-reference
+              example: /api/v1/install-sessions/01J8XR4ZS6Q9V2H7K3N5M0B8TC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+              example:
+                id: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                status: in_progress
+                tier: B
+                catalogRevision: 1
+                selectedApps: [nene-invoice, nene-clear]
+                disclaimerAccepted: false
+                disclaimerAcceptedAt: null
+                orgExternalId: null
+                orgDisplayName: Example Organization
+                installManifestId: null
+                failureCode: null
+                createdAt: '2026-05-30T09:48:46Z'
+                updatedAt: '2026-05-30T09:48:46Z'
+                completedAt: null
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/install-sessions/{installSessionId}:
+    parameters:
+      - $ref: '#/components/parameters/InstallSessionId'
+    get:
+      tags: [Install session]
+      operationId: getInstallSession
+      summary: Fetch one install session.
+      description: Read-only; no audit event (audit-trail §1).
+      security: []
+      responses:
+        '200':
+          description: Session found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+              example:
+                id: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                status: in_progress
+                tier: B
+                catalogRevision: 1
+                selectedApps: [nene-invoice, nene-clear]
+                disclaimerAccepted: true
+                disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
+                orgExternalId: null
+                orgDisplayName: Example Organization
+                installManifestId: null
+                failureCode: null
+                createdAt: '2026-05-30T09:48:46Z'
+                updatedAt: '2026-05-30T09:50:00Z'
+                completedAt: null
+        '404':
+          $ref: '#/components/responses/InstallSessionNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/install-sessions/{installSessionId}/app-selection:
+    parameters:
+      - $ref: '#/components/parameters/InstallSessionId'
+    put:
+      tags: [Install session]
+      operationId: updateAppSelection
+      summary: Replace the selected app set for a session (R-01).
+      description: |
+        Idempotent replacement of the selected catalog ids. The server resolves
+        and enforces dependency order (e.g. selecting `nene-clear` requires
+        `nene-invoice`) and rejects non-`installable` apps.
+
+        **Audit:** emits `app_selection.changed`
+        (`before_json` prior selection → `after_json` new selection, with full
+        catalog id list and dependency resolution) per audit-trail §4.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppSelectionRequest'
+            example:
+              selectedApps: [nene-clear]
+      responses:
+        '200':
+          description: Selection updated (dependencies resolved into `selectedApps`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+              example:
+                id: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                status: in_progress
+                tier: B
+                catalogRevision: 1
+                selectedApps: [nene-invoice, nene-clear]
+                disclaimerAccepted: false
+                disclaimerAcceptedAt: null
+                orgExternalId: null
+                orgDisplayName: Example Organization
+                installManifestId: null
+                failureCode: null
+                createdAt: '2026-05-30T09:48:46Z'
+                updatedAt: '2026-05-30T09:49:10Z'
+                completedAt: null
+        '404':
+          $ref: '#/components/responses/InstallSessionNotFound'
+        '409':
+          $ref: '#/components/responses/InstallSessionConflict'
+        '422':
+          description: |
+            Validation failed. Common slugs: `validation-failed` (bad shape),
+            `dependency-unmet` (a required app was omitted),
+            `app-not-installable` (a `planned`/`deprecated` app was selected).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ValidationProblemDetails'
+              examples:
+                dependencyUnmet:
+                  summary: Required dependency missing
+                  value:
+                    type: https://nene-suite.dev/problems/dependency-unmet
+                    title: Unmet app dependency
+                    status: 422
+                    detail: 'nene-clear requires nene-invoice to be selected.'
+                    instance: /api/v1/install-sessions/01J8XR4ZS6Q9V2H7K3N5M0B8TC/app-selection
+                    errors:
+                      - field: selectedApps
+                        code: dependency_unmet
+                        detail: 'nene-clear requires nene-invoice'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/install-sessions/{installSessionId}/disclaimer-acceptance:
+    parameters:
+      - $ref: '#/components/parameters/InstallSessionId'
+    post:
+      tags: [Install session]
+      operationId: acceptDisclaimer
+      summary: Record operator acceptance of the disclaimer (R-04).
+      description: |
+        Operator must accept the binding disclaimer before the install can
+        complete. `acceptedLabel` (e.g. operator email) is stored as the audit
+        `actor_label` display fallback only — never a secret.
+
+        **Audit:** emits `disclaimer.accepted`
+        (`before_json` NULL → `after_json` acknowledgment snapshot with version
+        string, timestamp, operator label) per audit-trail §4.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptDisclaimerRequest'
+            example:
+              disclaimerVersion: '2026-05-29'
+              acceptedLabel: operator@example.com
+      responses:
+        '200':
+          description: Acceptance recorded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+              example:
+                id: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                status: in_progress
+                tier: B
+                catalogRevision: 1
+                selectedApps: [nene-invoice, nene-clear]
+                disclaimerAccepted: true
+                disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
+                orgExternalId: null
+                orgDisplayName: Example Organization
+                installManifestId: null
+                failureCode: null
+                createdAt: '2026-05-30T09:48:46Z'
+                updatedAt: '2026-05-30T09:50:00Z'
+                completedAt: null
+        '404':
+          $ref: '#/components/responses/InstallSessionNotFound'
+        '409':
+          $ref: '#/components/responses/InstallSessionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/install-sessions/{installSessionId}/complete:
+    parameters:
+      - $ref: '#/components/parameters/InstallSessionId'
+    post:
+      tags: [Install session]
+      operationId: completeInstallSession
+      summary: Finalize an install session (R-04, R-05, R-08).
+      description: |
+        Transitions the session to `completed`. Pre-conditions: disclaimer
+        accepted (R-04) and at least one installable app selected. On success the
+        server writes the install manifest (no secrets, R-05) and links it via
+        `installManifestId`.
+
+        **Audit:** emits `install_session.completed`
+        (`before_json` in-progress → `after_json` completed snapshot) and
+        `manifest.created`. The completed `after_json` SHOULD reference the same
+        content as the manifest (hash or embedded copy) per audit-trail §4, §8.
+      security: []
+      responses:
+        '200':
+          description: Session completed; manifest written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+              example:
+                id: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                status: completed
+                tier: B
+                catalogRevision: 1
+                selectedApps: [nene-invoice, nene-clear]
+                disclaimerAccepted: true
+                disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
+                orgExternalId: 01J8XR0G7Q9V2H7K3N5M0BRZX9
+                orgDisplayName: Example Organization
+                installManifestId: 01J8XR9MAQ9V2H7K3N5M0B8DFG
+                failureCode: null
+                createdAt: '2026-05-30T09:48:46Z'
+                updatedAt: '2026-05-30T09:51:30Z'
+                completedAt: '2026-05-30T09:51:30Z'
+        '404':
+          $ref: '#/components/responses/InstallSessionNotFound'
+        '409':
+          $ref: '#/components/responses/InstallSessionConflict'
+        '422':
+          description: |
+            Pre-conditions unmet. Common slugs: `disclaimer-not-accepted` (R-04),
+            `no-apps-selected`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                disclaimerNotAccepted:
+                  summary: Disclaimer not accepted
+                  value:
+                    type: https://nene-suite.dev/problems/disclaimer-not-accepted
+                    title: Disclaimer not accepted
+                    status: 422
+                    detail: The disclaimer must be accepted before completing installation.
+                    instance: /api/v1/install-sessions/01J8XR4ZS6Q9V2H7K3N5M0B8TC/complete
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/install-sessions/{installSessionId}/fail:
+    parameters:
+      - $ref: '#/components/parameters/InstallSessionId'
+    post:
+      tags: [Install session]
+      operationId: failInstallSession
+      summary: Mark an install session as failed (R-08).
+      description: |
+        Records a terminal failure (e.g. database provisioning error). `failureCode`
+        is required and is persisted to the audit `metadata_json.failure_code`.
+
+        **Audit:** emits `install_session.failed`
+        (`before_json` in-progress → `after_json` failed snapshot;
+        `metadata_json.failure_code` required) per audit-trail §4.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FailInstallSessionRequest'
+            example:
+              failureCode: database_provision_failed
+              reason: 'Could not create database for nene-clear.'
+      responses:
+        '200':
+          description: Session marked failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+              example:
+                id: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                status: failed
+                tier: B
+                catalogRevision: 1
+                selectedApps: [nene-invoice, nene-clear]
+                disclaimerAccepted: true
+                disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
+                orgExternalId: null
+                orgDisplayName: Example Organization
+                installManifestId: null
+                failureCode: database_provision_failed
+                createdAt: '2026-05-30T09:48:46Z'
+                updatedAt: '2026-05-30T09:51:00Z'
+                completedAt: null
+        '404':
+          $ref: '#/components/responses/InstallSessionNotFound'
+        '409':
+          $ref: '#/components/responses/InstallSessionConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/installed-apps:
+    get:
+      tags: [Installed apps]
+      operationId: listInstalledApps
+      summary: List applications installed through the suite (R-06).
+      description: |
+        Powers the apex launcher. Returns installed apps with their public URL and
+        an optional SSOT role label (`docs/explanation/terminology.md` §7), derived
+        from each app's catalog `provides`. Read-only; no audit event.
+      responses:
+        '200':
+          description: Installed apps.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstalledAppList'
+              example:
+                apps:
+                  - catalogId: nene-invoice
+                    name: NeNe Invoice
+                    publicUrl: https://example.com/nene-invoice/
+                    databaseName: nene_invoice
+                    ssotRole: billing
+                  - catalogId: nene-clear
+                    name: NeNe Clear
+                    publicUrl: https://example.com/nene-clear/
+                    databaseName: nene_clear
+                    ssotRole: reconciliation_evidence
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/suite-audit-events:
+    get:
+      tags: [Audit]
+      operationId: listSuiteAuditEvents
+      summary: Read the orchestration audit trail (R-08, read-only).
+      description: |
+        Paginated, append-only orchestration audit events (before/after snapshots).
+        Domain audit stays in each sibling product. Phase 1 is **read-only**; no
+        create/update/delete (audit-trail §7 — append-only, hard delete forbidden).
+        Operator-authenticated.
+
+        Field names map to `schema/suite-audit-event.schema.json` per the mapping
+        table in `info.description` (`before`→`before_json`, etc.).
+      parameters:
+        - name: installSessionId
+          in: query
+          required: false
+          description: Filter to events grouped under one install run.
+          schema:
+            $ref: '#/components/schemas/Ulid'
+        - name: action
+          in: query
+          required: false
+          description: Filter by audit action (`{entity}.{verb}`), audit-trail §4.
+          schema:
+            type: string
+            pattern: '^[a-z_]+\.[a-z_]+$'
+          example: install_session.completed
+        - name: limit
+          in: query
+          required: false
+          description: Page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: Opaque pagination cursor from a prior `nextCursor`.
+          schema:
+            type: string
+            maxLength: 512
+      responses:
+        '200':
+          description: Page of audit events (newest first).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuiteAuditEventList'
+              example:
+                items:
+                  - id: 01J8XRADTQ9V2H7K3N5M0B8QGH
+                    suiteId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                    orgExternalId: 01J8XR0G7Q9V2H7K3N5M0BRZX9
+                    actorUserId: null
+                    actorLabel: operator@example.com
+                    action: disclaimer.accepted
+                    entityType: disclaimer_acknowledgment
+                    entityId: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                    before: null
+                    after:
+                      disclaimerVersion: '2026-05-29'
+                      acceptedAt: '2026-05-30T09:50:00Z'
+                    createdAt: '2026-05-30T09:50:00Z'
+                    source: installer_ui
+                    requestId: 7f3a9c2e-0b1d-4c8a-9e2f-1a2b3c4d5e6f
+                    installSessionId: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                    metadata: null
+                nextCursor: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Apex operator JWT (suite mode issuer, `docs/explanation/suite-environment-contract.md`).
+        Required for authenticated apex endpoints. Installer wizard steps run
+        pre-auth on the host during setup, so they are unauthenticated and record
+        `actor_user_id: null` with an `actor_label` fallback (audit-trail §3).
+
+  parameters:
+    InstallSessionId:
+      name: installSessionId
+      in: path
+      required: true
+      description: ULID of the install session (maps to `install_session_id`).
+      schema:
+        $ref: '#/components/schemas/Ulid'
+      example: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+
+  responses:
+    Unauthorized:
+      description: Authentication required or token invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/unauthorized
+            title: Authentication required
+            status: 401
+            detail: A valid apex operator token is required.
+            instance: /api/v1/installed-apps
+    InstallSessionNotFound:
+      description: No install session with that id.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/install-session-not-found
+            title: Install session not found
+            status: 404
+            detail: 'No install session exists for id 01J8XR4ZS6Q9V2H7K3N5M0B8TC.'
+            instance: /api/v1/install-sessions/01J8XR4ZS6Q9V2H7K3N5M0B8TC
+    InstallSessionConflict:
+      description: Session is in a state that does not allow this transition.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/install-session-conflict
+            title: Install session conflict
+            status: 409
+            detail: This install session is already completed and cannot be modified.
+            instance: /api/v1/install-sessions/01J8XR4ZS6Q9V2H7K3N5M0B8TC/complete
+    ValidationFailed:
+      description: Request body or parameters failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/validation-failed
+            title: Validation failed
+            status: 422
+            detail: One or more fields are invalid.
+            instance: /api/v1/install-sessions
+            errors:
+              - field: tier
+                code: invalid_enum
+                detail: 'tier must be one of: B'
+    ServerError:
+      description: Unexpected server error. No stack traces, SQL, paths, or secrets exposed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/internal-error
+            title: Internal server error
+            status: 500
+            detail: An unexpected error occurred. Please try again later.
+            instance: /api/v1/install-sessions
+
+  schemas:
+    Ulid:
+      type: string
+      pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+      description: Crockford base32 ULID (26 chars). Matches `schema/*.schema.json`.
+      example: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+
+    CatalogId:
+      type: string
+      pattern: '^nene-[a-z0-9-]+$'
+      description: Catalog app id (`docs/explanation/terminology.md` §2.1).
+      example: nene-invoice
+
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required: [status, suiteMode, time]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        suiteMode:
+          type: boolean
+          description: Reflects `NENE_SUITE_MODE` (ADR 0004).
+        time:
+          type: string
+          format: date-time
+
+    CatalogApp:
+      type: object
+      additionalProperties: false
+      required: [id, name, status, requires, provides]
+      description: One catalog entry (mirrors `catalog/apps.json`; `installEntry` ↔ `install_entry`).
+      properties:
+        id:
+          $ref: '#/components/schemas/CatalogId'
+        name:
+          type: string
+          description: Display name (terminology §1, exact spelling, e.g. "NeNe Invoice").
+        repository:
+          type: [string, 'null']
+          description: '`owner/repo` or null for unannounced apps.'
+        path:
+          type: string
+        status:
+          type: string
+          enum: [planned, installable, deprecated]
+        requires:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogId'
+        provides:
+          type: array
+          items:
+            type: string
+          description: Capability tokens (terminology §2.3), e.g. `billing-api`.
+        installEntry:
+          type: string
+          description: Sibling installer entry path (`install_entry` in catalog JSON).
+        databaseEnvPrefix:
+          type: string
+          description: Per-app DB env prefix (`database.env_prefix` in catalog JSON).
+          example: NENE_INVOICE_DB_
+
+    CatalogAppList:
+      type: object
+      additionalProperties: false
+      required: [version, apps]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogApp'
+
+    InstallSessionStatus:
+      type: string
+      enum: [in_progress, completed, failed]
+      description: Lifecycle state (PHP `InstallSessionStatus`; HTTP value is snake_case).
+
+    Tier:
+      type: string
+      enum: [B]
+      description: |
+        Deployment tier (terminology §11). Phase 1 ships **Tier B** (Docker / VPS)
+        only; **Tier A** (shared hosting) follows in Phase 3 and will extend this enum.
+
+    InstallSession:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - suiteId
+        - status
+        - tier
+        - catalogRevision
+        - selectedApps
+        - disclaimerAccepted
+        - createdAt
+        - updatedAt
+      description: Installer wizard run. Persisted in the `nene_suite` control DB (no secrets).
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        suiteId:
+          allOf:
+            - $ref: '#/components/schemas/Ulid'
+          description: Matches `NENE_SUITE_ID` / manifest `suite_id`.
+        status:
+          $ref: '#/components/schemas/InstallSessionStatus'
+        tier:
+          $ref: '#/components/schemas/Tier'
+        catalogRevision:
+          type: integer
+          minimum: 1
+          description: Pinned `catalog/apps.json` `version` at session start.
+        selectedApps:
+          type: array
+          description: Catalog ids selected, dependency-resolved and ordered.
+          items:
+            $ref: '#/components/schemas/CatalogId'
+        disclaimerAccepted:
+          type: boolean
+        disclaimerAcceptedAt:
+          type: [string, 'null']
+          format: date-time
+        orgExternalId:
+          oneOf:
+            - $ref: '#/components/schemas/Ulid'
+            - type: 'null'
+          description: Federation UUID (`org_external_id`) — IT federation only, not tax registration.
+        orgDisplayName:
+          type: [string, 'null']
+          maxLength: 500
+        installManifestId:
+          oneOf:
+            - $ref: '#/components/schemas/Ulid'
+            - type: 'null'
+          description: Set when `status` is `completed`; links to the written install manifest.
+        failureCode:
+          type: [string, 'null']
+          description: Set when `status` is `failed`; mirrors audit `metadata_json.failure_code`.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: [string, 'null']
+          format: date-time
+
+    StartInstallSessionRequest:
+      type: object
+      additionalProperties: false
+      required: [tier]
+      properties:
+        tier:
+          $ref: '#/components/schemas/Tier'
+        selectedApps:
+          type: array
+          description: Optional initial selection; can also be set later via `updateAppSelection`.
+          items:
+            $ref: '#/components/schemas/CatalogId'
+        orgDisplayName:
+          type: string
+          maxLength: 500
+
+    UpdateAppSelectionRequest:
+      type: object
+      additionalProperties: false
+      required: [selectedApps]
+      properties:
+        selectedApps:
+          type: array
+          description: |
+            Catalog ids the operator wants. The server resolves dependencies
+            (adds required apps) and rejects non-`installable` entries.
+          items:
+            $ref: '#/components/schemas/CatalogId'
+
+    AcceptDisclaimerRequest:
+      type: object
+      additionalProperties: false
+      required: [disclaimerVersion]
+      properties:
+        disclaimerVersion:
+          type: string
+          description: Version string of the accepted disclaimer copy.
+          maxLength: 64
+          example: '2026-05-29'
+        acceptedLabel:
+          type: string
+          description: Operator display label (e.g. email) stored as audit `actor_label`. No secrets.
+          maxLength: 320
+
+    FailInstallSessionRequest:
+      type: object
+      additionalProperties: false
+      required: [failureCode]
+      properties:
+        failureCode:
+          type: string
+          description: Machine code persisted to audit `metadata_json.failure_code`.
+          pattern: '^[a-z0-9_]+$'
+          maxLength: 64
+          example: database_provision_failed
+        reason:
+          type: string
+          description: Human-readable detail (no secrets).
+          maxLength: 1000
+
+    SsotRole:
+      type: string
+      enum: [billing, reconciliation_evidence, cms, archive, none]
+      description: |
+        System-of-record role for the launcher label (terminology §7), derived from
+        catalog `provides`: `billing-api`→`billing`, `reconciliation-api`→
+        `reconciliation_evidence`, `cms-api`→`cms`, `archive-api`→`archive`.
+
+    InstalledApp:
+      type: object
+      additionalProperties: false
+      required: [catalogId, name, publicUrl, ssotRole]
+      properties:
+        catalogId:
+          $ref: '#/components/schemas/CatalogId'
+        name:
+          type: string
+        publicUrl:
+          type: string
+          format: uri
+          description: Public base URL (manifest `public_url`).
+        databaseName:
+          type: [string, 'null']
+          maxLength: 64
+          description: Per-app database name (manifest `database_name`). No credentials.
+        ssotRole:
+          $ref: '#/components/schemas/SsotRole'
+
+    InstalledAppList:
+      type: object
+      additionalProperties: false
+      required: [apps]
+      properties:
+        apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstalledApp'
+
+    AuditEntityType:
+      type: string
+      description: Affected orchestration entity (audit-trail §4; matches `schema/suite-audit-event.schema.json`).
+      enum:
+        - install_session
+        - app_selection
+        - disclaimer_acknowledgment
+        - suite_env_config
+        - app_database
+        - integration_wiring
+        - install_manifest
+        - suite_org_profile
+        - catalog_pin
+
+    AuditSource:
+      type: string
+      enum: [installer_ui, installer_cli, apex_admin, system, api]
+
+    SuiteAuditEvent:
+      type: object
+      additionalProperties: false
+      description: |
+        Read projection of one append-only audit row. snake_case persistence
+        columns are mapped to camelCase here: `before`→`before_json`,
+        `after`→`after_json`, `metadata`→`metadata_json`, `*Id`→`*_id`.
+        Sanitized — secret-bearing values already appear as `"[REDACTED]"`
+        (audit-trail §5).
+      required: [id, suiteId, action, entityType, entityId, createdAt, source]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        suiteId:
+          $ref: '#/components/schemas/Ulid'
+        orgExternalId:
+          oneOf:
+            - $ref: '#/components/schemas/Ulid'
+            - type: 'null'
+        actorUserId:
+          oneOf:
+            - $ref: '#/components/schemas/Ulid'
+            - type: 'null'
+          description: Apex user; null for pre-auth wizard / system events.
+        actorLabel:
+          type: [string, 'null']
+          maxLength: 320
+          description: Display fallback only; no secrets.
+        action:
+          type: string
+          pattern: '^[a-z_]+\.[a-z_]+$'
+          description: '`{entity}.{verb}`, registered in audit-trail §4.'
+          example: install_session.completed
+        entityType:
+          $ref: '#/components/schemas/AuditEntityType'
+        entityId:
+          type: string
+          minLength: 1
+          maxLength: 64
+        before:
+          type: [object, 'null']
+          description: Sanitized state before mutation (`before_json`); null on create.
+        after:
+          type: [object, 'null']
+          description: Sanitized state after mutation (`after_json`); null only if policy allows.
+        createdAt:
+          type: string
+          format: date-time
+        source:
+          $ref: '#/components/schemas/AuditSource'
+        requestId:
+          type: [string, 'null']
+          maxLength: 128
+          description: Correlates with HTTP `X-Request-Id` when present.
+        installSessionId:
+          oneOf:
+            - $ref: '#/components/schemas/Ulid'
+            - type: 'null'
+        metadata:
+          type: [object, 'null']
+          description: Event-specific extras (`metadata_json`); obeys audit-trail §5 sanitization.
+
+    SuiteAuditEventList:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuiteAuditEvent'
+        nextCursor:
+          type: [string, 'null']
+          description: Opaque cursor for the next page, or null when no more rows.
+
+    ProblemDetails:
+      type: object
+      description: RFC 9457 Problem Details. `type` uses `https://nene-suite.dev/problems/{slug}`.
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+          example: https://nene-suite.dev/problems/install-session-not-found
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+
+    ValidationProblemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          required: [errors]
+          properties:
+            errors:
+              type: array
+              description: Structured field errors for `validation-failed` and related slugs.
+              items:
+                type: object
+                additionalProperties: false
+                required: [field, code]
+                properties:
+                  field:
+                    type: string
+                    example: selectedApps
+                  code:
+                    type: string
+                    example: dependency_unmet
+                  detail:
+                    type: string
