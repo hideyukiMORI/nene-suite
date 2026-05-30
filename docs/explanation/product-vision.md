@@ -42,4 +42,9 @@ A suite installer that:
 - Standalone Invoice install unchanged when suite is not used.
 - Documented `NENE_SUITE_*` contract consumed by at least two sibling apps.
 
+## Disclaimer
+
+Suite success criteria are **technical only**. Compliance or business readiness of
+installed apps is explicitly out of scope — see [`disclaimer.md`](./disclaimer.md).
+
 Last updated: 2026-05-29

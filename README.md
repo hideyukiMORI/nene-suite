@@ -16,6 +16,10 @@ installable standalone via their own git clone or release ZIP.
 > [`nene-clear`](https://github.com/hideyukiMORI/nene-clear), or sibling repos.
 > See [ADR 0002](./docs/adr/0002-orchestrator-not-application-monolith.md).
 
+> **Disclaimer:** Suite assists with **environment setup only** — it does not guarantee
+> business outcomes, legal compliance, or accounting correctness.
+> See [`DISCLAIMER.md`](./DISCLAIMER.md) and [ADR 0003](./docs/adr/0003-installer-disclaimer-no-business-warranty.md).
+
 ## Goals
 
 - **Selective install** — choose apps during suite setup; install + initial config in one flow
@@ -30,6 +34,7 @@ installable standalone via their own git clone or release ZIP.
 | --- | --- |
 | Agent entry | [`AGENTS.md`](./AGENTS.md) |
 | Scope contract (binding) | [`docs/explanation/scope-contract.md`](./docs/explanation/scope-contract.md) |
+| Disclaimer (binding) | [`docs/explanation/disclaimer.md`](./docs/explanation/disclaimer.md) |
 | Product vision | [`docs/explanation/product-vision.md`](./docs/explanation/product-vision.md) |
 | Sibling / installable apps | [`docs/integrations/sibling-products.md`](./docs/integrations/sibling-products.md) |
 | App catalog | [`catalog/apps.json`](./catalog/apps.json) |

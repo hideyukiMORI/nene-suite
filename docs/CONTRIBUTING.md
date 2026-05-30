@@ -8,6 +8,7 @@ NeNe Suite is built through small, Issue-driven changes. This document is the sh
 | --- | --- |
 | Agent entry point | `AGENTS.md` |
 | Scope contract (binding) | `docs/explanation/scope-contract.md` |
+| Disclaimer (binding) | `docs/explanation/disclaimer.md` |
 | Product vision | `docs/explanation/product-vision.md` |
 | Sibling / installable apps | `docs/integrations/sibling-products.md` |
 | App catalog | `catalog/apps.json` |
@@ -51,6 +52,12 @@ NeNe Suite should stay small, explicit, and AI-readable:
 - Environment contract for suite mode (`NENE_SUITE_*`) shared across siblings
 - Standalone install path must remain valid for every catalog entry
 - English repository documentation
+
+## Disclaimer
+
+NeNe Suite is **setup orchestration only**. Contributors must not add language that
+guarantees business outcomes, legal compliance, or professional advice. See
+[`docs/explanation/disclaimer.md`](explanation/disclaimer.md).
 
 ## Sibling Products
 

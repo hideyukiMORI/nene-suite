@@ -4,7 +4,8 @@
 
 ## Done
 
-- [x] Issue #1: Governance bootstrap — PR #1
+- [x] Issue #1: Governance bootstrap — PR #2
+- [x] Issue #3: Installer disclaimer — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
