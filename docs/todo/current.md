@@ -6,25 +6,26 @@
 
 - [x] Issue #1: Governance bootstrap — PR #2
 - [x] Issue #3: Installer disclaimer — PR #4
-- [x] Issue #5: Professional review gate — PR pending
-- [x] Issue #6: Suite environment contract (`NENE_SUITE_*`) — PR pending
+- [x] Issue #5–#6: Review gate + env contract — PR #7
+- [x] Issue #8: Orchestration compliance (士業 review pattern) — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
-- [ ] Issue #7: Catalog validation script
-- [ ] Issue #8: Docker Compose installer MVP (Invoice + Clear)
-- [ ] Issue #9: CI workflow (catalog schema + docs link check)
+- [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
+- [ ] **弁護士 sign-off** — disclaimer + installer copy
+- [ ] Issue #9: Catalog validation script
+- [ ] Issue #10: Docker Compose installer MVP (Invoice + Clear)
+- [ ] Issue #11: CI workflow (catalog schema + docs link check)
 
 ## Blockers
 
+- External installer MVP blocked until professional sign-off records merged.
 - Sibling apps need `NENE_SUITE_MODE` env readers (cross-repo Issues).
 - Tier A suite wizard depends on sibling release ZIP installers (Invoice Phase 3).
-- Public release blocked until ADR 0003 professional review gate is satisfied.
 
 ## Handoff
 
-Private meta repo. Inherit workflow from NENE2 / NeNe Records.
-Do not vendor sibling product source.
-Env contract: ADR 0004 + `.env.suite.example`.
+Private meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
+Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
 Last updated: 2026-05-29

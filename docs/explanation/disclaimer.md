@@ -4,6 +4,11 @@
 this document as non-negotiable product posture. Changing it requires ADR 0003 or
 a superseding ADR plus professional review when legal exposure changes.
 
+**Positive MUST rules** for SSOT, database separation, and federation are in
+[`orchestration-compliance.md`](./orchestration-compliance.md) (binding — ADR 0005).
+This disclaimer states limits of liability and non-warranty; orchestration-compliance
+states what the installer **must** preserve for professional review.
+
 > **This is standard open-source software disclaimer language — not legal advice.**
 > Operators with compliance obligations should obtain review from qualified
 > professionals (tax accountant, certified public accountant, lawyer) before
@@ -122,7 +127,8 @@ When implementing installer UI, docs, or examples:
 | **Document status** | Engineering draft (binding within this private repo) |
 | **Public release** | Blocked until [ADR 0003 professional review gate](../adr/0003-installer-disclaimer-no-business-warranty.md#professional-review-gate-before-public-release) is satisfied |
 | **Legal review** | Not yet performed |
-| **Tax/accounting review** | Not yet performed (recommended before public marketing) |
+| **Tax/accounting review** | Not yet performed — required for SSOT matrix per [orchestration-compliance §9](./orchestration-compliance.md#9-professional-sign-off-and-change-control) |
+| **Sign-off template** | [`professional-sign-off-record.md`](./professional-sign-off-record.md) |
 
 Update this table when reviews complete (via PR linked to the gate checklist).
 

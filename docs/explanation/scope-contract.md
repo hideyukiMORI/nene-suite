@@ -8,7 +8,9 @@ This document defines what NeNe Suite **is** and **is not**. Implementation and 
 
 ## GOAL
 
-Provide a **selective multi-app installer and apex shell** for NeNe sibling products while preserving standalone installs and separate databases.
+Provide a **selective multi-app installer and apex shell** for NeNe sibling products while preserving standalone installs, separate databases, and **documented SSOT boundaries** reviewable by 士業.
+
+> **Binding compliance:** [`orchestration-compliance.md`](./orchestration-compliance.md)
 
 ## DO
 
