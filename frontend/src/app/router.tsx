@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { AuditEventsPage } from '@/pages/admin/audit-events/AuditEventsPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { InstallPage } from '@/pages/install/InstallPage'
 import { LoginPage } from '@/pages/login/LoginPage'
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <HomePage /> },
       { path: '/install', element: <InstallPage /> },
+      { path: '/admin/audit-events', element: <AuditEventsPage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },
