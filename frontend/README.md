@@ -15,13 +15,13 @@ npm run codegen   # regenerate src/shared/api/schema.gen.ts from ../docs/openapi
 
 ## Layout
 
-| Layer | Owns |
-| --- | --- |
-| `shared/` | HTTP client, errors, env, i18n, generated OpenAPI types |
+| Layer       | Owns                                                                                                            |
+| ----------- | --------------------------------------------------------------------------------------------------------------- |
+| `shared/`   | HTTP client, errors, env, i18n, generated OpenAPI types                                                         |
 | `entities/` | One API resource: `api-types` / `model` / `mapper` / `query-keys` / `queries` / `mutations` (barrel `index.ts`) |
-| `features/` | Workflows (`hooks/` + `ui/`) — consume entities, never raw `fetch`/DTOs |
-| `pages/` | Route wiring |
-| `app/` | Providers, router, auth gate, error boundary |
+| `features/` | Workflows (`hooks/` + `ui/`) — consume entities, never raw `fetch`/DTOs                                         |
+| `pages/`    | Route wiring                                                                                                    |
+| `app/`      | Providers, router, auth gate, error boundary                                                                    |
 
 - **All user-visible strings** via `useTranslation()` / `t('key')` — catalogs in
   `src/shared/i18n/messages/` ([`docs/development/i18n.md`](../docs/development/i18n.md)).
