@@ -12,8 +12,10 @@ use NeNeSuite\AppCatalog\AppCatalogRouteRegistrar;
 use NeNeSuite\AppCatalog\AppCatalogServiceProvider;
 use NeNeSuite\AppSelection\AppSelectionRouteRegistrar;
 use NeNeSuite\AppSelection\AppSelectionServiceProvider;
+use NeNeSuite\InstallManifest\InstallManifestServiceProvider;
 use NeNeSuite\InstallSession\InstallSessionConflictExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
+use NeNeSuite\InstallSession\InstallSessionNotReadyExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
@@ -35,6 +37,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         $builder
             ->addProvider(new AppCatalogServiceProvider())
             ->addProvider(new SuiteAuditServiceProvider())
+            ->addProvider(new InstallManifestServiceProvider())
             ->addProvider(new InstallSessionServiceProvider())
             ->addProvider(new AppSelectionServiceProvider());
 
@@ -70,6 +73,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 static function (ContainerInterface $container): array {
                     $installSessionNotFound = $container->get(InstallSessionNotFoundExceptionHandler::class);
                     $installSessionConflict = $container->get(InstallSessionConflictExceptionHandler::class);
+                    $installSessionNotReady = $container->get(InstallSessionNotReadyExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
@@ -79,9 +83,14 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Install session conflict exception handler service is invalid.');
                     }
 
+                    if (!$installSessionNotReady instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Install session not ready exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
                         $installSessionConflict,
+                        $installSessionNotReady,
                     ];
                 },
             );

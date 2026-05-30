@@ -41,8 +41,13 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
     public const SUITE_ID = 'nene-suite.suite_id';
 
+    public const SUITE_ORG_EXTERNAL_ID = 'nene-suite.org_external_id';
+
     /** Stable placeholder suite id used until the installer writes NENE_SUITE_ID. */
     private const DEV_SUITE_ID = '01J8XRDEV000000000000000ZA';
+
+    /** Placeholder org federation id until the installer writes NENE_SUITE_ORG_EXTERNAL_ID. */
+    private const DEV_ORG_EXTERNAL_ID = '01J8XRDEV0FED0000000000ZAB';
 
     /** Suite Problem Details base (docs/explanation/terminology.md §13). */
     private const PROBLEM_DETAILS_BASE_URL = 'https://nene-suite.dev/problems/';
@@ -54,11 +59,11 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder
             ->set(
                 self::SUITE_ID,
-                static function (ContainerInterface $container): string {
-                    $fromEnv = getenv('NENE_SUITE_ID');
-
-                    return is_string($fromEnv) && $fromEnv !== '' ? $fromEnv : self::DEV_SUITE_ID;
-                },
+                static fn (ContainerInterface $container): string => self::env('NENE_SUITE_ID', self::DEV_SUITE_ID),
+            )
+            ->set(
+                self::SUITE_ORG_EXTERNAL_ID,
+                static fn (ContainerInterface $container): string => self::env('NENE_SUITE_ORG_EXTERNAL_ID', self::DEV_ORG_EXTERNAL_ID),
             )
             ->set(
                 ConfigLoader::class,
@@ -232,8 +237,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
      */
     private static function resolveProblemDetailsBaseUrl(): string
     {
-        $override = $_SERVER['PROBLEM_DETAILS_BASE_URL'] ?? $_ENV['PROBLEM_DETAILS_BASE_URL'] ?? null;
+        return self::env('PROBLEM_DETAILS_BASE_URL', self::PROBLEM_DETAILS_BASE_URL);
+    }
 
-        return is_string($override) && $override !== '' ? $override : self::PROBLEM_DETAILS_BASE_URL;
+    /**
+     * Reads an environment value from $_SERVER / $_ENV (the same source NENE2's
+     * ConfigLoader uses after loading .env), falling back to the given default.
+     * .env is loaded once in RuntimeContainerFactory, so reads are order-independent.
+     */
+    private static function env(string $key, string $default): string
+    {
+        $value = $_SERVER[$key] ?? $_ENV[$key] ?? null;
+
+        return is_string($value) && $value !== '' ? $value : $default;
     }
 }

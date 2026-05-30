@@ -77,6 +77,27 @@ final readonly class InstallSession
         );
     }
 
+    public function withCompleted(string $installManifestId, string $orgExternalId, string $completedAt, string $updatedAt): self
+    {
+        return new self(
+            id: $this->id,
+            suiteId: $this->suiteId,
+            status: InstallSessionStatus::Completed,
+            tier: $this->tier,
+            catalogRevision: $this->catalogRevision,
+            selectedApps: $this->selectedApps,
+            disclaimerAccepted: $this->disclaimerAccepted,
+            disclaimerAcceptedAt: $this->disclaimerAcceptedAt,
+            orgExternalId: $orgExternalId,
+            orgDisplayName: $this->orgDisplayName,
+            installManifestId: $installManifestId,
+            failureCode: $this->failureCode,
+            createdAt: $this->createdAt,
+            updatedAt: $updatedAt,
+            completedAt: $completedAt,
+        );
+    }
+
     public function withFailure(string $failureCode, string $updatedAt): self
     {
         return new self(

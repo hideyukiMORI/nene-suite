@@ -13,6 +13,7 @@ final readonly class InstallSessionRouteRegistrar
         private StartInstallSessionHandler $startHandler,
         private GetInstallSessionHandler $getHandler,
         private AcceptDisclaimerHandler $acceptDisclaimerHandler,
+        private CompleteInstallSessionHandler $completeHandler,
         private FailInstallSessionHandler $failHandler,
     ) {
     }
@@ -22,6 +23,7 @@ final readonly class InstallSessionRouteRegistrar
         $startHandler = $this->startHandler;
         $getHandler = $this->getHandler;
         $acceptDisclaimerHandler = $this->acceptDisclaimerHandler;
+        $completeHandler = $this->completeHandler;
         $failHandler = $this->failHandler;
 
         $router->post(
@@ -35,6 +37,10 @@ final readonly class InstallSessionRouteRegistrar
         $router->post(
             '/api/v1/install-sessions/{installSessionId}/disclaimer-acceptance',
             static fn (ServerRequestInterface $request) => $acceptDisclaimerHandler->handle($request),
+        );
+        $router->post(
+            '/api/v1/install-sessions/{installSessionId}/complete',
+            static fn (ServerRequestInterface $request) => $completeHandler->handle($request),
         );
         $router->post(
             '/api/v1/install-sessions/{installSessionId}/fail',
