@@ -122,13 +122,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Stream factory service is invalid.');
                     }
 
-                    // Problem Details `type` MUST use the suite base (terminology §13);
-                    // honour an explicit PROBLEM_DETAILS_BASE_URL override, else default
-                    // to the suite base rather than the NENE2 framework default.
-                    $override = $_SERVER['PROBLEM_DETAILS_BASE_URL'] ?? $_ENV['PROBLEM_DETAILS_BASE_URL'] ?? null;
-                    $baseUrl = is_string($override) && $override !== '' ? $override : self::PROBLEM_DETAILS_BASE_URL;
-
-                    return new ProblemDetailsResponseFactory($responseFactory, $streamFactory, $baseUrl);
+                    return new ProblemDetailsResponseFactory($responseFactory, $streamFactory, self::resolveProblemDetailsBaseUrl());
                 },
             )
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
@@ -212,6 +206,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         domainExceptionHandlers: $exceptionHandlers,
                         requestIdHolder: $requestIdHolder,
                         routeRegistrars: $routeRegistrars,
+                        problemDetailsBaseUrl: self::resolveProblemDetailsBaseUrl(),
                     );
                 },
             )
@@ -228,5 +223,17 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(ResponseEmitter::class, static fn (ContainerInterface $container): ResponseEmitter => new ResponseEmitter());
+    }
+
+    /**
+     * Problem Details `type` base for both framework-level and domain errors
+     * (terminology §13). Honours an explicit PROBLEM_DETAILS_BASE_URL override,
+     * else uses the suite base rather than the NENE2 framework default.
+     */
+    private static function resolveProblemDetailsBaseUrl(): string
+    {
+        $override = $_SERVER['PROBLEM_DETAILS_BASE_URL'] ?? $_ENV['PROBLEM_DETAILS_BASE_URL'] ?? null;
+
+        return is_string($override) && $override !== '' ? $override : self::PROBLEM_DETAILS_BASE_URL;
     }
 }
