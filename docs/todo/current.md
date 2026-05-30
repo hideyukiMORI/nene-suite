@@ -27,7 +27,8 @@
 - [x] Issue #42: Backend slice 7 — apex Auth domain (operator + JWT session) — merged (PR #43)
 - [x] Issue #44: Backend slice 8 — suite-audit-events read (R-08, paginated, authenticated) — merged (PR #45)
 - [x] Issue #46: Backend slice 9 — SuiteEnv URL reader + installed-apps launcher (R-06) — merged (PR #47)
-- [x] Issue #48: Backend slice 10 — populate install manifest apps[] (SuiteEnv URLs + DatabaseProvision names) — PR pending
+- [x] Issue #48: Backend slice 10 — populate install manifest apps[] (SuiteEnv URLs + DatabaseProvision names) — merged (PR #49)
+- [x] Issue #50: Frontend slice 1 — strict toolchain + shared/api + auth login vertical — PR pending
 
 ## Phase 1 OpenAPI: all 13 operations implemented ✅
 
@@ -40,6 +41,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [ ] **Provisioning (write side)**: `SuiteEnv` env **generation** + `DatabaseProvision` actual DB creation (Tier B); `app_versions` pinning; audit `env_config.written` / `database.provisioned` (manifest `apps[]` now populated — #48)
 - [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — calls the same use cases; **blocked on professional sign-off** per Blockers
 - [ ] Operator provisioning — first apex operator created by the installer / org-admin flow
+- [ ] **Frontend slices 2+**: app-launcher (installed-apps) → install wizard (apps/disclaimer/review/complete) → audit viewer; `shared/ui` primitives + Tailwind; Storybook + knip + MSW handlers per entity
 - [ ] Shared apex auth middleware (≥2 endpoints now authenticate via `BearerTokenAuthenticator`)
 - [ ] `IntegrationWiring`; `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
 - [ ] Backend: `SuiteEnv` (NENE_SUITE_* generation) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
