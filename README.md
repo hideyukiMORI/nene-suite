@@ -42,6 +42,7 @@ installable standalone via their own git clone or release ZIP.
 | Product vision | [`docs/explanation/product-vision.md`](./docs/explanation/product-vision.md) |
 | Sibling / installable apps | [`docs/integrations/sibling-products.md`](./docs/integrations/sibling-products.md) |
 | App catalog | [`catalog/apps.json`](./catalog/apps.json) |
+| API contract (Phase 1, SSOT) | [`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml) |
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |
 | Commit conventions | [`docs/development/commit-conventions.md`](./docs/development/commit-conventions.md) |
 | Current work | [`docs/todo/current.md`](./docs/todo/current.md) |
