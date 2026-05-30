@@ -22,6 +22,7 @@ use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotReadyExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
+use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use Psr\Container\ContainerInterface;
 
@@ -54,6 +55,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $installSession = $container->get('nene-suite.route_registrar.install_session');
                     $appSelection = $container->get('nene-suite.route_registrar.app_selection');
                     $auth = $container->get('nene-suite.route_registrar.auth');
+                    $suiteAudit = $container->get('nene-suite.route_registrar.suite_audit');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -71,11 +73,16 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Auth route registrar service is invalid.');
                     }
 
+                    if (!$suiteAudit instanceof SuiteAuditRouteRegistrar) {
+                        throw new LogicException('Suite audit route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
                         $installSession,
                         $appSelection,
                         $auth,
+                        $suiteAudit,
                     ];
                 },
             )
