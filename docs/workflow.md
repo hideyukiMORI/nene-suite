@@ -39,6 +39,19 @@ Every PR should include:
 
 Do not commit directly to `main`.
 
+## Continuous Integration
+
+`.github/workflows/ci.yml` runs on every PR and `main` push. It executes the same
+self-contained guards available locally — no CI-only checks:
+
+- `tools/check-terminology.sh` (terminology guard, ADR 0006)
+- `tools/validate-catalog.sh` (catalog schema + dependency DAG)
+- `npx @redocly/cli@2 lint docs/openapi/openapi.yaml` (OpenAPI 3.1 contract)
+- `frontend`: `npm ci` + `npm run check` (type-check + Vitest)
+
+Run these locally before opening a PR. `composer openapi` and docs link checking
+join CI when their prerequisites land (backend scaffold; link-check tool).
+
 ## Local Project Memory
 
 - `docs/roadmap.md`: long-lived direction and phases
