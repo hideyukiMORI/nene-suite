@@ -7,8 +7,13 @@ namespace NeNeSuite;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Error\DomainExceptionHandlerInterface;
 use NeNeSuite\AppCatalog\AppCatalogRouteRegistrar;
 use NeNeSuite\AppCatalog\AppCatalogServiceProvider;
+use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
+use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
+use NeNeSuite\InstallSession\InstallSessionServiceProvider;
+use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -24,26 +29,45 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
     public function register(ContainerBuilder $builder): void
     {
-        $builder->addProvider(new AppCatalogServiceProvider());
+        $builder
+            ->addProvider(new AppCatalogServiceProvider())
+            ->addProvider(new SuiteAuditServiceProvider())
+            ->addProvider(new InstallSessionServiceProvider());
 
         $builder
             ->set(
                 self::ROUTE_REGISTRARS,
                 static function (ContainerInterface $container): array {
                     $appCatalog = $container->get('nene-suite.route_registrar.app_catalog');
+                    $installSession = $container->get('nene-suite.route_registrar.install_session');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
                     }
 
+                    if (!$installSession instanceof InstallSessionRouteRegistrar) {
+                        throw new LogicException('Install session route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
+                        $installSession,
                     ];
                 },
             )
             ->set(
                 self::EXCEPTION_HANDLERS,
-                static fn (ContainerInterface $container): array => [],
+                static function (ContainerInterface $container): array {
+                    $installSessionNotFound = $container->get(InstallSessionNotFoundExceptionHandler::class);
+
+                    if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Install session not found exception handler service is invalid.');
+                    }
+
+                    return [
+                        $installSessionNotFound,
+                    ];
+                },
             );
     }
 }

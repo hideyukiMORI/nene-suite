@@ -4,9 +4,11 @@ NeNe Suite backend is a **NENE2 consumer application** for the apex HTTP API,
 installer orchestration, and suite control database. Sibling product domain logic
 (billing, reconciliation, CMS, archive) **MUST NOT** appear in this repository.
 
-**Status:** Phase 1 vertical slices land incrementally — catalog read (✅ done,
-`src/AppCatalog/`), then install session lifecycle, env generation, manifest write,
-audit recording — following these rules from the first commit.
+**Status:** Phase 1 vertical slices land incrementally — catalog read
+(✅ `src/AppCatalog/`), install session start/get + control DB + audit recorder
+(✅ `src/InstallSession/`, `src/SuiteAudit/`), then the remaining lifecycle
+(app-selection, disclaimer, complete, fail), env generation, manifest write —
+following these rules from the first commit.
 
 **Framework reference:** `vendor/hideyukimori/nene2/docs/` after `composer install`;
 sibling checkout at `../NENE2`.

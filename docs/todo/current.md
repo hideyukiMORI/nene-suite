@@ -16,14 +16,16 @@
 - [x] Issue #20: Catalog validation script — merged (PR #21)
 - [x] Issue #22: CI workflow (terminology + catalog + OpenAPI lint + frontend) — merged (PR #23)
 - [x] Issue #24: Untrack frontend/node_modules + .gitignore fix — merged (PR #25)
-- [x] Issue #26: Backend scaffold + first slice (AppCatalog read) — PR pending (`src/AppCatalog/`, `composer.json`, CI backend job)
+- [x] Issue #26: Backend scaffold + first slice (AppCatalog read) — merged (PR #27)
+- [x] Issue #28: Backend slice 2 — control DB + SuiteAudit recorder + InstallSession start/get — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] Backend slice 2: `InstallSession` lifecycle + control DB (Phinx) + `SuiteAudit` recorder (start/complete/fail, app-selection, disclaimer)
-- [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + audit read endpoints
+- [ ] Backend slice 3: remaining InstallSession lifecycle — `app-selection` (dependency resolution) / `disclaimer-acceptance` / `complete` (+ manifest) / `fail`, each with audit
+- [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + `suite-audit-events` read endpoints
+- [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred from #28)
 - [ ] Docker Compose installer MVP (Invoice + Clear)
 - [ ] Docs relative-link check tool + add to CI (deferred from #22)
 - [ ] `composer openapi` PHP validator + add to CI backend job (follow-up to #18/#26)
