@@ -84,6 +84,27 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
             return null;
         }
 
+        return $this->hydrate($row);
+    }
+
+    public function findLatestCompleted(): ?InstallSession
+    {
+        $row = $this->query->fetchOne(
+            "SELECT * FROM install_sessions WHERE status = 'completed' ORDER BY completed_at DESC, id DESC LIMIT 1",
+        );
+
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->hydrate($row);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function hydrate(array $row): InstallSession
+    {
         return new InstallSession(
             id: (string) $row['id'],
             suiteId: (string) $row['suite_id'],

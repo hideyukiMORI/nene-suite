@@ -25,18 +25,22 @@
 - [x] Issue #38: Backend slice 6 — OpenAPI contract validation (`composer openapi`) + route↔spec test — merged (PR #39)
 - [x] Issue #40: OpenAPI contract — apex auth session — merged (PR #41)
 - [x] Issue #42: Backend slice 7 — apex Auth domain (operator + JWT session) — merged (PR #43)
-- [x] Issue #44: Backend slice 8 — suite-audit-events read (R-08, paginated, authenticated) — PR pending
+- [x] Issue #44: Backend slice 8 — suite-audit-events read (R-08, paginated, authenticated) — merged (PR #45)
+- [x] Issue #46: Backend slice 9 — SuiteEnv URL reader + installed-apps launcher (R-06) — PR pending
 
-## Next (Phase 0 → Phase 1)
+## Phase 1 OpenAPI: all 13 operations implemented ✅
+
+health · catalog · install-session (start/get/app-selection/disclaimer/complete/fail) · auth session (create/get/delete) · suite-audit-events · installed-apps. Every mutation has before/after audit; all Problem `type` use `nene-suite.dev`; `composer openapi` + route↔spec test guard the contract.
+
+## Next (Phase 1 → Phase 2)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] Backend: `SuiteEnv` (generate `NENE_SUITE_APP_*_URL` etc.) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; then `installed-apps` (R-06) reads real public URLs
-- [ ] Shared apex auth middleware (now that ≥2 endpoints authenticate via `BearerTokenAuthenticator`)
-- [ ] Operator provisioning — first apex operator created by the installer / org-admin flow (no creation endpoint yet)
+- [ ] **Provisioning (write side)**: `SuiteEnv` env generation + `DatabaseProvision` → write per-app DB names / public URLs; populate manifest `apps[]` / `app_versions`; audit `env_config.written` / `database.provisioned`
+- [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — calls the same use cases; **blocked on professional sign-off** per Blockers
+- [ ] Operator provisioning — first apex operator created by the installer / org-admin flow
+- [ ] Shared apex auth middleware (≥2 endpoints now authenticate via `BearerTokenAuthenticator`)
 - [ ] `IntegrationWiring`; `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
-
-Phase 1 OpenAPI: **12 of 13 operations implemented** — only `listInstalledApps` (R-06) remains, paired with SuiteEnv public-URL generation.
 - [ ] Backend: `SuiteEnv` (NENE_SUITE_* generation) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
 - [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
 
