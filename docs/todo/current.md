@@ -24,16 +24,19 @@
 - [x] Issue #36: Backend slice 5 — completeInstallSession + InstallManifest (ADR 0010) — merged (PR #37)
 - [x] Issue #38: Backend slice 6 — OpenAPI contract validation (`composer openapi`) + route↔spec test — merged (PR #39)
 - [x] Issue #40: OpenAPI contract — apex auth session — merged (PR #41)
-- [x] Issue #42: Backend slice 7 — apex Auth domain (operator + JWT session) — PR pending
+- [x] Issue #42: Backend slice 7 — apex Auth domain (operator + JWT session) — merged (PR #43)
+- [x] Issue #44: Backend slice 8 — suite-audit-events read (R-08, paginated, authenticated) — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] Backend read endpoints — `installed-apps` (R-06) + `suite-audit-events` (R-08, paginated), protected with `BearerTokenAuthenticator` (or a shared apex auth middleware when ≥2 protected endpoints exist)
+- [ ] Backend: `SuiteEnv` (generate `NENE_SUITE_APP_*_URL` etc.) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; then `installed-apps` (R-06) reads real public URLs
+- [ ] Shared apex auth middleware (now that ≥2 endpoints authenticate via `BearerTokenAuthenticator`)
 - [ ] Operator provisioning — first apex operator created by the installer / org-admin flow (no creation endpoint yet)
-- [ ] Backend: `SuiteEnv` / `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
-- [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
+- [ ] `IntegrationWiring`; `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
+
+Phase 1 OpenAPI: **12 of 13 operations implemented** — only `listInstalledApps` (R-06) remains, paired with SuiteEnv public-URL generation.
 - [ ] Backend: `SuiteEnv` (NENE_SUITE_* generation) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
 - [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
 
