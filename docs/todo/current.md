@@ -7,7 +7,8 @@
 - [x] Issue #1: Governance bootstrap — PR #2
 - [x] Issue #3: Installer disclaimer — PR #4
 - [x] Issue #5–#6: Review gate + env contract — PR #7
-- [x] Issue #8: Orchestration compliance (士業 review pattern) — PR pending
+- [x] Issue #8: Orchestration compliance — PR #9
+- [ ] Issue #10: Terminology registry — PR pending
 
 ## Next (Phase 0 → Phase 1)
 

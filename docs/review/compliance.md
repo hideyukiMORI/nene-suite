@@ -23,3 +23,4 @@ Do not delete items to pass. Mark `N/A` only when genuinely not applicable.
 - [ ] Secrets not written to install manifest or git.
 - [ ] Any deviation carries ADR + professional sign-off per orchestration-compliance §9.
 - [ ] Sibling product compliance docs referenced where domain touch occurs — not duplicated or overridden.
+- [ ] Terminology matches [`../explanation/terminology.md`](../explanation/terminology.md); see [`../review/terminology.md`](../review/terminology.md).

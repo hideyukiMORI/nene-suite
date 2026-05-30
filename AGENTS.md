@@ -14,6 +14,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 ## Read First
 
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
+- **Terminology (binding — exact spellings):** `docs/explanation/terminology.md`
 - **Disclaimer (binding):** `docs/explanation/disclaimer.md` — no business or legal warranty
 - **Orchestration compliance (binding):** `docs/explanation/orchestration-compliance.md` — SSOT / DB / 士業 review (ADR 0005)
 - **Requirements:** `docs/explanation/requirements.md`
@@ -35,6 +36,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Do not vendor sibling product source** into this repository
 - **Do not add product domain logic** (billing, CMS entities, document archive, etc.)
 - **Do not imply business, legal, or compliance guarantees** — see `docs/explanation/disclaimer.md`
+- **Use exact terms from `docs/explanation/terminology.md`** — typos and unregistered identifiers block merge (ADR 0006)
 - **Repository docs: English only**
 - **No secrets** — never commit `.env`, tokens, or production credentials
 

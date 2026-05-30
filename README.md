@@ -34,6 +34,7 @@ installable standalone via their own git clone or release ZIP.
 | --- | --- |
 | Agent entry | [`AGENTS.md`](./AGENTS.md) |
 | Scope contract (binding) | [`docs/explanation/scope-contract.md`](./docs/explanation/scope-contract.md) |
+| Terminology (binding) | [`docs/explanation/terminology.md`](./docs/explanation/terminology.md) |
 | Disclaimer (binding) | [`docs/explanation/disclaimer.md`](./docs/explanation/disclaimer.md) |
 | Orchestration compliance (binding) | [`docs/explanation/orchestration-compliance.md`](./docs/explanation/orchestration-compliance.md) |
 | Requirements | [`docs/explanation/requirements.md`](./docs/explanation/requirements.md) |

@@ -8,6 +8,7 @@ NeNe Suite is built through small, Issue-driven changes. This document is the sh
 | --- | --- |
 | Agent entry point | `AGENTS.md` |
 | Scope contract (binding) | `docs/explanation/scope-contract.md` |
+| Terminology (binding) | `docs/explanation/terminology.md` |
 | Disclaimer (binding) | `docs/explanation/disclaimer.md` |
 | Orchestration compliance (binding) | `docs/explanation/orchestration-compliance.md` |
 | Requirements | `docs/explanation/requirements.md` |
@@ -64,8 +65,9 @@ guarantees business outcomes, legal compliance, or professional advice. See
 [`docs/explanation/disclaimer.md`](explanation/disclaimer.md).
 
 Installer and catalog changes **must** follow
-[`docs/explanation/orchestration-compliance.md`](explanation/orchestration-compliance.md)
-and [`docs/review/compliance.md`](review/compliance.md).
+[`docs/explanation/orchestration-compliance.md`](explanation/orchestration-compliance.md),
+[`docs/explanation/terminology.md`](explanation/terminology.md), and
+[`docs/review/compliance.md`](review/compliance.md).
 
 ## Sibling Products
 

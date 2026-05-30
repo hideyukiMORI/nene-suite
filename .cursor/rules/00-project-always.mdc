@@ -10,5 +10,6 @@ alwaysApply: true
 - Do NOT vendor sibling product source or merge product repos into this tree.
 - Do NOT add billing, CMS, archive, CSV, or reconciliation domain logic here.
 - Do NOT imply business, legal, tax, or compliance guarantees — see `docs/explanation/disclaimer.md`.
+- **Terminology SSOT:** all identifiers MUST match `docs/explanation/terminology.md` exactly (ADR 0006).
 - Issue-driven workflow; English repository docs; no secrets in git.
 - When docs and Cursor rules conflict, update docs first and keep rules concise.

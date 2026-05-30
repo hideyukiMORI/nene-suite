@@ -6,7 +6,7 @@ accepted
 
 ## Context
 
-NeNe Invoice uses [`accounting-compliance.md`](../explanation/accounting-compliance.md)
+NeNe Invoice uses [nene-invoice `accounting-compliance.md`](https://github.com/hideyukiMORI/nene-invoice/blob/main/docs/explanation/accounting-compliance.md)
 so finance professionals can review billing logic with **zero silent deviations**.
 NeNe Clear mirrors that pattern for reconciliation.
 
