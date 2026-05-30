@@ -28,6 +28,7 @@ This template is **not legal advice**. It records engineering process only.
 - [ ] HTTP integration wiring defaults (§5)
 - [ ] Install manifest requirements (§6.1)
 - [ ] Orchestration audit trail — before/after, no secrets (§6.2, audit-trail.md)
+- [ ] Coding standards inheritance (ADR 0008, backend/frontend standards)
 - [ ] Other: _______________
 
 ---

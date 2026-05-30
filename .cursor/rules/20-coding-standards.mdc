@@ -1,0 +1,14 @@
+---
+description: NENE2-derived coding standards — mandatory for all implementation
+alwaysApply: true
+---
+
+# Coding Standards (NENE2 inheritance)
+
+- **SSOT:** `docs/inheritance-from-nene2.md`, `docs/development/coding-standards.md`, ADR 0008.
+- **Backend:** domain-grouped `src/{Domain}/` — Handler → UseCase → Repository; `SuiteAuditRecorder` in mutating use cases; control DB only.
+- **Frontend:** `app → pages → features → entities → shared`; TanStack Query in entities; no fetch outside `shared/api/client.ts`.
+- **Naming:** `docs/development/naming-conventions.md` + `docs/explanation/terminology.md` — violations block merge.
+- **Schema:** `catalog/` and `schema/` per `docs/development/schema-conventions.md`.
+- **PR:** run checklists from `docs/development/self-review.md`; name them in PR body.
+- **Do not** copy NENE2 framework trees into `src/`; **do not** add sibling domain logic.
