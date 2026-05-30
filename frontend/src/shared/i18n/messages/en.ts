@@ -125,8 +125,7 @@ export const en = {
   'suite.install.errors.disclaimerRequired': 'Accept the disclaimer to continue.',
 
   // ── Apex footer ──────────────────────────────────────────────────────────
-  'suite.disclaimer.footer':
-    'Setup orchestration only — no business or legal warranty.',
+  'suite.disclaimer.footer': 'Setup orchestration only — no business or legal warranty.',
 
   // ── Audit log UI (Phase 2+) ──────────────────────────────────────────────
   'suite.audit.title': 'Orchestration audit log',

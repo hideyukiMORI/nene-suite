@@ -14,7 +14,9 @@ describe('translate', () => {
   })
 
   it('interpolates {{param}} placeholders', () => {
-    expect(translate(en, 'suite.install.apps.selectedCount', { count: 2 })).toBe('2 app(s) selected')
+    expect(translate(en, 'suite.install.apps.selectedCount', { count: 2 })).toBe(
+      '2 app(s) selected',
+    )
   })
 })
 
