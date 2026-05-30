@@ -1,16 +1,22 @@
 import { Link } from 'react-router-dom'
 import { InstallWizard } from '@/features/install-wizard'
 import { useTranslation } from '@/shared/i18n'
+import { LocaleSwitcher, PageHeader } from '@/shared/ui'
 
 export function InstallPage() {
   const { t } = useTranslation()
 
   return (
     <main>
-      <header>
-        <h1>{t('suite.nav.appTitle')}</h1>
-        <Link to="/">{t('suite.nav.home')}</Link>
-      </header>
+      <PageHeader
+        title={t('suite.nav.appTitle')}
+        actions={
+          <>
+            <Link to="/">{t('suite.nav.home')}</Link>
+            <LocaleSwitcher />
+          </>
+        }
+      />
       <InstallWizard />
     </main>
   )

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { SsotRole } from '@/entities/installed-app'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
+import { EmptyState, ErrorState, LoadingState } from '@/shared/ui'
 import { useAppLauncher } from '../hooks/use-app-launcher'
 
 const SSOT_LABEL_KEYS: Record<SsotRole, MessageKey | null> = {
@@ -16,20 +17,20 @@ export function AppLauncher() {
   const { apps, isLoading, isError } = useAppLauncher()
 
   if (isLoading) {
-    return <p>{t('common.state.loading')}</p>
+    return <LoadingState label={t('common.state.loading')} />
   }
 
   if (isError) {
-    return <p role="alert">{t('common.state.error')}</p>
+    return <ErrorState label={t('common.state.error')} />
   }
 
   if (apps.length === 0) {
     return (
-      <section>
-        <h3>{t('suite.launcher.empty.title')}</h3>
-        <p>{t('suite.launcher.empty.description')}</p>
-        <Link to="/install">{t('suite.launcher.startInstall')}</Link>
-      </section>
+      <EmptyState
+        title={t('suite.launcher.empty.title')}
+        description={t('suite.launcher.empty.description')}
+        action={<Link to="/install">{t('suite.launcher.startInstall')}</Link>}
+      />
     )
   }
 
