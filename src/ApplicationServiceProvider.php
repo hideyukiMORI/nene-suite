@@ -16,6 +16,7 @@ use NeNeSuite\Auth\AuthRouteRegistrar;
 use NeNeSuite\Auth\AuthServiceProvider;
 use NeNeSuite\Auth\InvalidCredentialsExceptionHandler;
 use NeNeSuite\Auth\UnauthorizedExceptionHandler;
+use NeNeSuite\DatabaseProvision\DatabaseProvisionServiceProvider;
 use NeNeSuite\InstalledApps\InstalledAppsRouteRegistrar;
 use NeNeSuite\InstalledApps\InstalledAppsServiceProvider;
 use NeNeSuite\InstallManifest\InstallManifestServiceProvider;
@@ -50,6 +51,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new AppSelectionServiceProvider())
             ->addProvider(new AuthServiceProvider())
             ->addProvider(new SuiteEnvServiceProvider())
+            ->addProvider(new DatabaseProvisionServiceProvider())
             ->addProvider(new InstalledAppsServiceProvider());
 
         $builder

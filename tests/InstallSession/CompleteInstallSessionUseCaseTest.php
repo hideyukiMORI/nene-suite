@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Tests\InstallSession;
 
+use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallSession\CompleteInstallSessionInput;
 use NeNeSuite\InstallSession\CompleteInstallSessionUseCase;
@@ -13,6 +14,7 @@ use NeNeSuite\InstallSession\InstallSessionNotFoundException;
 use NeNeSuite\InstallSession\InstallSessionNotReadyException;
 use NeNeSuite\InstallSession\InstallSessionStatus;
 use NeNeSuite\InstallSession\InstallTier;
+use NeNeSuite\Tests\InstalledApps\FixedSuiteAppUrlReader;
 use NeNeSuite\Tests\InstallManifest\InMemoryInstallManifestRepository;
 use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorder;
 use PHPUnit\Framework\TestCase;
@@ -59,6 +61,41 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         self::assertSame('completed', $completedEvent->afterJson['status']);
     }
 
+    public function testPopulatesManifestAppsForConfiguredUrls(): void
+    {
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->readySession(selectedApps: ['nene-invoice', 'nene-clear']));
+        $manifests = new InMemoryInstallManifestRepository();
+
+        // Only nene-invoice has a configured public URL; nene-clear is omitted from apps[].
+        $useCase = $this->useCase($sessions, $manifests, null, ['nene-invoice' => 'https://example.com/nene-invoice/']);
+        $output = $useCase->execute(new CompleteInstallSessionInput(self::SESSION_ID));
+
+        $manifest = $manifests->findById((string) $output->session->installManifestId);
+        self::assertNotNull($manifest);
+        self::assertArrayHasKey('apps', $manifest->body);
+        self::assertIsArray($manifest->body['apps']);
+        self::assertCount(1, $manifest->body['apps']);
+        self::assertSame([
+            'catalog_id' => 'nene-invoice',
+            'public_url' => 'https://example.com/nene-invoice/',
+            'database_name' => 'nene_invoice',
+        ], $manifest->body['apps'][0]);
+    }
+
+    public function testOmitsManifestAppsWhenNoUrlsConfigured(): void
+    {
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->readySession(selectedApps: ['nene-invoice']));
+        $manifests = new InMemoryInstallManifestRepository();
+
+        $output = $this->useCase($sessions, $manifests)->execute(new CompleteInstallSessionInput(self::SESSION_ID));
+
+        $manifest = $manifests->findById((string) $output->session->installManifestId);
+        self::assertNotNull($manifest);
+        self::assertArrayNotHasKey('apps', $manifest->body);
+    }
+
     public function testThrowsWhenDisclaimerNotAccepted(): void
     {
         $sessions = new InMemoryInstallSessionRepository();
@@ -102,16 +139,22 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         $this->useCase(new InMemoryInstallSessionRepository())->execute(new CompleteInstallSessionInput(self::SESSION_ID));
     }
 
+    /**
+     * @param array<string, string> $urls
+     */
     private function useCase(
         InMemoryInstallSessionRepository $sessions,
         ?InMemoryInstallManifestRepository $manifests = null,
         ?RecordingSuiteAuditRecorder $recorder = null,
+        array $urls = [],
     ): CompleteInstallSessionUseCase {
         return new CompleteInstallSessionUseCase(
             $sessions,
             $manifests ?? new InMemoryInstallManifestRepository(),
             new InstallManifestFactory(),
             $recorder ?? new RecordingSuiteAuditRecorder(),
+            new FixedSuiteAppUrlReader($urls),
+            new AppDatabaseNamer(),
             self::SUITE_ID,
             self::ORG_ID,
         );

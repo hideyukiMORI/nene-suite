@@ -8,17 +8,22 @@ use stdClass;
 use Symfony\Component\Uid\Ulid;
 
 /**
- * Builds the Phase 1 minimal install manifest (ADR 0010) from data available at
- * completion. Per-app provisioning details (`apps[]`, pinned `app_versions`) are
- * added by later provisioning slices; `app_versions` is an empty object until then.
+ * Builds the install manifest (ADR 0010) from data available at completion.
+ * `apps[]` carries the per-app public URL and provisioned database name for apps
+ * with a configured URL; `app_versions` stays an empty object until version
+ * pinning lands.
  */
 final readonly class InstallManifestFactory
 {
+    /**
+     * @param list<InstallManifestApp> $apps installed apps with a configured public URL
+     */
     public function create(
         string $suiteId,
         string $orgExternalId,
         ?string $orgDisplayName,
         ?string $disclaimerAcceptedAt,
+        array $apps = [],
     ): InstallManifest {
         $installedAt = gmdate('Y-m-d\TH:i:s\Z');
 
@@ -36,6 +41,17 @@ final readonly class InstallManifestFactory
 
         if ($disclaimerAcceptedAt !== null) {
             $body['disclaimer_accepted_at'] = $disclaimerAcceptedAt;
+        }
+
+        if ($apps !== []) {
+            $body['apps'] = array_map(
+                static fn (InstallManifestApp $app): array => [
+                    'catalog_id' => $app->catalogId,
+                    'public_url' => $app->publicUrl,
+                    'database_name' => $app->databaseName,
+                ],
+                $apps,
+            );
         }
 
         $contentHash = hash('sha256', json_encode($body, JSON_THROW_ON_ERROR));
