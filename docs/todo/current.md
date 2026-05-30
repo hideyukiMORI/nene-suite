@@ -9,7 +9,8 @@
 - [x] Issue #5–#6: Review gate + env contract — PR #7
 - [x] Issue #8: Orchestration compliance — PR #9
 - [x] Issue #10: Terminology registry — PR #11
-- [x] Issue #12: Audit trail (before/after) — PR pending
+- [x] Issue #12: Audit trail (before/after) — merged
+- [ ] Issue #14: NENE2 coding standards — PR pending
 
 ## Next (Phase 0 → Phase 1)
 

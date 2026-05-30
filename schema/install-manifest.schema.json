@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nene-suite.dev/schemas/install-manifest.json",
+  "title": "InstallManifest",
+  "description": "Point-in-time suite install snapshot. No secrets. Binding fields match docs/explanation/terminology.md and orchestration-compliance.md section 6.1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "suite_id",
+    "installed_at",
+    "app_versions",
+    "org_external_id",
+    "enabled_integrations"
+  ],
+  "properties": {
+    "suite_id": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "installed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "app_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Map of catalog id to pinned version string"
+    },
+    "org_external_id": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "org_display_name": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "enabled_integrations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "apps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["catalog_id", "public_url", "database_name"],
+        "properties": {
+          "catalog_id": {
+            "type": "string",
+            "pattern": "^nene-[a-z0-9-]+$"
+          },
+          "public_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        }
+      }
+    },
+    "disclaimer_accepted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "manifest_content_hash": {
+      "type": "string",
+      "description": "Optional SHA-256 hex for audit alignment with install_session.completed"
+    }
+  }
+}

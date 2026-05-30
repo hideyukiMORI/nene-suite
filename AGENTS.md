@@ -13,6 +13,13 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 
 ## Read First
 
+- **NENE2 inheritance (binding):** `docs/inheritance-from-nene2.md` — ADR 0008
+- **Coding standards index:** `docs/development/coding-standards.md`
+- **Backend standards (binding):** `docs/development/backend-standards.md`
+- **Frontend standards (binding):** `docs/development/frontend-standards.md`
+- **Naming conventions (binding):** `docs/development/naming-conventions.md`
+- **Schema conventions (binding):** `docs/development/schema-conventions.md`
+- **Self-review:** `docs/development/self-review.md`, `docs/review/`
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
 - **Terminology (binding — exact spellings):** `docs/explanation/terminology.md`
 - **Disclaimer (binding):** `docs/explanation/disclaimer.md` — no business or legal warranty
@@ -38,6 +45,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Do not add product domain logic** (billing, CMS entities, document archive, etc.)
 - **Do not imply business, legal, or compliance guarantees** — see `docs/explanation/disclaimer.md`
 - **Use exact terms from `docs/explanation/terminology.md`** — typos and unregistered identifiers block merge (ADR 0006)
+- **Follow NENE2-derived coding standards** — placement, layering, naming, schema rules block merge (ADR 0008)
 - **Repository docs: English only**
 - **No secrets** — never commit `.env`, tokens, or production credentials
 

@@ -276,7 +276,20 @@ Permitted alternatives: see [`disclaimer.md`](./disclaimer.md) and
 
 ---
 
-## 13. How to change this registry
+## 13. Code identifiers (Phase 1+)
+
+| Symbol | Canonical | Never |
+| --- | --- | --- |
+| PHP root namespace | **`NeNeSuite\`** | `NeneSuite\`, `NeNe\Suite\`, `Suite\` |
+| Audit recorder class | **`SuiteAuditRecorder`** | `AuditLogger`, `AuditService` |
+| Problem Details base | **`https://nene-suite.dev/problems/`** | ad-hoc problem URLs |
+| API prefix | **`/api/v1/`** | `/api/`, unversioned public JSON |
+
+Full placement and naming: [`../development/naming-conventions.md`](../development/naming-conventions.md).
+
+---
+
+## 14. How to change this registry
 
 1. Open an Issue explaining the new term or correction.
 2. Update this file in the same PR as the first use.
