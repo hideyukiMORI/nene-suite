@@ -76,6 +76,8 @@ tags:
     description: Apex launcher — applications provisioned through the suite.
   - name: Audit
     description: Read-only orchestration audit trail (operator-authenticated).
+  - name: Auth
+    description: Apex operator authentication session (login / current operator / logout).
 
 paths:
   /health:
@@ -600,6 +602,94 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/auth/session:
+    post:
+      tags: [Auth]
+      operationId: createAuthSession
+      summary: Log in — create an apex operator session.
+      description: |
+        Authenticates an operator by email and password and returns a short-lived
+        apex JWT plus the operator profile. Unauthenticated. Invalid credentials
+        return 401 `invalid-credentials` (not 422) so the apex shell can show a
+        single "invalid email or password" message without revealing which field failed.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuthSessionRequest'
+            example:
+              email: operator@example.com
+              password: '••••••••'
+      responses:
+        '201':
+          description: Session created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature
+                expiresAt: '2026-05-30T11:48:46Z'
+                operator:
+                  id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                  email: operator@example.com
+                  displayName: Example Operator
+        '401':
+          description: Invalid email or password.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://nene-suite.dev/problems/invalid-credentials
+                title: Invalid credentials
+                status: 401
+                detail: Invalid email or password.
+                instance: /api/v1/auth/session
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Auth]
+      operationId: getAuthSession
+      summary: Current operator for the presented token.
+      description: |
+        Returns the operator associated with the bearer token, so the apex shell
+        can validate the session on load and render the signed-in operator.
+        Read-only; no audit event.
+      responses:
+        '200':
+          description: Authenticated operator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+              example:
+                id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                email: operator@example.com
+                displayName: Example Operator
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [Auth]
+      operationId: deleteAuthSession
+      summary: Log out — end the apex operator session.
+      description: |
+        Ends the current session. JWTs are stateless in Phase 1, so clients MUST
+        discard the token; server-side revocation MAY be added in Phase 2.
+      responses:
+        '204':
+          description: Session ended; no content.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -700,6 +790,50 @@ components:
       pattern: '^nene-[a-z0-9-]+$'
       description: Catalog app id (`docs/explanation/terminology.md` §2.1).
       example: nene-invoice
+
+    Operator:
+      type: object
+      additionalProperties: false
+      required: [id, email]
+      description: Apex operator identity. No password or secret material.
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        email:
+          type: string
+          format: email
+        displayName:
+          type: [string, 'null']
+          maxLength: 320
+
+    CreateAuthSessionRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        password:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          description: Never logged, stored in plaintext, or echoed in audit/manifest.
+
+    AuthSession:
+      type: object
+      additionalProperties: false
+      required: [token, expiresAt, operator]
+      properties:
+        token:
+          type: string
+          description: 'Apex operator JWT (bearer). Present it as the Authorization: Bearer header.'
+        expiresAt:
+          type: string
+          format: date-time
+        operator:
+          $ref: '#/components/schemas/Operator'
 
     HealthResponse:
       type: object
