@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { HomePage } from '@/pages/home/HomePage'
+import { InstallPage } from '@/pages/install/InstallPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { RequireAuth } from './auth-gate'
@@ -10,7 +11,10 @@ const router = createBrowserRouter([
   {
     element: <RequireAuth />,
     errorElement: <RootErrorBoundary />,
-    children: [{ path: '/', element: <HomePage /> }],
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/install', element: <InstallPage /> },
+    ],
   },
   { path: '*', element: <NotFoundPage /> },
 ])
