@@ -18,13 +18,13 @@
 - [x] Issue #24: Untrack frontend/node_modules + .gitignore fix — merged (PR #25)
 - [x] Issue #26: Backend scaffold + first slice (AppCatalog read) — merged (PR #27)
 - [x] Issue #28: Backend slice 2 — control DB + SuiteAudit recorder + InstallSession start/get — merged (PR #29)
-- [x] Issue #30: Backend slice 3 — app-selection with dependency resolution — PR pending
+- [x] Issue #30: Backend slice 3 — app-selection with dependency resolution — merged (PR #31)
+- [x] Issue #32: Problem Details base for framework errors → `nene-suite.dev` (NENE2 v1.5.328 / NENE2#1355) — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] **Problem Details base**: framework-level errors (ValidationException/no-route/500) use NENE2 default `nene2.dev` base; terminology §13 requires `nene-suite.dev`. Fix via suite response middleware or NENE2 configurability (cross-repo). Domain handlers already use `nene-suite.dev`.
 - [ ] Backend slice 4: remaining InstallSession lifecycle — `disclaimer-acceptance` / `fail` (reuse `update()`), then `complete` (+ manifest), each with audit
 - [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + `suite-audit-events` read endpoints
 - [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred from #28)

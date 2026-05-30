@@ -74,7 +74,7 @@
             "dist": {
                 "type": "path",
                 "url": "../NENE2",
-                "reference": "1baf2096dd07e296417b7ec88b4176a83c992bb7"
+                "reference": "62748cbfee7790fdd4f3673650e7a1a4992e29b2"
             },
             "require": {
                 "monolog/monolog": "^3.0",
