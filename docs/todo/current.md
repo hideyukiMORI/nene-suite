@@ -22,14 +22,15 @@
 - [x] Issue #32: Problem Details base for framework errors → `nene-suite.dev` (NENE2 v1.5.328 / NENE2#1355) — merged (PR #33)
 - [x] Issue #34: Backend slice 4 — install-session disclaimer-acceptance + fail — merged (PR #35)
 - [x] Issue #36: Backend slice 5 — completeInstallSession + InstallManifest (ADR 0010) — merged (PR #37)
-- [x] Issue #38: Backend slice 6 — OpenAPI contract validation (`composer openapi`) + route↔spec test — PR pending
+- [x] Issue #38: Backend slice 6 — OpenAPI contract validation (`composer openapi`) + route↔spec test — merged (PR #39)
+- [x] Issue #40: OpenAPI contract — apex auth session (createAuthSession / getAuthSession / deleteAuthSession) — PR pending
 
 ## Next (Phase 0 → Phase 1)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] **Apex auth foundation** (prerequisite for read endpoints): operator login + JWT verify middleware; protects `installed-apps` / `suite-audit-events`
-- [ ] Backend read endpoints — `installed-apps` (R-06) + `suite-audit-events` (R-08, paginated) — after apex auth
+- [ ] **Apex auth implementation** (契約 #40 を SSOT に): `Auth` domain — operator + password hash, `POST/GET/DELETE /api/v1/auth/session`, JWT issue/verify, apex auth middleware
+- [ ] Backend read endpoints — `installed-apps` (R-06) + `suite-audit-events` (R-08, paginated) — protected by apex auth
 - [ ] Backend: `SuiteEnv` (NENE_SUITE_* generation) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
 - [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
 
