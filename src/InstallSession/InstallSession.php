@@ -31,4 +31,28 @@ final readonly class InstallSession
         public ?string $completedAt,
     ) {
     }
+
+    /**
+     * @param list<string> $selectedApps
+     */
+    public function withSelectedApps(array $selectedApps, string $updatedAt): self
+    {
+        return new self(
+            id: $this->id,
+            suiteId: $this->suiteId,
+            status: $this->status,
+            tier: $this->tier,
+            catalogRevision: $this->catalogRevision,
+            selectedApps: $selectedApps,
+            disclaimerAccepted: $this->disclaimerAccepted,
+            disclaimerAcceptedAt: $this->disclaimerAcceptedAt,
+            orgExternalId: $this->orgExternalId,
+            orgDisplayName: $this->orgDisplayName,
+            installManifestId: $this->installManifestId,
+            failureCode: $this->failureCode,
+            createdAt: $this->createdAt,
+            updatedAt: $updatedAt,
+            completedAt: $this->completedAt,
+        );
+    }
 }

@@ -17,6 +17,11 @@ final class InMemoryInstallSessionRepository implements InstallSessionRepository
         $this->sessions[$session->id] = $session;
     }
 
+    public function update(InstallSession $session): void
+    {
+        $this->sessions[$session->id] = $session;
+    }
+
     public function findById(string $id): ?InstallSession
     {
         return $this->sessions[$id] ?? null;

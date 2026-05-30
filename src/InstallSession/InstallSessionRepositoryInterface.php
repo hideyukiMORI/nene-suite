@@ -8,5 +8,7 @@ interface InstallSessionRepositoryInterface
 {
     public function save(InstallSession $session): void;
 
+    public function update(InstallSession $session): void;
+
     public function findById(string $id): ?InstallSession;
 }

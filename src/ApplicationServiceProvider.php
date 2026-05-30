@@ -10,6 +10,9 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use NeNeSuite\AppCatalog\AppCatalogRouteRegistrar;
 use NeNeSuite\AppCatalog\AppCatalogServiceProvider;
+use NeNeSuite\AppSelection\AppSelectionRouteRegistrar;
+use NeNeSuite\AppSelection\AppSelectionServiceProvider;
+use NeNeSuite\InstallSession\InstallSessionConflictExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
@@ -32,7 +35,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         $builder
             ->addProvider(new AppCatalogServiceProvider())
             ->addProvider(new SuiteAuditServiceProvider())
-            ->addProvider(new InstallSessionServiceProvider());
+            ->addProvider(new InstallSessionServiceProvider())
+            ->addProvider(new AppSelectionServiceProvider());
 
         $builder
             ->set(
@@ -40,6 +44,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 static function (ContainerInterface $container): array {
                     $appCatalog = $container->get('nene-suite.route_registrar.app_catalog');
                     $installSession = $container->get('nene-suite.route_registrar.install_session');
+                    $appSelection = $container->get('nene-suite.route_registrar.app_selection');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -49,9 +54,14 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Install session route registrar service is invalid.');
                     }
 
+                    if (!$appSelection instanceof AppSelectionRouteRegistrar) {
+                        throw new LogicException('App selection route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
                         $installSession,
+                        $appSelection,
                     ];
                 },
             )
@@ -59,13 +69,19 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 self::EXCEPTION_HANDLERS,
                 static function (ContainerInterface $container): array {
                     $installSessionNotFound = $container->get(InstallSessionNotFoundExceptionHandler::class);
+                    $installSessionConflict = $container->get(InstallSessionConflictExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
                     }
 
+                    if (!$installSessionConflict instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Install session conflict exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
+                        $installSessionConflict,
                     ];
                 },
             );

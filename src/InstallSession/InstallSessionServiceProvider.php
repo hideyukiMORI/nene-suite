@@ -124,6 +124,18 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                 },
             )
             ->set(
+                InstallSessionConflictExceptionHandler::class,
+                static function (ContainerInterface $container): InstallSessionConflictExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new InstallSessionConflictExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.install_session',
                 static function (ContainerInterface $container): InstallSessionRouteRegistrar {
                     $start = $container->get(StartInstallSessionHandler::class);

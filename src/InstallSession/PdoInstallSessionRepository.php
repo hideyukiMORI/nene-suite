@@ -44,6 +44,35 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
         );
     }
 
+    public function update(InstallSession $session): void
+    {
+        $this->query->execute(
+            <<<'SQL'
+                UPDATE install_sessions SET
+                    status = ?, tier = ?, catalog_revision = ?, selected_apps_json = ?,
+                    disclaimer_accepted = ?, disclaimer_accepted_at = ?, org_external_id = ?,
+                    org_display_name = ?, install_manifest_id = ?, failure_code = ?,
+                    updated_at = ?, completed_at = ?
+                WHERE id = ?
+                SQL,
+            [
+                $session->status->value,
+                $session->tier->value,
+                $session->catalogRevision,
+                json_encode($session->selectedApps, JSON_THROW_ON_ERROR),
+                $session->disclaimerAccepted ? 1 : 0,
+                $session->disclaimerAcceptedAt,
+                $session->orgExternalId,
+                $session->orgDisplayName,
+                $session->installManifestId,
+                $session->failureCode,
+                $session->updatedAt,
+                $session->completedAt,
+                $session->id,
+            ],
+        );
+    }
+
     public function findById(string $id): ?InstallSession
     {
         $row = $this->query->fetchOne(

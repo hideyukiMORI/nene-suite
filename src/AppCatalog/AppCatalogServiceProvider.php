@@ -16,6 +16,7 @@ final readonly class AppCatalogServiceProvider implements ServiceProviderInterfa
     public function register(ContainerBuilder $builder): void
     {
         $builder
+            ->set(AppDependencyResolver::class, static fn (ContainerInterface $container): AppDependencyResolver => new AppDependencyResolver())
             ->set(
                 CatalogAppRepositoryInterface::class,
                 static function (ContainerInterface $container): CatalogAppRepositoryInterface {
