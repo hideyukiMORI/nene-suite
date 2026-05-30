@@ -7,8 +7,9 @@ installer orchestration, and suite control database. Sibling product domain logi
 **Status:** Phase 1 vertical slices land incrementally — catalog read
 (✅ `src/AppCatalog/`), install session start/get + control DB + audit recorder
 (✅ `src/InstallSession/`, `src/SuiteAudit/`), app-selection with dependency
-resolution (✅ `src/AppSelection/`), disclaimer-acceptance + fail
-(✅ `src/InstallSession/`), then complete (+ manifest), env generation —
+resolution (✅ `src/AppSelection/`), disclaimer-acceptance + fail + complete
+(✅ `src/InstallSession/`) with install manifest (✅ `src/InstallManifest/`,
+ADR 0010), then env generation, per-app provisioning, read endpoints —
 following these rules from the first commit.
 
 **Framework reference:** `vendor/hideyukimori/nene2/docs/` after `composer install`;

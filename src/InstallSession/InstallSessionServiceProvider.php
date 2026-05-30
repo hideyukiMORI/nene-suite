@@ -13,6 +13,8 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\AppCatalog\CatalogAppRepositoryInterface;
 use NeNeSuite\Http\RuntimeServiceProvider;
+use NeNeSuite\InstallManifest\InstallManifestFactory;
+use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderInterface;
 use Psr\Container\ContainerInterface;
 
@@ -214,11 +216,83 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                 },
             )
             ->set(
+                InstallSessionNotReadyExceptionHandler::class,
+                static function (ContainerInterface $container): InstallSessionNotReadyExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new InstallSessionNotReadyExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                CompleteInstallSessionUseCaseInterface::class,
+                static function (ContainerInterface $container): CompleteInstallSessionUseCaseInterface {
+                    $sessions = $container->get(InstallSessionRepositoryInterface::class);
+                    $manifests = $container->get(InstallManifestRepositoryInterface::class);
+                    $factory = $container->get(InstallManifestFactory::class);
+                    $audit = $container->get(SuiteAuditRecorderInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+                    $orgExternalId = $container->get(RuntimeServiceProvider::SUITE_ORG_EXTERNAL_ID);
+
+                    if (!$sessions instanceof InstallSessionRepositoryInterface) {
+                        throw new LogicException('Install session repository service is invalid.');
+                    }
+
+                    if (!$manifests instanceof InstallManifestRepositoryInterface) {
+                        throw new LogicException('Install manifest repository service is invalid.');
+                    }
+
+                    if (!$factory instanceof InstallManifestFactory) {
+                        throw new LogicException('Install manifest factory service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderInterface) {
+                        throw new LogicException('Suite audit recorder service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    if (!is_string($orgExternalId) || $orgExternalId === '') {
+                        throw new LogicException('Suite org external id service is invalid.');
+                    }
+
+                    return new CompleteInstallSessionUseCase($sessions, $manifests, $factory, $audit, $suiteId, $orgExternalId);
+                },
+            )
+            ->set(
+                CompleteInstallSessionHandler::class,
+                static function (ContainerInterface $container): CompleteInstallSessionHandler {
+                    $useCase = $container->get(CompleteInstallSessionUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    $requestIdHolder = $container->get(RequestIdHolder::class);
+
+                    if (!$useCase instanceof CompleteInstallSessionUseCaseInterface) {
+                        throw new LogicException('CompleteInstallSession use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    if (!$requestIdHolder instanceof RequestIdHolder) {
+                        throw new LogicException('RequestIdHolder service is invalid.');
+                    }
+
+                    return new CompleteInstallSessionHandler($useCase, $response, $requestIdHolder);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.install_session',
                 static function (ContainerInterface $container): InstallSessionRouteRegistrar {
                     $start = $container->get(StartInstallSessionHandler::class);
                     $get = $container->get(GetInstallSessionHandler::class);
                     $disclaimer = $container->get(AcceptDisclaimerHandler::class);
+                    $complete = $container->get(CompleteInstallSessionHandler::class);
                     $fail = $container->get(FailInstallSessionHandler::class);
 
                     if (!$start instanceof StartInstallSessionHandler) {
@@ -233,11 +307,15 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('AcceptDisclaimer handler service is invalid.');
                     }
 
+                    if (!$complete instanceof CompleteInstallSessionHandler) {
+                        throw new LogicException('CompleteInstallSession handler service is invalid.');
+                    }
+
                     if (!$fail instanceof FailInstallSessionHandler) {
                         throw new LogicException('FailInstallSession handler service is invalid.');
                     }
 
-                    return new InstallSessionRouteRegistrar($start, $get, $disclaimer, $fail);
+                    return new InstallSessionRouteRegistrar($start, $get, $disclaimer, $complete, $fail);
                 },
             );
     }
