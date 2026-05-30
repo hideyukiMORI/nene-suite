@@ -14,15 +14,19 @@
 - [x] Issue #16: i18n message catalogs — merged (PR #17)
 - [x] Issue #18: Phase 1 OpenAPI contract — merged (PR #19)
 - [x] Issue #20: Catalog validation script — merged (PR #21)
-- [x] Issue #22: CI workflow (terminology + catalog + OpenAPI lint + frontend) — PR pending (`.github/workflows/ci.yml`)
+- [x] Issue #22: CI workflow (terminology + catalog + OpenAPI lint + frontend) — merged (PR #23)
+- [x] Issue #24: Untrack frontend/node_modules + .gitignore fix — merged (PR #25)
+- [x] Issue #26: Backend scaffold + first slice (AppCatalog read) — PR pending (`src/AppCatalog/`, `composer.json`, CI backend job)
 
 ## Next (Phase 0 → Phase 1)
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
+- [ ] Backend slice 2: `InstallSession` lifecycle + control DB (Phinx) + `SuiteAudit` recorder (start/complete/fail, app-selection, disclaimer)
+- [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + audit read endpoints
 - [ ] Docker Compose installer MVP (Invoice + Clear)
 - [ ] Docs relative-link check tool + add to CI (deferred from #22)
-- [ ] Backend scaffold (composer + NENE2 handlers) — consumes `docs/openapi/openapi.yaml` as SSOT; adds `composer openapi` to CI (follow-up to #18)
+- [ ] `composer openapi` PHP validator + add to CI backend job (follow-up to #18/#26)
 - [ ] Frontend codegen + `entities/` from OpenAPI (follow-up to #18)
 
 ## Blockers

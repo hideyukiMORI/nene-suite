@@ -58,3 +58,26 @@ jobs:
 
       - name: Type-check and test
         run: npm run check
+
+  backend:
+    name: Backend (PHPUnit + PHPStan + CS)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_sqlite
+          coverage: none
+
+      - name: Clone NENE2 (local path dependency)
+        run: git clone --depth=1 https://github.com/hideyukiMORI/NENE2.git ../NENE2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run checks
+        run: composer check
