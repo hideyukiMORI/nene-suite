@@ -28,7 +28,8 @@
 - [x] Issue #44: Backend slice 8 — suite-audit-events read (R-08, paginated, authenticated) — merged (PR #45)
 - [x] Issue #46: Backend slice 9 — SuiteEnv URL reader + installed-apps launcher (R-06) — merged (PR #47)
 - [x] Issue #48: Backend slice 10 — populate install manifest apps[] (SuiteEnv URLs + DatabaseProvision names) — merged (PR #49)
-- [x] Issue #50: Frontend slice 1 — strict toolchain + shared/api + auth login vertical — PR pending
+- [x] Issue #50: Frontend slice 1 — strict toolchain + shared/api + auth login vertical — merged (PR #51)
+- [x] Issue #52: Frontend slice 2 — installed-app entity + app-launcher feature (apex home) — PR pending
 
 ## Phase 1 OpenAPI: all 13 operations implemented ✅
 

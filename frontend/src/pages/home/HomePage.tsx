@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useSignOut } from '@/entities/auth'
+import { AppLauncher } from '@/features/app-launcher'
 import { useTranslation } from '@/shared/i18n'
 
 export function HomePage() {
@@ -23,8 +24,11 @@ export function HomePage() {
           {t('suite.nav.logout')}
         </button>
       </header>
-      <h2>{t('suite.launcher.title')}</h2>
-      <p>{t('suite.launcher.description')}</p>
+      <section>
+        <h2>{t('suite.launcher.title')}</h2>
+        <p>{t('suite.launcher.description')}</p>
+        <AppLauncher />
+      </section>
     </main>
   )
 }
