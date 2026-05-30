@@ -11,6 +11,7 @@ $finder = Finder::create()
         __DIR__ . '/src',
         __DIR__ . '/tests',
         __DIR__ . '/database',
+        __DIR__ . '/tools',
     ])
     ->name('*.php');
 
