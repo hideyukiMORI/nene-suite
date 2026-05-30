@@ -9,8 +9,9 @@ installer orchestration, and suite control database. Sibling product domain logi
 (✅ `src/InstallSession/`, `src/SuiteAudit/`), app-selection with dependency
 resolution (✅ `src/AppSelection/`), disclaimer-acceptance + fail + complete
 (✅ `src/InstallSession/`) with install manifest (✅ `src/InstallManifest/`,
-ADR 0010), then env generation, per-app provisioning, read endpoints —
-following these rules from the first commit.
+ADR 0010), apex auth session (✅ `src/Auth/`), then env generation, per-app
+provisioning, authenticated read endpoints — following these rules from the
+first commit.
 
 **Framework reference:** `vendor/hideyukimori/nene2/docs/` after `composer install`;
 sibling checkout at `../NENE2`.
@@ -221,6 +222,7 @@ src/InstallSession/
 | `IntegrationWiring/` | Enable/disable documented HTTP integrations |
 | `InstallManifest/` | Manifest create/update; no secrets |
 | `SuiteAudit/` | `SuiteAuditRecorder`, event persistence, sanitization presenters |
+| `Auth/` | Apex operator identity, password hashing, JWT session (login / current / logout) |
 | `DatabaseProvision/` | Per-app DB **name** provisioning metadata (not sibling schema) |
 
 New domains require Issue + update this table + `naming-conventions.md`.

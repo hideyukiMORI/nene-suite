@@ -32,6 +32,9 @@ final class OpenApiContractTest extends TestCase
         'acceptDisclaimer',
         'completeInstallSession',
         'failInstallSession',
+        'createAuthSession',
+        'getAuthSession',
+        'deleteAuthSession',
     ];
 
     public function testEveryServedApiRouteIsDocumentedWithOperationId(): void

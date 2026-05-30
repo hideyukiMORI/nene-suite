@@ -12,6 +12,10 @@ use NeNeSuite\AppCatalog\AppCatalogRouteRegistrar;
 use NeNeSuite\AppCatalog\AppCatalogServiceProvider;
 use NeNeSuite\AppSelection\AppSelectionRouteRegistrar;
 use NeNeSuite\AppSelection\AppSelectionServiceProvider;
+use NeNeSuite\Auth\AuthRouteRegistrar;
+use NeNeSuite\Auth\AuthServiceProvider;
+use NeNeSuite\Auth\InvalidCredentialsExceptionHandler;
+use NeNeSuite\Auth\UnauthorizedExceptionHandler;
 use NeNeSuite\InstallManifest\InstallManifestServiceProvider;
 use NeNeSuite\InstallSession\InstallSessionConflictExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
@@ -39,7 +43,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new SuiteAuditServiceProvider())
             ->addProvider(new InstallManifestServiceProvider())
             ->addProvider(new InstallSessionServiceProvider())
-            ->addProvider(new AppSelectionServiceProvider());
+            ->addProvider(new AppSelectionServiceProvider())
+            ->addProvider(new AuthServiceProvider());
 
         $builder
             ->set(
@@ -48,6 +53,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $appCatalog = $container->get('nene-suite.route_registrar.app_catalog');
                     $installSession = $container->get('nene-suite.route_registrar.install_session');
                     $appSelection = $container->get('nene-suite.route_registrar.app_selection');
+                    $auth = $container->get('nene-suite.route_registrar.auth');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -61,10 +67,15 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('App selection route registrar service is invalid.');
                     }
 
+                    if (!$auth instanceof AuthRouteRegistrar) {
+                        throw new LogicException('Auth route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
                         $installSession,
                         $appSelection,
+                        $auth,
                     ];
                 },
             )
@@ -74,6 +85,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $installSessionNotFound = $container->get(InstallSessionNotFoundExceptionHandler::class);
                     $installSessionConflict = $container->get(InstallSessionConflictExceptionHandler::class);
                     $installSessionNotReady = $container->get(InstallSessionNotReadyExceptionHandler::class);
+                    $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
+                    $unauthorized = $container->get(UnauthorizedExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
@@ -87,10 +100,20 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Install session not ready exception handler service is invalid.');
                     }
 
+                    if (!$invalidCredentials instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Invalid credentials exception handler service is invalid.');
+                    }
+
+                    if (!$unauthorized instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Unauthorized exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
                         $installSessionConflict,
                         $installSessionNotReady,
+                        $invalidCredentials,
+                        $unauthorized,
                     ];
                 },
             );
