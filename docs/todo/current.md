@@ -49,7 +49,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 
 ## Next (Phase 1 → Phase 2)
 
-- [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
+- [x] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§5, ADR 0005 — 辻村総合会計事務所 / 2026-05-31 (Issue #75, PR #76)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
 - [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — use cases ready; **blocked on professional sign-off** per Blockers
 - [ ] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新
