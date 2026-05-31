@@ -47,18 +47,14 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [ ] **Provisioning (write side)**: `SuiteEnv` env **generation** + `DatabaseProvision` actual DB creation (Tier B); `app_versions` pinning; audit `env_config.written` / `database.provisioned` (manifest `apps[]` now populated — #48)
 - [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — calls the same use cases; **blocked on professional sign-off** per Blockers
 - [ ] Operator provisioning — first apex operator created by the installer / org-admin flow
-- [ ] **Frontend slices 2+**: app-launcher (installed-apps) → install wizard (apps/disclaimer/review/complete) → audit viewer; `shared/ui` primitives + Tailwind; Storybook + knip + MSW handlers per entity
+- [x] **Frontend slices 1–5**: login · launcher · install wizard · audit viewer · shared/ui + locale switcher — PR #51–#59
 - [ ] Shared apex auth middleware (≥2 endpoints now authenticate via `BearerTokenAuthenticator`)
 - [ ] `IntegrationWiring`; `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
 - [ ] Backend: `SuiteEnv` (NENE_SUITE_* generation) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
-- [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
-
-The full install-session wizard lifecycle (start → app-selection → disclaimer → complete / fail) is now implemented with before/after audit on every mutation.
-- [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + `suite-audit-events` read endpoints
 - [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred from #28)
 - [ ] Docker Compose installer MVP (Invoice + Clear)
-- [ ] Docs relative-link check tool + add to CI (deferred from #22)
-- [ ] `composer openapi` PHP validator + add to CI backend job (follow-up to #18/#26)
+- [x] Docs relative-link check tool + add to CI (deferred from #22) — PR #63
+- [x] `composer openapi` PHP validator + add to CI backend job (follow-up to #18/#26) — PR #62
 - [ ] Frontend codegen + `entities/` from OpenAPI (follow-up to #18)
 
 ## Blockers
@@ -72,4 +68,4 @@ The full install-session wizard lifecycle (start → app-selection → disclaime
 Private meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
 Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
-Last updated: 2026-05-30
+Last updated: 2026-05-31
