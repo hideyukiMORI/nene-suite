@@ -32,7 +32,7 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 
 | Variable | Example | Notes |
 | --- | --- | --- |
-| `NENE_SUITE_CONTROL_DATABASE_URL` | `mysql://nene_suite:***@db/nene_suite` | **Suite only** — `suite_audit_events` + manifest metadata; not sibling app data |
+| `NENE_SUITE_CONTROL_DATABASE_URL` | `mysql://nene_suite:***@db/nene_suite` | **Suite only** — `suite_audit_events` + manifest metadata; not sibling app data. Resolution: [ADR 0011](../adr/0011-control-database-url-resolution.md) |
 
 ---
 

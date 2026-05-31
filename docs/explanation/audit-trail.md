@@ -54,9 +54,9 @@ Per [ADR 0002](../adr/0002-orchestrator-not-application-monolith.md), suite
 The control DB is **orchestration metadata only** — no Invoice lines, Clear
 evidence blobs, or Vault file bytes.
 
-Environment variable (Phase 1+): `NENE_SUITE_CONTROL_DATABASE_URL` — documented
-in installer ADR when implementation lands. Until then, treat the name as
-registered in [`terminology.md`](./terminology.md).
+Environment variable (Phase 1+): `NENE_SUITE_CONTROL_DATABASE_URL` — resolution
+strategy documented in [ADR 0011](../adr/0011-control-database-url-resolution.md).
+Canonical name registered in [`terminology.md`](./terminology.md).
 
 ---
 
