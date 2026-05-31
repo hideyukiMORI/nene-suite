@@ -3,6 +3,7 @@ services:
   # ---------------------------------------------------------------
   # Suite control database
   # Hosts: nene_suite (control) + one database per installed app
+  # Local port: 3389 (see CLAUDE.md — portfolio port registry)
   # ---------------------------------------------------------------
   db:
     image: mysql:8.0
@@ -11,6 +12,8 @@ services:
       MYSQL_DATABASE: nene_suite
       MYSQL_USER: nene_suite
       MYSQL_PASSWORD: ${NENE_SUITE_CONTROL_DB_PASSWORD:?NENE_SUITE_CONTROL_DB_PASSWORD is required}
+    ports:
+      - "${SUITE_DB_PORT:-3389}:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -23,6 +26,7 @@ services:
 
   # ---------------------------------------------------------------
   # NeNe Suite apex shell (login + app launcher + installer)
+  # Local port: 8800 (see CLAUDE.md — portfolio port registry)
   # ---------------------------------------------------------------
   suite:
     build: .
@@ -41,7 +45,7 @@ services:
       NENE_SUITE_PROVISION_DB_USER: root
       NENE_SUITE_PROVISION_DB_PASSWORD: ${NENE_SUITE_PROVISION_DB_PASSWORD}
     ports:
-      - "${SUITE_HTTP_PORT:-80}:80"
+      - "${SUITE_HTTP_PORT:-8800}:80"
     restart: unless-stopped
 
   # ---------------------------------------------------------------
@@ -65,7 +69,7 @@ services:
   #     NENE_SUITE_JWT_SECRET: ${NENE_SUITE_JWT_SECRET}
   #     NENE_SUITE_APEX_URL: ${NENE_SUITE_APEX_URL}
   #   ports:
-  #     - "8001:80"
+  #     - "8500:80"   # NeNe Invoice local port (see CLAUDE.md)
   #   restart: unless-stopped
 
   # nene-clear:
@@ -83,7 +87,7 @@ services:
   #     NENE_SUITE_JWT_SECRET: ${NENE_SUITE_JWT_SECRET}
   #     NENE_SUITE_APP_NENE_INVOICE_URL: ${NENE_SUITE_APP_NENE_INVOICE_URL}
   #   ports:
-  #     - "8002:80"
+  #     - "8300:80"   # NeNe Clear local port (see CLAUDE.md)
   #   restart: unless-stopped
 
 volumes:

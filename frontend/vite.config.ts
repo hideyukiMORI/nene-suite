@@ -6,10 +6,10 @@ import { defineConfig, loadEnv } from 'vite'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig(({ mode }) => {
-  // Keep the dev proxy in sync with the project-root .env app port without
-  // duplicating it (the suite serves the API at the apex path).
+  // Local dev port 5188 — fixed in CLAUDE.md portfolio port registry.
+  // API proxy target reads SUITE_HTTP_PORT (default 8800, also fixed in CLAUDE.md).
   const projectEnv = loadEnv(mode, path.resolve(dirname, '..'), '')
-  const appPort = projectEnv['NENE_SUITE_PORT'] ?? '8080'
+  const appPort = projectEnv['SUITE_HTTP_PORT'] ?? '8800'
   const target = `http://localhost:${appPort}`
 
   return {
@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      port: 5188,
       proxy: {
         '/api': { target, changeOrigin: true },
         '/health': { target, changeOrigin: true },
