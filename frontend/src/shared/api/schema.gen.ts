@@ -274,6 +274,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/operators": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an apex operator.
+         * @description Creates a new apex operator account. Operator-authenticated; an existing
+         *     operator must supply a valid bearer token. Emits `apex_operator.created`
+         *     in the suite audit trail. Password is hashed server-side and never echoed.
+         */
+        post: operations["createOperator"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/session": {
         parameters: {
             query?: never;
@@ -327,6 +349,13 @@ export interface components {
             id: components["schemas"]["Ulid"];
             /** Format: email */
             email: string;
+            displayName?: string | null;
+        };
+        CreateOperatorRequest: {
+            /** Format: email */
+            email: string;
+            /** @description Minimum 12 characters. Never echoed or stored in plaintext. */
+            password: string;
             displayName?: string | null;
         };
         CreateAuthSessionRequest: {
@@ -1208,6 +1237,65 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    createOperator: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "email": "admin@example.com",
+                 *       "password": "••••••••••••",
+                 *       "displayName": "Suite Admin"
+                 *     }
+                 */
+                "application/json": components["schemas"]["CreateOperatorRequest"];
+            };
+        };
+        responses: {
+            /** @description Operator created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "email": "admin@example.com",
+                     *       "displayName": "Suite Admin"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Operator"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description An operator with this email already exists. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "type": "https://nene-suite.dev/problems/operator-email-conflict",
+                     *       "title": "Operator email already exists",
+                     *       "status": 409,
+                     *       "detail": "An operator with this email address is already registered.",
+                     *       "instance": "/api/v1/operators"
+                     *     }
+                     */
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             422: components["responses"]["ValidationFailed"];
             500: components["responses"]["ServerError"];
         };

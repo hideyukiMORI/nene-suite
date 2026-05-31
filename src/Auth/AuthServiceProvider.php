@@ -217,11 +217,34 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                CreateOperatorHandler::class,
+                static function (ContainerInterface $container): CreateOperatorHandler {
+                    $authenticator = $container->get(BearerTokenAuthenticator::class);
+                    $useCase = $container->get(CreateOperatorUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$authenticator instanceof BearerTokenAuthenticator) {
+                        throw new LogicException('Bearer token authenticator service is invalid.');
+                    }
+
+                    if (!$useCase instanceof CreateOperatorUseCaseInterface) {
+                        throw new LogicException('CreateOperator use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new CreateOperatorHandler($authenticator, $useCase, $response);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.auth',
                 static function (ContainerInterface $container): AuthRouteRegistrar {
                     $create = $container->get(CreateAuthSessionHandler::class);
                     $get = $container->get(GetAuthSessionHandler::class);
                     $delete = $container->get(DeleteAuthSessionHandler::class);
+                    $createOperator = $container->get(CreateOperatorHandler::class);
 
                     if (!$create instanceof CreateAuthSessionHandler) {
                         throw new LogicException('CreateAuthSession handler service is invalid.');
@@ -235,7 +258,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('DeleteAuthSession handler service is invalid.');
                     }
 
-                    return new AuthRouteRegistrar($create, $get, $delete);
+                    if (!$createOperator instanceof CreateOperatorHandler) {
+                        throw new LogicException('CreateOperator handler service is invalid.');
+                    }
+
+                    return new AuthRouteRegistrar($create, $get, $delete, $createOperator);
                 },
             );
     }
