@@ -104,13 +104,15 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
             ->set(
                 DatabaseConnectionFactoryInterface::class,
                 static function (ContainerInterface $container): DatabaseConnectionFactoryInterface {
-                    $config = $container->get(AppConfig::class);
+                    $loader = $container->get(ConfigLoader::class);
 
-                    if (!$config instanceof AppConfig) {
-                        throw new LogicException('Application config service is invalid.');
+                    if (!$loader instanceof ConfigLoader) {
+                        throw new LogicException('Config loader service is invalid.');
                     }
 
-                    return new PdoConnectionFactory($config->database);
+                    $dbConfig = (new ControlDatabaseConfigResolver())->resolve($loader);
+
+                    return new PdoConnectionFactory($dbConfig);
                 },
             )
             ->set(
