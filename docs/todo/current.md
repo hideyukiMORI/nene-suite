@@ -32,7 +32,14 @@
 - [x] Issue #52: Frontend slice 2 — installed-app entity + app-launcher feature (apex home) — merged (PR #53)
 - [x] Issue #54: Frontend slice 3 — install-session + catalog-app entities + install wizard — merged (PR #55)
 - [x] Issue #56: Frontend slice 4 — suite-audit-event entity + audit viewer (admin) — merged (PR #57)
-- [x] Issue #58: Frontend slice 5 — shared/ui primitives (AsyncStates/PageHeader) + locale switcher — PR pending
+- [x] Issue #58: Frontend slice 5 — shared/ui primitives (AsyncStates/PageHeader) + locale switcher — merged (PR #59)
+- [x] Issue #60: `composer openapi` を CI backend job に追加 — PR #62
+- [x] Issue #61: Docs 相対リンクチェックツール + CI 追加 — PR #63
+- [x] Issue #65: SuiteEnv 生成 + DatabaseProvision write side use case — PR #66
+- [x] Issue #67: CreateOperator use case (初回 apex operator 作成) — PR #68
+- [x] Issue #69: WriteEnvConfig / ProvisionAppDatabases use case をサービスプロバイダーに配線 — PR #70
+- [x] Issue #71: frontend api-types → schema.gen.ts generated types に置き換え — PR #72
+- [x] Issue #73: ADR 0011 — NENE_SUITE_CONTROL_DATABASE_URL 解決方針 — PR #74
 
 ### Frontend: all Phase 1 API surfaces have UI ✅ — login · launcher (installed-apps) · install wizard · audit viewer, with shared/ui primitives + locale switching. Strict layering enforced by ESLint boundaries; every feature has a Vitest+MSW test.
 
@@ -44,22 +51,13 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 
 - [ ] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§4 (template: professional-sign-off-record.md)
 - [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] **Provisioning (write side)**: `SuiteEnv` env **generation** + `DatabaseProvision` actual DB creation (Tier B); `app_versions` pinning; audit `env_config.written` / `database.provisioned` (manifest `apps[]` now populated — #48)
-- [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — calls the same use cases; **blocked on professional sign-off** per Blockers
-- [ ] Operator provisioning — first apex operator created by the installer / org-admin flow
-- [ ] **Frontend slices 2+**: app-launcher (installed-apps) → install wizard (apps/disclaimer/review/complete) → audit viewer; `shared/ui` primitives + Tailwind; Storybook + knip + MSW handlers per entity
-- [ ] Shared apex auth middleware (≥2 endpoints now authenticate via `BearerTokenAuthenticator`)
-- [ ] `IntegrationWiring`; `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
-- [ ] Backend: `SuiteEnv` (NENE_SUITE_* generation) + `DatabaseProvision` → populate manifest `apps[]` / `app_versions`; `IntegrationWiring`
-- [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred)
-
-The full install-session wizard lifecycle (start → app-selection → disclaimer → complete / fail) is now implemented with before/after audit on every mutation.
-- [ ] Backend: `SuiteEnv` / `InstallManifest` / `IntegrationWiring` + `installed-apps` + `suite-audit-events` read endpoints
-- [ ] `NENE_SUITE_CONTROL_DATABASE_URL` resolution + installer ADR (deferred from #28)
+- [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — use cases ready; **blocked on professional sign-off** per Blockers
+- [ ] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新
+- [ ] Operator provisioning HTTP endpoint — `CreateOperatorUseCase` はあるが Phase 1 では HTTP 未公開
+- [ ] Shared apex auth middleware — `BearerTokenAuthenticator` を 4 handler が直接呼ぶパターンのまま (Phase 2 で middleware 化)
+- [ ] `IntegrationWiring` — Phase 2 スコープ
+- [ ] `app_versions` pinning in manifest — Phase 2 スコープ
 - [ ] Docker Compose installer MVP (Invoice + Clear)
-- [ ] Docs relative-link check tool + add to CI (deferred from #22)
-- [ ] `composer openapi` PHP validator + add to CI backend job (follow-up to #18/#26)
-- [ ] Frontend codegen + `entities/` from OpenAPI (follow-up to #18)
 
 ## Blockers
 
@@ -72,4 +70,4 @@ The full install-session wizard lifecycle (start → app-selection → disclaime
 Private meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
 Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
-Last updated: 2026-05-30
+Last updated: 2026-05-31
