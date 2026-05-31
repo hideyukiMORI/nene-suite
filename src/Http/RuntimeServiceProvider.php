@@ -46,6 +46,8 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
     public const SUITE_ORG_EXTERNAL_ID = 'nene-suite.org_external_id';
 
+    public const SUITE_BASE_URL = 'nene-suite.suite_base_url';
+
     /** Stable placeholder suite id used until the installer writes NENE_SUITE_ID. */
     private const DEV_SUITE_ID = '01J8XRDEV000000000000000ZA';
 
@@ -70,6 +72,10 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
             ->set(
                 self::SUITE_ORG_EXTERNAL_ID,
                 static fn (ContainerInterface $container): string => self::env('NENE_SUITE_ORG_EXTERNAL_ID', self::DEV_ORG_EXTERNAL_ID),
+            )
+            ->set(
+                self::SUITE_BASE_URL,
+                static fn (ContainerInterface $container): string => self::env('NENE_SUITE_BASE_URL', 'http://localhost/'),
             )
             ->set(
                 ConfigLoader::class,
