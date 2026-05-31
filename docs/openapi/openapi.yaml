@@ -602,6 +602,55 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/operators:
+    post:
+      tags: [Auth]
+      operationId: createOperator
+      summary: Create an apex operator.
+      description: |
+        Creates a new apex operator account. Operator-authenticated; an existing
+        operator must supply a valid bearer token. Emits `apex_operator.created`
+        in the suite audit trail. Password is hashed server-side and never echoed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOperatorRequest'
+            example:
+              email: admin@example.com
+              password: '••••••••••••'
+              displayName: Suite Admin
+      responses:
+        '201':
+          description: Operator created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+              example:
+                id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                email: admin@example.com
+                displayName: Suite Admin
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: An operator with this email already exists.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://nene-suite.dev/problems/operator-email-conflict
+                title: Operator email already exists
+                status: 409
+                detail: An operator with this email address is already registered.
+                instance: /api/v1/operators
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/auth/session:
     post:
       tags: [Auth]
@@ -806,6 +855,23 @@ components:
           type: [string, 'null']
           maxLength: 320
 
+    CreateOperatorRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        password:
+          type: string
+          description: Minimum 12 characters. Never echoed or stored in plaintext.
+          minLength: 12
+        displayName:
+          type: string
+          nullable: true
+          maxLength: 320
     CreateAuthSessionRequest:
       type: object
       additionalProperties: false
