@@ -125,9 +125,9 @@ When implementing installer UI, docs, or examples:
 | Field | Value |
 | --- | --- |
 | **Document status** | Engineering draft (binding within this private repo) |
-| **Public release** | Blocked until [ADR 0003 professional review gate](../adr/0003-installer-disclaimer-no-business-warranty.md#professional-review-gate-before-public-release) is satisfied |
-| **Legal review** | Not yet performed |
-| **Tax/accounting review** | Not yet performed — required for SSOT matrix per [orchestration-compliance §9](./orchestration-compliance.md#9-professional-sign-off-and-change-control) |
+| **Public release** | Partially unblocked — tax/accounting sign-off completed; legal (弁護士) sign-off pending |
+| **Legal review** | Not yet performed — required before external release |
+| **Tax/accounting review** | ✅ Completed 2026-05-31 — 辻村総合会計事務所（公認会計士・税理士）, scope: orchestration-compliance §2–§5, ADR 0005. Record: [`sign-off-tax-accounting-2026-05-31.md`](./sign-off-tax-accounting-2026-05-31.md) |
 | **Sign-off template** | [`professional-sign-off-record.md`](./professional-sign-off-record.md) |
 
 Update this table when reviews complete (via PR linked to the gate checklist).
