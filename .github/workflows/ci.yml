@@ -59,6 +59,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: OpenAPI codegen freshness check
+        run: |
+          npm run codegen
+          git diff --exit-code src/shared/api/schema.gen.ts || \
+            (echo "ERROR: schema.gen.ts is stale — run 'npm run codegen' and commit." && exit 1)
+
       - name: Type-check and test
         run: npm run check
 

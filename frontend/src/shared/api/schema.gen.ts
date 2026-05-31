@@ -471,7 +471,7 @@ export interface components {
          * @description Affected orchestration entity (audit-trail §4; matches `schema/suite-audit-event.schema.json`).
          * @enum {string}
          */
-        AuditEntityType: "install_session" | "app_selection" | "disclaimer_acknowledgment" | "suite_env_config" | "app_database" | "integration_wiring" | "install_manifest" | "suite_org_profile" | "catalog_pin";
+        AuditEntityType: "install_session" | "app_selection" | "disclaimer_acknowledgment" | "suite_env_config" | "app_database" | "integration_wiring" | "install_manifest" | "suite_org_profile" | "catalog_pin" | "apex_operator";
         /** @enum {string} */
         AuditSource: "installer_ui" | "installer_cli" | "apex_admin" | "system" | "api";
         /**

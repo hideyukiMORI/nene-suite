@@ -1087,6 +1087,7 @@ components:
         - install_manifest
         - suite_org_profile
         - catalog_pin
+        - apex_operator
 
     AuditSource:
       type: string
