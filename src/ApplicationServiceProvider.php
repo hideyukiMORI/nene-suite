@@ -15,6 +15,8 @@ use NeNeSuite\AppSelection\AppSelectionServiceProvider;
 use NeNeSuite\Auth\AuthRouteRegistrar;
 use NeNeSuite\Auth\AuthServiceProvider;
 use NeNeSuite\Auth\InvalidCredentialsExceptionHandler;
+use NeNeSuite\Auth\OperatorEmailConflictExceptionHandler;
+use NeNeSuite\Auth\OperatorValidationExceptionHandler;
 use NeNeSuite\Auth\UnauthorizedExceptionHandler;
 use NeNeSuite\DatabaseProvision\DatabaseProvisionServiceProvider;
 use NeNeSuite\InstalledApps\InstalledAppsRouteRegistrar;
@@ -107,6 +109,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $installSessionNotReady = $container->get(InstallSessionNotReadyExceptionHandler::class);
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
                     $unauthorized = $container->get(UnauthorizedExceptionHandler::class);
+                    $operatorEmailConflict = $container->get(OperatorEmailConflictExceptionHandler::class);
+                    $operatorValidation = $container->get(OperatorValidationExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
@@ -128,12 +132,22 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Unauthorized exception handler service is invalid.');
                     }
 
+                    if (!$operatorEmailConflict instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Operator email conflict exception handler service is invalid.');
+                    }
+
+                    if (!$operatorValidation instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Operator validation exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
                         $installSessionConflict,
                         $installSessionNotReady,
                         $invalidCredentials,
                         $unauthorized,
+                        $operatorEmailConflict,
+                        $operatorValidation,
                     ];
                 },
             );
