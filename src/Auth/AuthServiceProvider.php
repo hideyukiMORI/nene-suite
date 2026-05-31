@@ -13,6 +13,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Http\RuntimeServiceProvider;
+use NeNeSuite\SuiteAudit\SuiteAuditRecorderInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class AuthServiceProvider implements ServiceProviderInterface
@@ -162,6 +163,57 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     }
 
                     return new UnauthorizedExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                CreateOperatorUseCaseInterface::class,
+                static function (ContainerInterface $container): CreateOperatorUseCaseInterface {
+                    $operators = $container->get(OperatorRepositoryInterface::class);
+                    $hasher = $container->get(PasswordHasher::class);
+                    $audit = $container->get(SuiteAuditRecorderInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+
+                    if (!$operators instanceof OperatorRepositoryInterface) {
+                        throw new LogicException('Operator repository service is invalid.');
+                    }
+
+                    if (!$hasher instanceof PasswordHasher) {
+                        throw new LogicException('Password hasher service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderInterface) {
+                        throw new LogicException('Suite audit recorder service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    return new CreateOperatorUseCase($operators, $hasher, $audit, $suiteId);
+                },
+            )
+            ->set(
+                OperatorEmailConflictExceptionHandler::class,
+                static function (ContainerInterface $container): OperatorEmailConflictExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new OperatorEmailConflictExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                OperatorValidationExceptionHandler::class,
+                static function (ContainerInterface $container): OperatorValidationExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new OperatorValidationExceptionHandler($problemDetails);
                 },
             )
             ->set(

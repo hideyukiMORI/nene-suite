@@ -109,6 +109,7 @@ code merge.
 | `manifest.updated` | `install_manifest` | prior manifest | updated manifest | Incremental add-app |
 | `org_display_name.changed` | `suite_org_profile` | `{org_name: …}` | `{org_name: …}` | Does not change tax registration |
 | `catalog_pin.changed` | `catalog_pin` | prior pins | new pins | Sibling version pins only |
+| `apex_operator.created` | `apex_operator` | NULL | `{id, email, displayName}` | Installer provisions first operator; password hash omitted |
 
 Phase 2+ actions (register before implementation): `app.added`, `app.removed`,
 `apex_operator.invited`, `apex_operator.role_changed`.
