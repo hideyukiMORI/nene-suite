@@ -54,7 +54,8 @@
         "integration_wiring",
         "install_manifest",
         "suite_org_profile",
-        "catalog_pin"
+        "catalog_pin",
+        "apex_operator"
       ]
     },
     "entity_id": {
