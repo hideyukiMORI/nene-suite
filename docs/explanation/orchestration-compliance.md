@@ -209,13 +209,12 @@ Copy templates: [`installer-disclaimer-copy.md`](./installer-disclaimer-copy.md)
 
 ### Before installer MVP ships to external operators
 
-| Review | Reviewer | Record |
-| --- | --- | --- |
-| SSOT matrix (§2) and DB separation (§3) | **税理士** or **公認会計士** | [`professional-sign-off-record.md`](./professional-sign-off-record.md) |
-| Disclaimer + installer copy | **弁護士** (Japan law) | Same record template |
-| Federation semantics (§4) | **税理士** recommended | Same record template |
+| Review | Reviewer | Status | Record |
+| --- | --- | --- | --- |
+| SSOT matrix (§2), DB separation (§3), federation (§4) | **公認会計士・税理士** | ✅ 2026-05-31 | [`sign-off-tax-accounting-2026-05-31.md`](./sign-off-tax-accounting-2026-05-31.md) |
+| Disclaimer + installer copy | **弁護士** (Japan law) | ✅ 2026-05-31 | [`sign-off-legal-2026-05-31.md`](./sign-off-legal-2026-05-31.md) |
 
-Until recorded, treat Phase 1 installer as **internal / engineering preview**.
+**Both sign-offs on record — Phase 1 installer cleared for external operator release.**
 
 ### On every change touching install flow, catalog, env contract, or SSOT docs
 

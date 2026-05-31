@@ -50,8 +50,8 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 ## Next (Phase 1 → Phase 2)
 
 - [x] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§5, ADR 0005 — 辻村総合会計事務所 / 2026-05-31 (Issue #75, PR #76)
-- [ ] **弁護士 sign-off** — disclaimer + installer copy
-- [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — use cases ready; **blocked on professional sign-off** per Blockers
+- [x] **弁護士 sign-off** — disclaimer.md + installer-disclaimer-copy.md — 西村法律事務所 / 2026-05-31 (Issue #77, PR #78)
+- [ ] **Tier B installer** (Docker Compose MVP, Invoice + Clear) — 🟢 士業サインオフ完了・外部リリースゲート解除済み
 - [ ] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新
 - [ ] Operator provisioning HTTP endpoint — `CreateOperatorUseCase` はあるが Phase 1 では HTTP 未公開
 - [ ] Shared apex auth middleware — `BearerTokenAuthenticator` を 4 handler が直接呼ぶパターンのまま (Phase 2 で middleware 化)
@@ -61,7 +61,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 
 ## Blockers
 
-- External installer MVP blocked until professional sign-off records merged.
+- ~~External installer MVP blocked until professional sign-off records merged.~~ **🟢 Resolved 2026-05-31 — both sign-offs on record.**
 - Sibling apps need `NENE_SUITE_MODE` env readers (cross-repo Issues).
 - Tier A suite wizard depends on sibling release ZIP installers (Invoice Phase 3).
 

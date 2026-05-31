@@ -124,14 +124,12 @@ When implementing installer UI, docs, or examples:
 
 | Field | Value |
 | --- | --- |
-| **Document status** | Engineering draft (binding within this private repo) |
-| **Public release** | Partially unblocked — tax/accounting sign-off completed; legal (弁護士) sign-off pending |
-| **Legal review** | Not yet performed — required before external release |
+| **Document status** | Binding — professional review complete |
+| **Public release** | ✅ Professional review gate cleared — both sign-offs on record |
+| **Legal review** | ✅ Completed 2026-05-31 — 西村法律事務所（弁護士）, scope: disclaimer.md + installer-disclaimer-copy.md. Record: [`sign-off-legal-2026-05-31.md`](./sign-off-legal-2026-05-31.md) |
 | **Tax/accounting review** | ✅ Completed 2026-05-31 — 辻村総合会計事務所（公認会計士・税理士）, scope: orchestration-compliance §2–§5, ADR 0005. Record: [`sign-off-tax-accounting-2026-05-31.md`](./sign-off-tax-accounting-2026-05-31.md) |
 | **Sign-off template** | [`professional-sign-off-record.md`](./professional-sign-off-record.md) |
 
-Update this table when reviews complete (via PR linked to the gate checklist).
-
 ---
 
-Last updated: 2026-05-29
+Last updated: 2026-05-31
