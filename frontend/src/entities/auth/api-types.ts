@@ -1,18 +1,6 @@
-// Wire DTOs for the apex auth session (docs/openapi/openapi.yaml).
+// Wire DTOs for the apex auth session — derived from docs/openapi/openapi.yaml via schema.gen.ts.
+import type { components } from '@/shared/api/schema.gen'
 
-export interface OperatorDto {
-  id: string
-  email: string
-  displayName: string | null
-}
-
-export interface CreateAuthSessionRequestDto {
-  email: string
-  password: string
-}
-
-export interface AuthSessionDto {
-  token: string
-  expiresAt: string
-  operator: OperatorDto
-}
+export type OperatorDto = components['schemas']['Operator']
+export type CreateAuthSessionRequestDto = components['schemas']['CreateAuthSessionRequest']
+export type AuthSessionDto = components['schemas']['AuthSession']
