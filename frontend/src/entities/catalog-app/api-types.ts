@@ -1,20 +1,6 @@
-// Wire DTOs for the app catalog (docs/openapi/openapi.yaml CatalogAppList).
+// Wire DTOs for the app catalog — derived from docs/openapi/openapi.yaml via schema.gen.ts.
+import type { components } from '@/shared/api/schema.gen'
 
-export type CatalogAppStatusDto = 'planned' | 'installable' | 'deprecated'
-
-export interface CatalogAppDto {
-  id: string
-  name: string
-  repository: string | null
-  path: string
-  status: CatalogAppStatusDto
-  requires: string[]
-  provides: string[]
-  installEntry?: string
-  databaseEnvPrefix?: string
-}
-
-export interface CatalogAppListDto {
-  version: number
-  apps: CatalogAppDto[]
-}
+export type CatalogAppStatusDto = components['schemas']['CatalogApp']['status']
+export type CatalogAppDto = components['schemas']['CatalogApp']
+export type CatalogAppListDto = components['schemas']['CatalogAppList']

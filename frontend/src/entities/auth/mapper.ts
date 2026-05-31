@@ -5,7 +5,7 @@ export function toOperator(dto: OperatorDto): Operator {
   return {
     id: dto.id,
     email: dto.email,
-    displayName: dto.displayName,
+    displayName: dto.displayName ?? null,
   }
 }
 

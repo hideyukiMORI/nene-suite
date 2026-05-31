@@ -6,7 +6,7 @@ export function toInstalledApp(dto: InstalledAppDto): InstalledApp {
     catalogId: dto.catalogId,
     name: dto.name,
     publicUrl: dto.publicUrl,
-    databaseName: dto.databaseName,
+    databaseName: dto.databaseName ?? null,
     ssotRole: dto.ssotRole,
   }
 }

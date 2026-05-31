@@ -1,15 +1,6 @@
-// Wire DTOs for the apex launcher (docs/openapi/openapi.yaml InstalledAppList).
+// Wire DTOs for the apex launcher — derived from docs/openapi/openapi.yaml via schema.gen.ts.
+import type { components } from '@/shared/api/schema.gen'
 
-export type SsotRoleDto = 'billing' | 'reconciliation_evidence' | 'cms' | 'archive' | 'none'
-
-export interface InstalledAppDto {
-  catalogId: string
-  name: string
-  publicUrl: string
-  databaseName: string | null
-  ssotRole: SsotRoleDto
-}
-
-export interface InstalledAppListDto {
-  apps: InstalledAppDto[]
-}
+export type SsotRoleDto = components['schemas']['SsotRole']
+export type InstalledAppDto = components['schemas']['InstalledApp']
+export type InstalledAppListDto = components['schemas']['InstalledAppList']

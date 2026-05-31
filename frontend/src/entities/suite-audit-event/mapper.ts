@@ -7,10 +7,10 @@ export function toSuiteAuditEvent(dto: SuiteAuditEventDto): SuiteAuditEvent {
     action: dto.action,
     entityType: dto.entityType,
     entityId: dto.entityId,
-    actorLabel: dto.actorLabel,
+    actorLabel: dto.actorLabel ?? null,
     source: dto.source,
     createdAt: dto.createdAt,
-    installSessionId: dto.installSessionId,
+    installSessionId: dto.installSessionId ?? null,
   }
 }
 
