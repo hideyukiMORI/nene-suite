@@ -30,6 +30,9 @@ jobs:
       - name: Terminology guard
         run: bash tools/check-terminology.sh
 
+      - name: Docs relative-link check
+        run: bash tools/check-links.sh
+
       - name: Catalog validation (schema + DAG)
         run: bash tools/validate-catalog.sh
 
