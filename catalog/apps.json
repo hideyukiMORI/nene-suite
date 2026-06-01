@@ -3,6 +3,19 @@
   "version": 1,
   "apps": [
     {
+      "id": "nene-deal",
+      "name": "NeNe Deal",
+      "repository": "hideyukiMORI/nene-deal",
+      "path": "nene-deal",
+      "status": "planned",
+      "requires": [],
+      "provides": ["pipeline-api"],
+      "install_entry": "/install/index.php",
+      "database": {
+        "env_prefix": "NENE_DEAL_DB_"
+      }
+    },
+    {
       "id": "nene-invoice",
       "name": "NeNe Invoice",
       "repository": "hideyukiMORI/nene-invoice",
