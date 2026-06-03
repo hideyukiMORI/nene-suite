@@ -646,6 +646,24 @@ export interface components {
                 "application/problem+json": components["schemas"]["ValidationProblemDetails"];
             };
         };
+        /** @description Rate limit exceeded for this public endpoint. */
+        TooManyRequests: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/rate-limited",
+                 *       "title": "Too many requests",
+                 *       "status": 429,
+                 *       "detail": "Rate limit exceeded. Please retry later.",
+                 *       "instance": "/health"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
         /** @description Unexpected server error. No stack traces, SQL, paths, or secrets exposed. */
         ServerError: {
             headers: {
@@ -703,6 +721,7 @@ export interface operations {
                     "application/json": components["schemas"]["HealthResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -759,6 +778,7 @@ export interface operations {
                     "application/json": components["schemas"]["CatalogAppList"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
