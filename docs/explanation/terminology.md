@@ -40,6 +40,7 @@ See also: [ADR 0006](../adr/0006-terminology-registry-binding.md),
 | Meta layer (technical) | **suite orchestrator** | suite orchestration layer (unless sentence needs noun), Suite Orchestrator (title case mid-sentence) |
 | Control plane (technical) | **deployment control plane** | control panel, admin hub |
 | Login / launcher UI | **apex shell** | Apex Shell (mid-sentence), portal (alone), dashboard (alone) |
+| Deal sibling | **NeNe Deal** | Nene Deal, nene deal |
 | Invoice sibling | **NeNe Invoice** | Nene Invoice, nene invoice |
 | Clear sibling | **NeNe Clear** | Nene Clear |
 | Records sibling | **NeNe Records** | Nene Records |
@@ -57,6 +58,7 @@ Repository slugs (`nene-invoice`) are **not** product display names.
 
 | Catalog `id` | `name` field | `path` segment |
 | --- | --- | --- |
+| `nene-deal` | NeNe Deal | `nene-deal` |
 | `nene-invoice` | NeNe Invoice | `nene-invoice` |
 | `nene-clear` | NeNe Clear | `nene-clear` |
 | `nene-records` | NeNe Records | `nene-records` |
@@ -82,6 +84,7 @@ Never: `ready`, `available`, `active`, `disabled`.
 
 | Token | Owner catalog `id` |
 | --- | --- |
+| `pipeline-api` | `nene-deal` |
 | `billing-api` | `nene-invoice` |
 | `reconciliation-api` | `nene-clear` |
 | `cms-api` | `nene-records` |
@@ -138,6 +141,7 @@ All suite orchestrator variables use prefix **`NENE_SUITE_`** (not `NENE2_SUITE_
 
 | Catalog `id` | Canonical variable |
 | --- | --- |
+| `nene-deal` | `NENE_SUITE_APP_NENE_DEAL_URL` |
 | `nene-invoice` | `NENE_SUITE_APP_NENE_INVOICE_URL` |
 | `nene-clear` | `NENE_SUITE_APP_NENE_CLEAR_URL` |
 | `nene-records` | `NENE_SUITE_APP_NENE_RECORDS_URL` |
