@@ -869,8 +869,7 @@ components:
           description: Minimum 12 characters. Never echoed or stored in plaintext.
           minLength: 12
         displayName:
-          type: string
-          nullable: true
+          type: [string, "null"]
           maxLength: 320
     CreateAuthSessionRequest:
       type: object
