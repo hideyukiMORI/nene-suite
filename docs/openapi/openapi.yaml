@@ -98,6 +98,8 @@ paths:
                 status: ok
                 suiteMode: true
                 time: '2026-05-30T09:48:46Z'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -139,6 +141,8 @@ paths:
                     provides: [reconciliation-api]
                     installEntry: /install/index.php
                     databaseEnvPrefix: NENE_CLEAR_DB_
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -814,6 +818,18 @@ components:
               - field: tier
                 code: invalid_enum
                 detail: 'tier must be one of: B'
+    TooManyRequests:
+      description: Rate limit exceeded for this public endpoint.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/rate-limited
+            title: Too many requests
+            status: 429
+            detail: Rate limit exceeded. Please retry later.
+            instance: /health
     ServerError:
       description: Unexpected server error. No stack traces, SQL, paths, or secrets exposed.
       content:
