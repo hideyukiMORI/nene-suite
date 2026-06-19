@@ -2,8 +2,13 @@
 
 ## Status
 
-proposed (draft — supersedes part of ADR 0004; not accepted until terminology
-registration + professional/governance sign-off land)
+accepted (2026-06-19 — supersedes part of ADR 0004; terminology registration landed
+in #95, owner governance sign-off recorded in
+[`sign-off-governance-adr-0012-2026-06-19.md`](../explanation/sign-off-governance-adr-0012-2026-06-19.md);
+the §11 compliance guardrails inherit the 2026-05-31 公認会計士・税理士 sign-off (#75)
+and introduce no new compliance obligation. A security review of the federation IdP /
+asymmetric key handling is a follow-up at implementation time, not a precondition of
+this architecture decision.)
 
 ## Context
 
@@ -286,9 +291,11 @@ This ADR introduces or changes registered identifiers; the terminology registry
   manifest persistence), ADR 0011 (control database URL resolution).
 - `docs/integrations/sibling-products.md` (organization federation, service tokens).
 - `docs/explanation/terminology.md` §4 (env vars), §5 (JWT claims), §6 (org federation).
-- Sibling conformance: nene-invoice ADR 0016 (references this contract; does not
-  finalize until this ADR is `accepted`), nene-invoice ADR 0017 (export/import-install
-  — independent, pure-local migration/DR).
+- Governance sign-off: `docs/explanation/sign-off-governance-adr-0012-2026-06-19.md`
+  (Issue `#96`). Inherits the 公認会計士・税理士 sign-off of 2026-05-31 (`#75`).
+- Sibling conformance: nene-invoice ADR 0016 (references this contract; this ADR is now
+  `accepted`, so 0016 may be written reference-only), nene-invoice ADR 0017
+  (export/import-install — independent, pure-local migration/DR).
 - Superseded by: none.
 </content>
 </invoke>
