@@ -130,6 +130,7 @@ All suite orchestrator variables use prefix **`NENE_SUITE_`** (not `NENE2_SUITE_
 | Public origin | `NENE_SUITE_BASE_URL` | `BASE_URL`, `NENE_BASE_URL` |
 | Launcher URL | `NENE_SUITE_APEX_URL` | `APEX_URL`, `NENE_APEX_URL` |
 | JWT issuer base | `NENE_SUITE_ISSUER_URL` | `ISSUER_URL`, `AUTH_URL` |
+| Federation JWKS endpoint | `NENE_SUITE_JWKS_URL` | `JWKS_URL`, `JWK_URI`, `NENE_SUITE_JWK_URL` |
 | Shared HMAC secret | `NENE_SUITE_JWT_SECRET` | `JWT_SECRET`, `NENE_JWT_SECRET` |
 | Org federation UUID | `NENE_SUITE_ORG_EXTERNAL_ID` | `ORG_UUID`, `TENANT_ID`, `NENE_ORG_ID` |
 | Org display name | `NENE_SUITE_ORG_NAME` | `ORG_NAME`, `COMPANY_NAME` |
@@ -163,6 +164,13 @@ Never: `NENE_INVOICE_URL` (missing `NENE_SUITE_APP_` prefix), `NENE_SUITE_INVOIC
 Suite copies `NENE_SUITE_JWT_SECRET` into each app's `NENE2_LOCAL_JWT_SECRET`.
 Never rename sibling env keys from this registry — they belong to NENE2 consumer apps.
 
+> **Pending supersession — [ADR 0012](../adr/0012-federation-participation-contract.md)
+> (proposed).** The federation login path moves from this shared-HMAC coupling to
+> asymmetric signing with a published JWKS (`NENE_SUITE_JWKS_URL`). Once ADR 0012 is
+> `accepted`, `NENE2_LOCAL_JWT_SECRET` becomes a **sibling-generated, sibling-local**
+> session key that the suite no longer distributes, and the suite does not share its
+> federation signing key with any sibling. Until then, this row stands as documented.
+
 ---
 
 ## 5. JWT claims (suite mode)
@@ -176,6 +184,14 @@ Never rename sibling env keys from this registry — they belong to NENE2 consum
 | Installation id | `suite_id` | `install_id`, `NENE_SUITE_ID` (as claim name) |
 | Issued at | `iat` | — |
 | Expires | `exp` | — |
+
+> **Clarification — [ADR 0012](../adr/0012-federation-participation-contract.md)
+> (proposed).** This claim set (note `org_id`, a **local** PK) describes the **sibling
+> local session in suite mode** — the HMAC token a sibling mints to guard its own
+> domain APIs. It is **not** the suite **federation assertion** (asymmetric, JWKS-verified),
+> which carries `sub` / `org_external_id` / `suite_id` / `email` and **never** `org_id`.
+> Federation claims (`org_external_id`, `suite_id`) are present in **suite mode only**
+> and absent in standalone. See ADR 0012 §4.
 
 ---
 
