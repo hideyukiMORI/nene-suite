@@ -173,6 +173,18 @@ Never rename sibling env keys from this registry — they belong to NENE2 consum
 > the suite does not copy a shared login secret. (Implementation lands with the JWKS
 > endpoint + authz-code surface — see ADR 0012 follow-up.)
 
+### 4.3 Origin (portfolio-neutral — not a `NENE_SUITE_` variable)
+
+| Variable | Canonical | Never |
+| --- | --- | --- |
+| NeNe Origin base URL | `NENE_ORIGIN_URL` | `NENE_SUITE_ORIGIN_URL`, `ORIGIN_URL`, `NENE2_ORIGIN_URL` |
+
+`NENE_ORIGIN_URL` points at **NeNe Origin**, the private vendor authority for signed
+updates, announcements, and house-ads ([ADR 0013](../adr/0013-update-aggregation-and-upgrade-orchestration.md)).
+It is **portfolio-neutral**: standalone siblings and the suite consume it identically, so
+it deliberately does **not** carry the `NENE_SUITE_` prefix. Suite is one client of Origin,
+not its authority.
+
 ---
 
 ## 5. JWT claims (suite mode)
