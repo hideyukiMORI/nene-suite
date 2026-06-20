@@ -113,3 +113,4 @@ standalone VPS-only compose file instead of the base + override pair.
   `docker compose -f docker-compose.yml -f compose.staging.yaml config`.
 - `curl -fsS https://suite-stg.nene-suite.com/health` returns 200 (`{"status":"ok"}`).
 - The control DB port is not published to the host or exposed externally.
+- The auto-deploy pipeline (CI → `Deploy (staging)`) reaches the VPS and ends with `health OK`.
