@@ -40,10 +40,18 @@ always use the ports from this table. Never hardcode `80`, `3306`, or other defa
 cp .env.suite.example .env.suite
 # fill required vars (passwords, org name, etc.)
 docker compose up db -d
+# Install (once): org bootstrap — first operator, disclaimer, app DBs, manifest.
+# install.php also applies migrations.
 docker compose run --rm suite php installer/install.php
 docker compose up -d
 # apex shell → http://localhost:8800
 ```
+
+**Install vs deploy/upgrade.** `installer/install.php` is the one-time
+organization bootstrap. Schema migrations are **idempotent and applied
+automatically on every server start** by the container entrypoint
+(`phinx migrate`), so a plain `docker compose up -d` keeps the schema current on
+fresh and upgraded hosts alike. See [ADR 0014](./docs/adr/0014-schema-migration-lifecycle.md).
 
 ## Frontend dev server
 
