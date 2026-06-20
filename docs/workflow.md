@@ -52,6 +52,11 @@ self-contained guards available locally — no CI-only checks:
 Run these locally before opening a PR. `composer openapi` and docs link checking
 join CI when their prerequisites land (backend scaffold; link-check tool).
 
+## Operations
+
+- `docs/ops/staging-deploy.md`: how the ConoHa VPS runs staging/demo (shared
+  Caddy entry point, `edge` network, `compose.staging.yaml` override).
+
 ## Local Project Memory
 
 - `docs/roadmap.md`: long-lived direction and phases

@@ -1,0 +1,37 @@
+# Staging override for ConoHa VPS — applied on top of docker-compose.yml.
+#
+#   docker compose -f docker-compose.yml -f compose.staging.yaml up -d --build
+#
+# Reverse proxy / TLS is provided by a single VPS-wide Caddy stack (NOT bundled
+# per app). The suite container only serves internal HTTP on port 80 and is
+# reached over the shared external `edge` network as `nene-suite-app:80`.
+# See docs/ops/staging-deploy.md.
+#
+# Note: `!reset []` requires Docker Compose v2.24+. If the VPS Compose is older
+# and rejects it, fall back to a standalone VPS-only compose file.
+services:
+
+  db:
+    # Control DB stays internal: do not publish to the host or expose externally.
+    # Joins the project default network only — never the shared `edge` network.
+    ports: !reset []
+    restart: unless-stopped
+
+  suite:
+    # Fixed name so the shared Caddy can target `reverse_proxy nene-suite-app:80`.
+    container_name: nene-suite-app
+    # No host port mapping on the VPS — traffic arrives via the shared Caddy.
+    ports: !reset []
+    expose:
+      - "80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    networks:
+      - default   # talk to db within this project
+      - edge       # reachable by the shared VPS Caddy
+    restart: unless-stopped
+
+networks:
+  edge:
+    external: true
