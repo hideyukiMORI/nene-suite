@@ -1,3 +1,18 @@
+# ---- Frontend build stage ----
+# Build the React/Vite SPA to static assets. The app is served same-origin (it
+# calls /api/v1 and /health on its own host), so no VITE_API_BASE_URL is needed
+# at build time. node_modules / dist are excluded by .dockerignore, so this
+# always builds fresh from a clean npm ci.
+FROM node:22-slim AS frontend
+WORKDIR /app/frontend
+# .npmrc carries `legacy-peer-deps=true`, required for npm ci to resolve the
+# eslint peer ranges — copy it before installing.
+COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# ---- Runtime stage ----
 FROM php:8.4-apache
 
 # git/unzip are needed to fetch the NENE2 path dependency and let Composer
@@ -40,5 +55,12 @@ COPY . .
 # Install PHP dependencies (no dev — production image). Fail the build on error;
 # a missing vendor/ must never ship silently.
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Place the built SPA into the Apache document root alongside index.php. The
+# .htaccess routes /api + /health to the PHP front controller, serves real
+# files (assets, index.html, openapi.php) directly, and falls back to
+# index.html for client-side routes. Runs after `COPY . .` so the static
+# index.html is added without clobbering index.php / .htaccess / openapi.php.
+COPY --from=frontend /app/frontend/dist/. ${APACHE_DOCUMENT_ROOT}/
 
 EXPOSE 80

@@ -1,5 +1,17 @@
 RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+# Serve the SPA shell (not the PHP front controller) for the site root.
+DirectoryIndex index.html
+
+# Backend API + health endpoints go to the PHP front controller. REQUEST_URI is
+# preserved, so the NENE2 router still sees the original /api/v1/... path.
+RewriteRule ^api(/|$) index.php [QSA,L]
+RewriteRule ^health$ index.php [QSA,L]
+
+# Existing files and directories (SPA assets, index.html, openapi.php) served as-is.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Everything else is a client-side route — serve the SPA shell.
+RewriteRule ^ index.html [L]
