@@ -50,7 +50,11 @@ installable standalone via their own git clone or release ZIP.
 
 ## Repository status
 
-**Phase 0 — Governance and product design.** Installer runtime not yet implemented.
+**Phase 1 — Tier B installer MVP.** Docker Compose orchestrator, apex shell
+(login + app launcher + install wizard + audit viewer), and all 13 Phase 1
+OpenAPI operations are implemented. CI and automatic staging deployment to
+ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, ADRs
+0001–0013, and professional sign-offs are on record.
 
 ## License
 
