@@ -44,6 +44,12 @@ PHP front controller (`index.php`), real files (SPA assets, `index.html`,
 `index.html` for client-side routing. Without it every backend route except `/`
 returns an Apache 404.
 
+The container entrypoint (`ops/docker/entrypoint.sh`) applies pending database
+migrations (`phinx migrate`, idempotent) before Apache starts, so every deploy
+keeps the control-DB schema current with no manual migrate step. `phinx` ships
+in the production image as a `require` dependency. See
+[ADR 0014](../adr/0014-schema-migration-lifecycle.md).
+
 The frontend is built into the image — there is **no separate `npm run build`
 step on the VPS**. The Vite dev server (`5188`) is local-only. For reproducible
 production builds, pin NENE2 with `--build-arg NENE2_GIT_REF=<tag>`.
@@ -92,13 +98,26 @@ git clone git@github.com:hideyukiMORI/nene-suite.git
 cd nene-suite
 cp .env.suite.example .env.suite   # then fill strong secrets
 
-# 4. first deploy
+# 4. first deploy (entrypoint applies migrations automatically)
 docker compose --env-file .env.suite \
   -f docker-compose.yml -f compose.staging.yaml up -d --build
+
+# 5. one-time org bootstrap — first operator, disclaimer, app DBs, manifest.
+#    Schema is already migrated by the entrypoint; this seeds the operator etc.
+#    Requires the installer env vars (NENE_SUITE_APEX_OPERATOR_*, disclaimer) in
+#    .env.suite — see .env.suite.example.
+docker compose --env-file .env.suite \
+  -f docker-compose.yml -f compose.staging.yaml \
+  run --rm suite php installer/install.php
 ```
 
 `--env-file .env.suite` is required so the top-level `${...}` interpolations
 (DB passwords) resolve.
+
+Schema migrations run automatically on every server start (entrypoint —
+ADR 0014), so routine deploys need no migrate step. Step 5 (org bootstrap) is
+run **once** per environment; without it there is no apex operator to log in
+with.
 
 ## Routine deploy
 

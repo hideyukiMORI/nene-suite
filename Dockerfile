@@ -63,4 +63,12 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # index.html is added without clobbering index.php / .htaccess / openapi.php.
 COPY --from=frontend /app/frontend/dist/. ${APACHE_DOCUMENT_ROOT}/
 
+# Entrypoint applies pending phinx migrations on server start (idempotent), then
+# hands off to the official PHP entrypoint. See ADR 0014. phinx ships in the
+# production image because it is a `require` (not require-dev) dependency.
+COPY ops/docker/entrypoint.sh /usr/local/bin/nene-suite-entrypoint
+RUN chmod +x /usr/local/bin/nene-suite-entrypoint
+ENTRYPOINT ["nene-suite-entrypoint"]
+CMD ["apache2-foreground"]
+
 EXPOSE 80

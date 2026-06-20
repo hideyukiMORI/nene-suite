@@ -19,8 +19,8 @@ use RuntimeException;
  * Parsed individual fields are used by PdoConnectionFactory (not the raw URL string,
  * which is a mysql:// format incompatible with PHP's PDO DSN format).
  *
- * For Phinx migrations, `phinx.php` reads the URL directly when set (Phinx natively
- * supports mysql:// URLs).
+ * `phinx.php` also consumes the parsed fields (not the raw URL): Phinx does not
+ * understand mysql:// URLs and cannot extract the database name from one.
  */
 final readonly class ControlDatabaseConfigResolver
 {
