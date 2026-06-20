@@ -1,0 +1,17 @@
+# Keep secrets and host-only artifacts out of the build context / image.
+.git
+.github
+.env
+.env.*
+!.env.suite.example
+
+# Dependencies are installed inside the image.
+vendor
+node_modules
+frontend/node_modules
+frontend/dist
+
+# Local tooling noise
+.idea
+.vscode
+*.log
