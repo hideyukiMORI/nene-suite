@@ -96,8 +96,9 @@ docker compose --env-file .env.suite \
 curl -fsS https://suite-stg.nene-suite.com/health
 ```
 
-This is wrapped by `deploy-staging.sh`. A future Issue wires GitHub Actions to
-invoke that script over SSH after CI succeeds on `main`.
+This is wrapped by `deploy-staging.sh`, which `.github/workflows/deploy-staging.yml`
+invokes over SSH after CI succeeds on a `main` push (`STAGING_SSH_HOST` /
+`STAGING_SSH_USER` / `STAGING_SSH_KEY`, optional `STAGING_SSH_PORT`).
 
 ## Compose version note
 
