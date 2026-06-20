@@ -26,15 +26,27 @@ nene-suite stack: nene-suite-app ──default──> db
 
 ## Self-contained image
 
-The `Dockerfile` clones the NENE2 path dependency **inside the build** (into
-`/var/www/NENE2`, which `composer.json` references as `../NENE2`) and runs
-`composer install`. There is therefore **no need to clone NENE2 next to the repo
-on the VPS** — the image is self-contained. `public_html/.htaccess` provides the
-front-controller rewrite; without it every route except `/` returns an Apache
-404.
+The `Dockerfile` is multi-stage and self-contained:
 
-For reproducible production builds, pin NENE2 with
-`--build-arg NENE2_GIT_REF=<tag>`.
+1. A `node:22` stage runs `npm ci && npm run build` in `frontend/` to compile the
+   React/Vite SPA to static assets. The app is served **same-origin** (it calls
+   `/api/v1` and `/health` on its own host), so no `VITE_API_BASE_URL` is needed
+   at build time.
+2. The `php:8.4-apache` stage clones the NENE2 path dependency **inside the
+   build** (into `/var/www/NENE2`, which `composer.json` references as
+   `../NENE2`) and runs `composer install`. There is therefore **no need to
+   clone NENE2 next to the repo on the VPS**. The built SPA from stage 1 is
+   copied into the Apache document root (`public_html/`) alongside `index.php`.
+
+`public_html/.htaccess` ties the two together: `/api/*` and `/health` go to the
+PHP front controller (`index.php`), real files (SPA assets, `index.html`,
+`openapi.php`) are served directly, and any other path falls back to
+`index.html` for client-side routing. Without it every backend route except `/`
+returns an Apache 404.
+
+The frontend is built into the image — there is **no separate `npm run build`
+step on the VPS**. The Vite dev server (`5188`) is local-only. For reproducible
+production builds, pin NENE2 with `--build-arg NENE2_GIT_REF=<tag>`.
 
 ## Repository artifacts
 
@@ -116,5 +128,7 @@ standalone VPS-only compose file instead of the base + override pair.
 - Merged config is valid:
   `docker compose -f docker-compose.yml -f compose.staging.yaml config`.
 - `curl -fsS https://suite-stg.nene-suite.com/health` returns 200 (`{"status":"ok"}`).
+- `https://suite-stg.nene-suite.com/` serves the SPA shell (`index.html`); a deep
+  link such as `/login` also returns the SPA, not an Apache 404.
 - The control DB port is not published to the host or exposed externally.
 - The auto-deploy pipeline (CI → `Deploy (staging)`) reaches the VPS and ends with `health OK`.
