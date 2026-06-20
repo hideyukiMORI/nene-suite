@@ -14,17 +14,29 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
 {
     public function register(ContainerBuilder $builder): void
     {
-        $builder->set(
-            OrganizationRepositoryInterface::class,
-            static function (ContainerInterface $container): OrganizationRepositoryInterface {
-                $query = $container->get(DatabaseQueryExecutorInterface::class);
+        $builder
+            ->set(
+                OrganizationRepositoryInterface::class,
+                static function (ContainerInterface $container): OrganizationRepositoryInterface {
+                    return new PdoOrganizationRepository(self::queryExecutor($container));
+                },
+            )
+            ->set(
+                MembershipRepositoryInterface::class,
+                static function (ContainerInterface $container): MembershipRepositoryInterface {
+                    return new PdoMembershipRepository(self::queryExecutor($container));
+                },
+            );
+    }
 
-                if (!$query instanceof DatabaseQueryExecutorInterface) {
-                    throw new LogicException('Database query executor service is invalid.');
-                }
+    private static function queryExecutor(ContainerInterface $container): DatabaseQueryExecutorInterface
+    {
+        $query = $container->get(DatabaseQueryExecutorInterface::class);
 
-                return new PdoOrganizationRepository($query);
-            },
-        );
+        if (!$query instanceof DatabaseQueryExecutorInterface) {
+            throw new LogicException('Database query executor service is invalid.');
+        }
+
+        return $query;
     }
 }
