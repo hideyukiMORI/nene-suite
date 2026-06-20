@@ -36,11 +36,16 @@ front-controller rewrite; without it every route except `/` returns an Apache
 For reproducible production builds, pin NENE2 with
 `--build-arg NENE2_GIT_REF=<tag>`.
 
-## Repository artifact
+## Repository artifacts
 
-Only one file in this repository is staging-specific:
+Staging-specific files tracked in this repository:
 
 - `compose.staging.yaml` — an override applied on top of `docker-compose.yml`.
+- `ops/staging/deploy-staging.sh` — brings the stack up and verifies health
+  (build + `/health`). It does **not** pull code; the caller pulls first.
+  Override `APP_DIR` / `HEALTH_URL` to reuse it elsewhere.
+- `.github/workflows/deploy-staging.yml` — pulls latest on the VPS, then runs
+  the script above over SSH.
 
 Local development is unchanged (`docker compose up -d`, apex on `8800`).
 
@@ -55,7 +60,6 @@ These live on the VPS and are created once by hand:
 | `/home/deploy/stacks/caddy/Caddyfile` | `suite-stg.nene-suite.com { reverse_proxy nene-suite-app:80 }` |
 | `/home/deploy/envs/suite-stg/nene-suite/` | repo clone (NENE2 is fetched inside the image — no sibling clone needed) |
 | `/home/deploy/envs/suite-stg/nene-suite/.env.suite` | secrets, `APP_ENV=production` — VPS only |
-| `/home/deploy/envs/suite-stg/nene-suite/deploy-staging.sh` | pull + rebuild + health check |
 
 The `.env.suite` file is never committed (see `.env.suite.example` for the
 template).
@@ -86,19 +90,19 @@ docker compose --env-file .env.suite \
 
 ## Routine deploy
 
+Automatic on every `main` push: CI success triggers
+`.github/workflows/deploy-staging.yml`, which SSHes in, pulls, and runs the repo
+deploy script (`STAGING_SSH_HOST` / `STAGING_SSH_USER` / `STAGING_SSH_KEY`,
+optional `STAGING_SSH_PORT`).
+
+To deploy by hand, do the same two steps the workflow does — pull, then run the
+repo script:
+
 ```bash
 cd /home/deploy/envs/suite-stg/nene-suite
 git fetch origin main && git reset --hard origin/main
-docker compose --env-file .env.suite \
-  -f docker-compose.yml -f compose.staging.yaml up -d --build
-docker compose --env-file .env.suite \
-  -f docker-compose.yml -f compose.staging.yaml ps
-curl -fsS https://suite-stg.nene-suite.com/health
+bash ops/staging/deploy-staging.sh
 ```
-
-This is wrapped by `deploy-staging.sh`, which `.github/workflows/deploy-staging.yml`
-invokes over SSH after CI succeeds on a `main` push (`STAGING_SSH_HOST` /
-`STAGING_SSH_USER` / `STAGING_SSH_KEY`, optional `STAGING_SSH_PORT`).
 
 ## Compose version note
 
