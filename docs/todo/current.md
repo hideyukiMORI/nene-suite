@@ -40,6 +40,12 @@
 - [x] Issue #69: WriteEnvConfig / ProvisionAppDatabases use case をサービスプロバイダーに配線 — PR #70
 - [x] Issue #71: frontend api-types → schema.gen.ts generated types に置き換え — PR #72
 - [x] Issue #73: ADR 0011 — NENE_SUITE_CONTROL_DATABASE_URL 解決方針 — PR #74
+- [x] Issue #100: Staging compose + operations docs for ConoHa VPS — PR #101
+- [x] Issue #103: Docker build/runtime fixes for staging (`NENE2` build clone, Composer failure hard-stop, front-controller rewrite) — PR #104
+- [x] Issue #105: Align staging operations docs with the actual VPS layout — PR #106
+- [x] Issue #102: Manual ConoHa VPS staging runtime build-out — completed 2026-06-20
+- [x] Issue #107: Automatic GitHub Actions deploy to staging after successful `main` CI — PR #108
+- [x] Issue #109: Automatic staging deploy smoke test — PR #110
 
 ### Frontend: all Phase 1 API surfaces have UI ✅ — login · launcher (installed-apps) · install wizard · audit viewer, with shared/ui primitives + locale switching. Strict layering enforced by ESLint boundaries; every feature has a Vitest+MSW test.
 
@@ -49,6 +55,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 
 ## Next (Phase 1 → Phase 2)
 
+- [x] Move staging deploy script into repository-managed `ops/staging/` while keeping VPS-specific values out of git — `ops/staging/deploy-staging.sh` (bootstrap-safe split: pull in workflow, build+health in script) — Issue #111, PR #112.
 - [x] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§5, ADR 0005 — 辻村総合会計事務所 / 2026-05-31 (Issue #75, PR #76)
 - [x] **弁護士 sign-off** — disclaimer.md + installer-disclaimer-copy.md — 西村法律事務所 / 2026-05-31 (Issue #77, PR #78)
 - [x] **Tier B installer** (Docker Compose MVP) — InstallerUseCase + installer/install.php + Dockerfile + docker-compose.yml — PR #80
@@ -69,4 +76,20 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 Private meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
 Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
-Last updated: 2026-05-31
+### VPS staging status — 2026-06-20
+
+- ConoHa VPS is active for `suite-stg.nene-suite.com`.
+- Shared Caddy stack lives at `/home/deploy/stacks/caddy/` and is attached to the
+  external Docker network `edge`.
+- Suite staging lives at `/home/deploy/envs/suite-stg/nene-suite/`.
+- `.env.suite` is VPS-local and must not be committed.
+- `suite-stg.nene-suite.com` routes through Caddy to `nene-suite-app:80`.
+- Suite database is internal only; it is not attached to `edge` and has no
+  published host ports.
+- `https://suite-stg.nene-suite.com/health` returns HTTP 200.
+- GitHub Actions staging deploy is active: `main` CI success triggers SSH deploy
+  to the VPS and reaches `health OK`. The deploy logic is repository-managed
+  (`ops/staging/deploy-staging.sh`); the workflow pulls, then runs that script.
+- Detailed daily report: `docs/daily-reports/2026-06-20.md`.
+
+Last updated: 2026-06-20
