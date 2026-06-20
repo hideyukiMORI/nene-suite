@@ -1,6 +1,8 @@
 # Auto-deploy to staging (ConoHa VPS) after CI succeeds on a `main` push.
-# Pull-based: this workflow only SSHes in and runs the VPS deploy script, which
-# does the git pull + rebuild + health check. See docs/ops/staging-deploy.md.
+# This workflow SSHes in, pulls latest, then runs the repo deploy script
+# (ops/staging/deploy-staging.sh = build + health). Pulling here (not in the
+# script) keeps the script from overwriting itself and avoids first-run
+# bootstrap issues. See docs/ops/staging-deploy.md.
 name: Deploy (staging)
 
 on:
@@ -25,12 +27,22 @@ jobs:
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main'
     steps:
-      - name: Run deploy script over SSH
+      - name: Pull latest and run repo deploy script over SSH
         uses: appleboy/ssh-action@v1
+        env:
+          APP_DIR: /home/deploy/envs/suite-stg/nene-suite
         with:
           host: ${{ secrets.STAGING_SSH_HOST }}
           username: ${{ secrets.STAGING_SSH_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           port: ${{ secrets.STAGING_SSH_PORT || '22' }}
+          envs: APP_DIR
           script_stop: true
-          script: bash /home/deploy/envs/suite-stg/nene-suite/deploy-staging.sh
+          # Pull happens here (caller's responsibility) so the repo script is
+          # always present and never overwrites itself mid-run.
+          script: |
+            set -euo pipefail
+            cd "$APP_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+            bash ops/staging/deploy-staging.sh
