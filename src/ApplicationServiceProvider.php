@@ -31,6 +31,7 @@ use NeNeSuite\InstallSession\InstallSessionServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use NeNeSuite\SuiteEnv\SuiteEnvServiceProvider;
+use NeNeSuite\Tenancy\TenancyServiceProvider;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -56,7 +57,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new SuiteEnvServiceProvider())
             ->addProvider(new DatabaseProvisionServiceProvider())
             ->addProvider(new InstalledAppsServiceProvider())
-            ->addProvider(new InstallerServiceProvider());
+            ->addProvider(new InstallerServiceProvider())
+            ->addProvider(new TenancyServiceProvider());
 
         $builder
             ->set(
