@@ -4,9 +4,11 @@
 
 proposed (draft, 2026-06-21)
 
-This ADR is a **draft**. It records a direction and the open decisions behind it;
-it is not accepted until the owner commits to operating a hosted service (see
-Open Questions §1) and the legal re-review (§7) is scheduled.
+This ADR is a **draft**. The commitment gate (Open Questions §1) is **decided —
+the owner is doing this as a business** (2026-06-21). The legal re-review (§7) is
+now a **launch** gate (batched before `free.nene-suite.com` goes public), not an
+acceptance gate. Acceptance still awaits the remaining open questions (signup/abuse,
+org-resolution choice) and the terminology registration landing.
 
 ## Context
 
@@ -67,12 +69,43 @@ pattern):
 - **Hosted — "NeNe Cloud Free".** A vendor-operated, multi-organization service.
   Free, ad-supported (house-ads via [ADR 0013](./0013-update-aggregation-and-upgrade-orchestration.md)
   entitlement), continued real use permitted. Acts as the acquisition funnel:
-  try → self-host → install support → custom development.
+  try → grow → **export → self-host** → install support → custom development.
 
-The word "demo" is retired for the hosted surface; it sets the wrong expectation
-once real businesses operate on it. An optional throwaway sample (sample data,
-no signup, periodically reset) may exist as the *entry* to NeNe Cloud Free, not a
-separate product.
+**Surfaces (subdomains).** The hosted surface is **`free.nene-suite.com`**, not
+`demo.*` — "demo" implies trial / throwaway / not-for-production, while "free"
+implies a free plan that may be used continuously, which matches this decision.
+Three surfaces are reserved, started in order:
+
+| Subdomain | Role | When |
+| --- | --- | --- |
+| **`free.nene-suite.com`** | NeNe Cloud Free — multi-org, ad-supported, continued use OK | first |
+| `demo.nene-suite.com` | No-signup hands-on trial, sample data, periodic reset | later |
+| `app.nene-suite.com` | Future cloud core incl. paid tiers | future |
+
+The screen must always label it (e.g. **"NeNe Cloud Free / 無料クラウド版 / 広告あり /
+自己ホスト移行可"**) so expectations do not drift.
+
+### 1.1 Positioning — lead with portability ("自己ホスト移行可"), not "free"
+
+The headline is **anti-lock-in / data portability**, not price. The differentiator
+is that — uniquely among comparable services — a NeNe Cloud Free organization can
+**export its data and move to its own self-hosted install at any time**. This is
+not bolted on: the sibling products already carry this DNA (NeNe Invoice's roadmap
+headline is *"Japan SMB billing without SaaS lock-in"*). Cloud Free amplifies what
+the parts already promise.
+
+This inverts the usual SaaS funnel: the **exit is the funnel**, not churn. A user
+who outgrows Free exports and self-hosts, and that migration is exactly where paid
+install support and bespoke development are sold. Monetization is therefore
+**ads (free tier) + services (install support / bespoke) + future paid cloud** —
+deliberately **not** subscription lock-in.
+
+Preferred copy frames *starting* and *moving*, not just price — e.g. "無料で始める。
+必要になったら、いつでも自社サーバーへ。" / "広告付き無料クラウド。データはあなたのもの。
+いつでも自己ホストへ移行できます。" Ads stay **house-ads only** (ADR 0013) — never
+ad-targeting on tenant financial data, or the "your data is yours" promise dies.
+
+**This makes data portability a build commitment, not a tagline (see §5.1).**
 
 ### 2. Realign the single-organization default (supersede ADR 0012 in part)
 
@@ -124,6 +157,18 @@ Caveat: the invoice security assessment is round 1. Cross-organization isolation
 of financial data must be treated as a **continuous** guarantee (defense in depth
 beyond a single `WHERE` clause; cross-tenant regression tests), not fire-and-forget.
 
+### 5.1 Data portability (export → self-host import) is a launch prerequisite
+
+Because §1.1 makes "自己ホスト移行可" the headline, a real, **tested whole-organization
+export → self-host import** path must exist before that claim is published — a
+broken "migrate anytime" is worse than not promising it. Today only **CSV
+import/export** exists at the app level (e.g. NeNe Invoice ADR 0011 / csv-import-design,
+NeNe Clear csv-export); a clean whole-org round-trip (the reserved-but-unwritten
+NeNe Invoice **ADR 0017 "export/import-install"** — its number is skipped between
+0016 and 0018) is **not yet built**. Finishing that round-trip, per app, is a
+**prerequisite to launching NeNe Cloud Free with the portability headline**, and is
+the single most strategically important dependency this ADR introduces.
+
 ### 6. Entitlement & ads
 
 Free vs paid (ads-on vs `ads_off`) reuses the
@@ -140,7 +185,12 @@ was written for the **self-hosted** operator who owns their own compliance. The
 hosted edition changes that, so it requires a **legal re-review** (西村法律事務所,
 already on record) scoped to data custody, retention, breach notification under
 個人情報保護法, and the limits of disclaiming liability when real use is foreseeable.
-This re-review is a **precondition of accepting this ADR**, not follow-up.
+
+**Review timing (owner decision 2026-06-21): batched, not per-change.** Confirming
+with counsel on every change would stall development. The legal re-review is run
+**once, near the end — before public launch of `free.nene-suite.com`** — as a
+consolidated gate, not a per-PR checkpoint. It is a precondition of *launch*, not
+of accepting this draft or of building behind a flag.
 
 ### 8. Non-goals
 
@@ -151,16 +201,17 @@ This re-review is a **precondition of accepting this ADR**, not follow-up.
 - This ADR does not retrofit tenancy into the apps — that work is already done in
   the sibling repositories and is referenced, not redone here.
 
-## Open questions (must resolve before acceptance)
+## Open questions
 
-1. **Commitment gate:** does the owner commit to operating NeNe Cloud Free as a
-   real service (ongoing backup/DR, 個人情報保護法 安全管理措置, availability, support,
-   abuse/bot handling)? Everything below depends on this "yes".
+1. ~~**Commitment gate:** does the owner commit to operating NeNe Cloud Free as a
+   real service?~~ **Decided 2026-06-21 — yes** ("ビジネスとしてやるなら 1 を選ぶ
+   しかない"). The owner commits to operating it, with the ongoing duties (backup/DR,
+   個人情報保護法 安全管理措置, availability, support, abuse/bot handling) accepted as cost.
 2. Signup / onboarding / org-creation flow and abuse prevention (bots, throttling).
 3. Org-resolution choice for hosted: `subdomain` vs `custom_domain` (vs `path`).
-4. Whether NeNe Cloud Free has a data-retention/reset policy at all, or is fully
-   persistent like a normal SaaS.
-5. Migration/decision on whether physical isolation (§5) is ever offered, and to whom.
+4. NeNe Cloud Free persistence/retention policy (persistent SaaS); `demo.*` is the
+   reset-on-schedule surface (§1).
+5. Whether physical isolation (§5) is ever offered, and to whom.
 
 ## Terminology registry impact (required on acceptance — ADR 0006)
 
@@ -208,6 +259,10 @@ sequenced so self-hosted/dev paths are unaffected.
 - Sibling multi-tenancy prior art (already accepted, referenced not redone):
   NeNe Invoice ADR 0006, NeNe Records (reference implementation), NeNe Payout
   ADR 0004 / 0018, NeNe Corpus ADR 0005, NeNe Contact ADR 0006, NeNe Serve ADR 0006.
+- Portability prior art / dependency (§5.1): NeNe Invoice "without SaaS lock-in"
+  roadmap + ADR 0011 (CSV import) + reserved ADR 0017 (export/import-install, not
+  yet written); NeNe Clear CSV export. The whole-org export→self-host round-trip is
+  a launch prerequisite.
 - `docs/explanation/disclaimer.md`, `docs/explanation/orchestration-compliance.md`
   (liability posture); `docs/explanation/sign-off-legal-2026-05-31.md` (legal
   re-review trigger).
