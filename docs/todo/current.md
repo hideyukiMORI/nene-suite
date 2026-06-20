@@ -60,10 +60,26 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] **弁護士 sign-off** — disclaimer.md + installer-disclaimer-copy.md — 西村法律事務所 / 2026-05-31 (Issue #77, PR #78)
 - [x] **Tier B installer** (Docker Compose MVP) — InstallerUseCase + installer/install.php + Dockerfile + docker-compose.yml — PR #80
 - [x] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新 — PR #81
+- [x] README status / TODO 整合 — PR #116
+- [x] `main` ブランチ保護 ruleset `protect-main`（PR必須・CI必須・admin bypass なし）+ `docs/ops/branch-protection.md` — PR #118
+- [x] フロントエンドをイメージに同梱（Dockerfile マルチステージ + `.htaccess` SPA ルーティング）— PR #120
+- [x] 起動時 entrypoint で冪等 migrate（ADR 0014; phinx を require へ; `phinx.php` の生URLバグ修正）— PR #122
+- [x] ADR 0014（schema migration lifecycle）— PR #122
+- [x] ADR 0015（Suite hosted multi-tenant mode / 製品エディション / 自己ホスト移行可ポジショニング）draft — PR #124, #126
 - [ ] Operator provisioning HTTP endpoint — `CreateOperatorUseCase` はあるが Phase 1 では HTTP 未公開
 - [ ] Shared apex auth middleware — `BearerTokenAuthenticator` を 4 handler が直接呼ぶパターンのまま (Phase 2 で middleware 化)
 - [ ] `IntegrationWiring` — Phase 2 スコープ
 - [ ] `app_versions` pinning in manifest — Phase 2 スコープ
+
+## Next (hosted edition / NeNe Cloud Free — ADR 0015 draft)
+
+- [ ] 組織まるごと export → 自己ホスト import（移行可 headline の launch 前提; 現状 CSV のみ。NeNe Invoice ADR 0017 を起こす）
+- [ ] Suite 多org化: `operators` → `organizations` + `memberships` + role；`superadmin` platform console
+- [ ] セッション JWT に `org_external_id` + role を載せる（現状 `sub` + `suite_id` のみ）
+- [ ] アプリの org 解決（`subdomain` / `custom_domain`）を Suite から driving
+- [ ] entitlement / house-ads 配線（ADR 0013）
+- [ ] ADR 0015 の open questions 解消（signup/不正対策、org解決方式、terminology 登録）→ ADR を accepted へ
+- [ ] **launch 前にまとめて** 法務再レビュー（西村法律事務所 — データ受託化）
 
 ## Blockers
 
@@ -92,4 +108,15 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   (`ops/staging/deploy-staging.sh`); the workflow pulls, then runs that script.
 - Detailed daily report: `docs/daily-reports/2026-06-20.md`.
 
-Last updated: 2026-06-20
+### 2026-06-21
+
+- Frontend now built into the image; staging serves the SPA at `/` (PR #120).
+- Schema migrations apply automatically on container start (ADR 0014, PR #122);
+  the staging `nene_suite` control DB has its tables.
+- `main` is protected by ruleset `protect-main` (PR #118).
+- Product direction set: self-hosted OSS + hosted **NeNe Cloud Free**
+  (ADR 0015, draft). Anti-lock-in / data portability is the headline.
+- phpMyAdmin runs as a VPS-local, out-of-repo compose project (SSH-tunnel only).
+- Detailed daily report: `docs/daily-reports/2026-06-21.md`.
+
+Last updated: 2026-06-21

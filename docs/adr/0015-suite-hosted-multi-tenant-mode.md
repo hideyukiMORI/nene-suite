@@ -100,10 +100,15 @@ install support and bespoke development are sold. Monetization is therefore
 **ads (free tier) + services (install support / bespoke) + future paid cloud** —
 deliberately **not** subscription lock-in.
 
-Preferred copy frames *starting* and *moving*, not just price — e.g. "無料で始める。
-必要になったら、いつでも自社サーバーへ。" / "広告付き無料クラウド。データはあなたのもの。
-いつでも自己ホストへ移行できます。" Ads stay **house-ads only** (ADR 0013) — never
-ad-targeting on tenant financial data, or the "your data is yours" promise dies.
+The **canonical taglines** (adopted as Suite's official copy — recorded in
+`docs/explanation/product-vision.md`) frame *starting* and *moving*, not price:
+
+> 無料で始める。必要になったら、いつでも自社サーバーへ。
+>
+> データはあなたのもの。
+
+Ads stay **house-ads only** (ADR 0013) — never ad-targeting on tenant financial
+data, or the "your data is yours" promise dies.
 
 **This makes data portability a build commitment, not a tagline (see §5.1).**
 
