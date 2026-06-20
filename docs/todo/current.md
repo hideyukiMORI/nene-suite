@@ -59,7 +59,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§5, ADR 0005 — 辻村総合会計事務所 / 2026-05-31 (Issue #75, PR #76)
 - [x] **弁護士 sign-off** — disclaimer.md + installer-disclaimer-copy.md — 西村法律事務所 / 2026-05-31 (Issue #77, PR #78)
 - [x] **Tier B installer** (Docker Compose MVP) — InstallerUseCase + installer/install.php + Dockerfile + docker-compose.yml — PR #80
-- [ ] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新
+- [x] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新 — PR #81
 - [ ] Operator provisioning HTTP endpoint — `CreateOperatorUseCase` はあるが Phase 1 では HTTP 未公開
 - [ ] Shared apex auth middleware — `BearerTokenAuthenticator` を 4 handler が直接呼ぶパターンのまま (Phase 2 で middleware 化)
 - [ ] `IntegrationWiring` — Phase 2 スコープ
