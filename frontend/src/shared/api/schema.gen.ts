@@ -365,6 +365,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{id}/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Grant an operator a membership in an organization.
+         * @description Grants an operator an organization-scoped role (admin/member/viewer).
+         *     Platform-superadmin only. Emits `membership.granted` in the suite audit trail.
+         */
+        post: operations["grantMembership"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/memberships/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke a membership.
+         * @description Removes a membership. Platform-superadmin only; the last admin / last superadmin
+         *     of a scope cannot be revoked. Emits `membership.revoked` in the suite audit trail.
+         */
+        delete: operations["revokeMembership"];
+        options?: never;
+        head?: never;
+        /**
+         * Change a membership's role.
+         * @description Updates a membership's organization role. Platform-superadmin only. Emits
+         *     `membership.role_changed` in the suite audit trail.
+         */
+        patch: operations["changeMembershipRole"];
+        trace?: never;
+    };
     "/api/v1/auth/session": {
         parameters: {
             query?: never;
@@ -425,6 +472,26 @@ export interface components {
         };
         RenameOrganizationRequest: {
             name: string;
+        };
+        /**
+         * @description Organization-scoped role. The platform `superadmin` role is not grantable via this API.
+         * @enum {string}
+         */
+        RoleEnum: "admin" | "member" | "viewer";
+        Membership: {
+            id: components["schemas"]["Ulid"];
+            operatorId: components["schemas"]["Ulid"];
+            /** @description The organization, or null for a platform superadmin membership. */
+            organizationId: components["schemas"]["Ulid"] | null;
+            /** @enum {string} */
+            role: "superadmin" | "admin" | "member" | "viewer";
+        };
+        GrantMembershipRequest: {
+            operatorId: components["schemas"]["Ulid"];
+            role: components["schemas"]["RoleEnum"];
+        };
+        ChangeMembershipRoleRequest: {
+            role: components["schemas"]["RoleEnum"];
         };
         /**
          * @description Catalog app id (`docs/explanation/terminology.md` §2.1).
@@ -842,6 +909,60 @@ export interface components {
                  *       "status": 404,
                  *       "detail": "No organization exists for the requested id.",
                  *       "instance": "/api/v1/organizations/01J8XR0G7Q9V2H7K3N5M0B8TCA"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The operator already has a membership in this scope. */
+        MembershipConflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/membership-conflict",
+                 *       "title": "Membership already exists",
+                 *       "status": 409,
+                 *       "detail": "The operator already has a membership in this scope.",
+                 *       "instance": "/api/v1/organizations/01J8XR4ZS6Q9V2H7K3N5M0B8TC/memberships"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The change would violate a membership invariant (e.g. removing the last admin). */
+        MembershipInvariant: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/membership-invariant",
+                 *       "title": "Membership invariant violated",
+                 *       "status": 409,
+                 *       "detail": "The last administrator of an organization cannot be removed.",
+                 *       "instance": "/api/v1/memberships/01J8XRMEM00000000000000ZAB"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description No membership with that id. */
+        MembershipNotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/membership-not-found",
+                 *       "title": "Membership not found",
+                 *       "status": 404,
+                 *       "detail": "No membership exists for the requested id.",
+                 *       "instance": "/api/v1/memberships/01J8XRMEM00000000000000ZAB"
                  *     }
                  */
                 "application/problem+json": components["schemas"]["ProblemDetails"];
@@ -1642,6 +1763,122 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["OrganizationNotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    grantMembership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "operatorId": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                 *       "role": "admin"
+                 *     }
+                 */
+                "application/json": components["schemas"]["GrantMembershipRequest"];
+            };
+        };
+        responses: {
+            /** @description Membership granted. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XRMEM00000000000000ZAB",
+                     *       "operatorId": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "organizationId": "01J8XR4ZS6Q9V2H7K3N5M0B8TC",
+                     *       "role": "admin"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Membership"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["OrganizationNotFound"];
+            409: components["responses"]["MembershipConflict"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    revokeMembership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership revoked; no content. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["MembershipNotFound"];
+            409: components["responses"]["MembershipInvariant"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    changeMembershipRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "role": "member"
+                 *     }
+                 */
+                "application/json": components["schemas"]["ChangeMembershipRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description Membership role changed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XRMEM00000000000000ZAB",
+                     *       "operatorId": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "organizationId": "01J8XR4ZS6Q9V2H7K3N5M0B8TC",
+                     *       "role": "member"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Membership"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["MembershipNotFound"];
+            409: components["responses"]["MembershipInvariant"];
+            422: components["responses"]["ValidationFailed"];
             500: components["responses"]["ServerError"];
         };
     };

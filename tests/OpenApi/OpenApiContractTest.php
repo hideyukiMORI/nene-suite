@@ -42,6 +42,9 @@ final class OpenApiContractTest extends TestCase
         'listOrganizations',
         'renameOrganization',
         'disableOrganization',
+        'grantMembership',
+        'changeMembershipRole',
+        'revokeMembership',
     ];
 
     public function testEveryServedApiRouteIsDocumentedWithOperationId(): void

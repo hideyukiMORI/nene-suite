@@ -175,6 +175,66 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
                 static fn (ContainerInterface $container): OrganizationNotFoundExceptionHandler => new OrganizationNotFoundExceptionHandler(
                     self::problemDetails($container),
                 ),
+            )
+            ->set(
+                GrantMembershipHandler::class,
+                static fn (ContainerInterface $container): GrantMembershipHandler => new GrantMembershipHandler(
+                    self::superadminGuard($container),
+                    self::grantMembershipUseCase($container),
+                    self::organizationRepository($container),
+                    self::responseFactory($container),
+                    self::requestIdHolder($container),
+                ),
+            )
+            ->set(
+                ChangeMembershipRoleHandler::class,
+                static fn (ContainerInterface $container): ChangeMembershipRoleHandler => new ChangeMembershipRoleHandler(
+                    self::superadminGuard($container),
+                    self::changeMembershipRoleUseCase($container),
+                    self::responseFactory($container),
+                    self::requestIdHolder($container),
+                ),
+            )
+            ->set(
+                RevokeMembershipHandler::class,
+                static fn (ContainerInterface $container): RevokeMembershipHandler => new RevokeMembershipHandler(
+                    self::superadminGuard($container),
+                    self::revokeMembershipUseCase($container),
+                    self::responseFactory($container),
+                    self::requestIdHolder($container),
+                ),
+            )
+            ->set(
+                'nene-suite.route_registrar.memberships',
+                static fn (ContainerInterface $container): MembershipRouteRegistrar => new MembershipRouteRegistrar(
+                    self::grantMembershipHandler($container),
+                    self::changeMembershipRoleHandler($container),
+                    self::revokeMembershipHandler($container),
+                ),
+            )
+            ->set(
+                MembershipValidationExceptionHandler::class,
+                static fn (ContainerInterface $container): MembershipValidationExceptionHandler => new MembershipValidationExceptionHandler(
+                    self::problemDetails($container),
+                ),
+            )
+            ->set(
+                MembershipConflictExceptionHandler::class,
+                static fn (ContainerInterface $container): MembershipConflictExceptionHandler => new MembershipConflictExceptionHandler(
+                    self::problemDetails($container),
+                ),
+            )
+            ->set(
+                MembershipInvariantExceptionHandler::class,
+                static fn (ContainerInterface $container): MembershipInvariantExceptionHandler => new MembershipInvariantExceptionHandler(
+                    self::problemDetails($container),
+                ),
+            )
+            ->set(
+                MembershipNotFoundExceptionHandler::class,
+                static fn (ContainerInterface $container): MembershipNotFoundExceptionHandler => new MembershipNotFoundExceptionHandler(
+                    self::problemDetails($container),
+                ),
             );
     }
 
@@ -393,6 +453,72 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
 
         if (!$handler instanceof DisableOrganizationHandler) {
             throw new LogicException('Disable organization handler service is invalid.');
+        }
+
+        return $handler;
+    }
+
+    private static function grantMembershipUseCase(ContainerInterface $container): GrantMembershipUseCaseInterface
+    {
+        $useCase = $container->get(GrantMembershipUseCaseInterface::class);
+
+        if (!$useCase instanceof GrantMembershipUseCaseInterface) {
+            throw new LogicException('Grant membership use case service is invalid.');
+        }
+
+        return $useCase;
+    }
+
+    private static function changeMembershipRoleUseCase(ContainerInterface $container): ChangeMembershipRoleUseCaseInterface
+    {
+        $useCase = $container->get(ChangeMembershipRoleUseCaseInterface::class);
+
+        if (!$useCase instanceof ChangeMembershipRoleUseCaseInterface) {
+            throw new LogicException('Change membership role use case service is invalid.');
+        }
+
+        return $useCase;
+    }
+
+    private static function revokeMembershipUseCase(ContainerInterface $container): RevokeMembershipUseCaseInterface
+    {
+        $useCase = $container->get(RevokeMembershipUseCaseInterface::class);
+
+        if (!$useCase instanceof RevokeMembershipUseCaseInterface) {
+            throw new LogicException('Revoke membership use case service is invalid.');
+        }
+
+        return $useCase;
+    }
+
+    private static function grantMembershipHandler(ContainerInterface $container): GrantMembershipHandler
+    {
+        $handler = $container->get(GrantMembershipHandler::class);
+
+        if (!$handler instanceof GrantMembershipHandler) {
+            throw new LogicException('Grant membership handler service is invalid.');
+        }
+
+        return $handler;
+    }
+
+    private static function changeMembershipRoleHandler(ContainerInterface $container): ChangeMembershipRoleHandler
+    {
+        $handler = $container->get(ChangeMembershipRoleHandler::class);
+
+        if (!$handler instanceof ChangeMembershipRoleHandler) {
+            throw new LogicException('Change membership role handler service is invalid.');
+        }
+
+        return $handler;
+    }
+
+    private static function revokeMembershipHandler(ContainerInterface $container): RevokeMembershipHandler
+    {
+        $handler = $container->get(RevokeMembershipHandler::class);
+
+        if (!$handler instanceof RevokeMembershipHandler) {
+            throw new LogicException('Revoke membership handler service is invalid.');
         }
 
         return $handler;

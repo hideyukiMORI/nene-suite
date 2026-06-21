@@ -80,6 +80,8 @@ tags:
     description: Apex operator authentication session (login / current operator / logout).
   - name: Organizations
     description: Platform-superadmin management of tenant organizations (cross-tenant).
+  - name: Memberships
+    description: Platform-superadmin management of operator memberships in organizations.
 
 paths:
   /health:
@@ -808,6 +810,127 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/organizations/{id}/memberships:
+    post:
+      tags: [Memberships]
+      operationId: grantMembership
+      summary: Grant an operator a membership in an organization.
+      description: |
+        Grants an operator an organization-scoped role (admin/member/viewer).
+        Platform-superadmin only. Emits `membership.granted` in the suite audit trail.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrantMembershipRequest'
+            example:
+              operatorId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+              role: admin
+      responses:
+        '201':
+          description: Membership granted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+              example:
+                id: 01J8XRMEM00000000000000ZAB
+                operatorId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                organizationId: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                role: admin
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '409':
+          $ref: '#/components/responses/MembershipConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/memberships/{id}:
+    patch:
+      tags: [Memberships]
+      operationId: changeMembershipRole
+      summary: Change a membership's role.
+      description: |
+        Updates a membership's organization role. Platform-superadmin only. Emits
+        `membership.role_changed` in the suite audit trail.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeMembershipRoleRequest'
+            example:
+              role: member
+      responses:
+        '200':
+          description: Membership role changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+              example:
+                id: 01J8XRMEM00000000000000ZAB
+                operatorId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                organizationId: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                role: member
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/MembershipNotFound'
+        '409':
+          $ref: '#/components/responses/MembershipInvariant'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [Memberships]
+      operationId: revokeMembership
+      summary: Revoke a membership.
+      description: |
+        Removes a membership. Platform-superadmin only; the last admin / last superadmin
+        of a scope cannot be revoked. Emits `membership.revoked` in the suite audit trail.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      responses:
+        '204':
+          description: Membership revoked; no content.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/MembershipNotFound'
+        '409':
+          $ref: '#/components/responses/MembershipInvariant'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/auth/session:
     post:
       tags: [Auth]
@@ -1034,6 +1157,42 @@ components:
             status: 404
             detail: No organization exists for the requested id.
             instance: /api/v1/organizations/01J8XR0G7Q9V2H7K3N5M0B8TCA
+    MembershipConflict:
+      description: The operator already has a membership in this scope.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/membership-conflict
+            title: Membership already exists
+            status: 409
+            detail: The operator already has a membership in this scope.
+            instance: /api/v1/organizations/01J8XR4ZS6Q9V2H7K3N5M0B8TC/memberships
+    MembershipInvariant:
+      description: The change would violate a membership invariant (e.g. removing the last admin).
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/membership-invariant
+            title: Membership invariant violated
+            status: 409
+            detail: The last administrator of an organization cannot be removed.
+            instance: /api/v1/memberships/01J8XRMEM00000000000000ZAB
+    MembershipNotFound:
+      description: No membership with that id.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/membership-not-found
+            title: Membership not found
+            status: 404
+            detail: No membership exists for the requested id.
+            instance: /api/v1/memberships/01J8XRMEM00000000000000ZAB
 
   schemas:
     Ulid:
@@ -1091,6 +1250,47 @@ components:
         name:
           type: string
           maxLength: 200
+
+    RoleEnum:
+      type: string
+      enum: [admin, member, viewer]
+      description: Organization-scoped role. The platform `superadmin` role is not grantable via this API.
+
+    Membership:
+      type: object
+      additionalProperties: false
+      required: [id, operatorId, organizationId, role]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        operatorId:
+          $ref: '#/components/schemas/Ulid'
+        organizationId:
+          oneOf:
+            - $ref: '#/components/schemas/Ulid'
+            - type: 'null'
+          description: The organization, or null for a platform superadmin membership.
+        role:
+          type: string
+          enum: [superadmin, admin, member, viewer]
+
+    GrantMembershipRequest:
+      type: object
+      additionalProperties: false
+      required: [operatorId, role]
+      properties:
+        operatorId:
+          $ref: '#/components/schemas/Ulid'
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+
+    ChangeMembershipRoleRequest:
+      type: object
+      additionalProperties: false
+      required: [role]
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
 
     CatalogId:
       type: string
