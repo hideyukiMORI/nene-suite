@@ -56,9 +56,6 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
     /** Placeholder org federation id until the installer writes NENE_SUITE_ORG_EXTERNAL_ID. */
     private const DEV_ORG_EXTERNAL_ID = '01J8XRDEV0FED0000000000ZAB';
 
-    /** Dev-only JWT secret used until the installer writes NENE_SUITE_JWT_SECRET. */
-    private const DEV_JWT_SECRET = 'nene-suite-dev-secret';
-
     /** Suite Problem Details base (docs/explanation/terminology.md §13). */
     private const PROBLEM_DETAILS_BASE_URL = 'https://nene-suite.dev/problems/';
 
@@ -160,7 +157,12 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
             )
             ->set(
                 LocalBearerTokenVerifier::class,
-                static fn (ContainerInterface $container): LocalBearerTokenVerifier => new LocalBearerTokenVerifier(self::env('NENE_SUITE_JWT_SECRET', self::DEV_JWT_SECRET)),
+                static fn (ContainerInterface $container): LocalBearerTokenVerifier => new LocalBearerTokenVerifier(
+                    (new JwtSecretResolver(
+                        self::env('NENE_SUITE_JWT_SECRET', ''),
+                        self::env('NENE_SUITE_ALLOW_DEV_SECRET', ''),
+                    ))->resolve(),
+                ),
             )
             ->set(
                 TokenVerifierInterface::class,

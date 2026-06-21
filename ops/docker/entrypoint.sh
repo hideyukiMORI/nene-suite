@@ -28,6 +28,12 @@ if [ "${1:-apache2-foreground}" = "apache2-foreground" ]; then
     sleep 2
   done
   echo "[entrypoint] migrations OK."
+
+  # Fail closed (milestone A1.5): refuse to serve without a configured apex JWT secret.
+  # Serving-only — the one-off installer (CMD `php installer/install.php`) skips this block,
+  # so a fresh install before the secret is written is unaffected. `set -e` aborts on failure.
+  echo "[entrypoint] verifying apex JWT signing secret (fail-closed)..."
+  php ops/docker/preflight-jwt-secret.php
 fi
 
 # Hand off to the official PHP image entrypoint so its setup still runs.

@@ -36,10 +36,11 @@ Suite installer generates these and writes them into each selected app's `.env` 
 | `NENE_SUITE_BASE_URL` | yes | Public origin with trailing slash, e.g. `https://example.com/` |
 | `NENE_SUITE_APEX_URL` | yes | Apex shell URL, e.g. `https://example.com/` or `https://example.com/suite/` |
 | `NENE_SUITE_ISSUER_URL` | yes | JWT issuer base used for apex login, e.g. `https://example.com/api/auth` |
-| `NENE_SUITE_JWT_SECRET` | yes | Shared HMAC secret; suite sets **the same value** as `NENE2_LOCAL_JWT_SECRET` in each app unless a future ADR adopts JWKS |
+| `NENE_SUITE_JWT_SECRET` | yes | Shared HMAC secret; suite sets **the same value** as `NENE2_LOCAL_JWT_SECRET` in each app unless a future ADR adopts JWKS. **Fail-closed (A1.5): a missing value aborts apex boot** unless `NENE_SUITE_ALLOW_DEV_SECRET` is set |
 | `NENE_SUITE_ORG_EXTERNAL_ID` | yes | ULID/UUID stored in `organizations.external_id` at provision time |
 | `NENE_SUITE_ORG_NAME` | recommended | Display name passed to each app's initial org record |
 | `NENE_SUITE_INSTALLED_APPS` | yes | Comma-separated catalog ids, e.g. `nene-invoice,nene-clear` |
+| `NENE_SUITE_ALLOW_DEV_SECRET` | no | Dev / local opt-in: permits the built-in dev JWT secret when `NENE_SUITE_JWT_SECRET` is unset. Never set in production / staging |
 
 ### Per-app public URL (sibling discovery)
 

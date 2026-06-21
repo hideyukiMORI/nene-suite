@@ -23,10 +23,20 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 | `NENE_SUITE_BASE_URL` | `https://ops.example.com/` | Trailing slash required |
 | `NENE_SUITE_APEX_URL` | `https://ops.example.com/` | Login / app launcher |
 | `NENE_SUITE_ISSUER_URL` | `https://ops.example.com/api/auth` | Token mint endpoint base |
-| `NENE_SUITE_JWT_SECRET` | `(random 32+ bytes hex)` | Copied to each app's `NENE2_LOCAL_JWT_SECRET` |
+| `NENE_SUITE_JWT_SECRET` | `(random 32+ bytes hex)` | Copied to each app's `NENE2_LOCAL_JWT_SECRET`. **Fail-closed: if unset the apex refuses to boot** unless `NENE_SUITE_ALLOW_DEV_SECRET=1` (dev only) |
 | `NENE_SUITE_ORG_EXTERNAL_ID` | `01JYYYYYYYYYYYYYYYYYYYY` | Written to `organizations.external_id` |
 | `NENE_SUITE_ORG_NAME` | `Example KK` | Initial org display name |
 | `NENE_SUITE_INSTALLED_APPS` | `nene-invoice,nene-clear` | Subset of catalog ids |
+| `NENE_SUITE_ALLOW_DEV_SECRET` | `1` | **Dev / local only.** Permits the built-in dev JWT secret when `NENE_SUITE_JWT_SECRET` is unset. Never set in production / staging |
+
+> **Fail-closed JWT secret (A1.5).** `NENE_SUITE_JWT_SECRET` is **required** to serve.
+> If it is empty/unset the apex runtime refuses to boot — immediately, with no grace
+> period — rather than sign sessions with the built-in development secret. A container
+> entrypoint preflight (`ops/docker/preflight-jwt-secret.php`) enforces this at start, so a
+> misconfigured deployment fails its health check instead of serving forgeable tokens. For
+> local development only, set `NENE_SUITE_ALLOW_DEV_SECRET=1` to permit the dev secret. The
+> installer writes a fresh random `NENE_SUITE_JWT_SECRET` on every run, so a completed install
+> satisfies this.
 
 ### Suite control database (Phase 1+)
 
@@ -75,4 +85,4 @@ Apps **must** verify signature with `NENE2_LOCAL_JWT_SECRET` (same material as `
 
 See [`.env.suite.example`](../../.env.suite.example).
 
-Last updated: 2026-05-29
+Last updated: 2026-06-21
