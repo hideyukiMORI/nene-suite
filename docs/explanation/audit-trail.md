@@ -110,9 +110,22 @@ code merge.
 | `org_display_name.changed` | `suite_org_profile` | `{org_name: …}` | `{org_name: …}` | Does not change tax registration |
 | `catalog_pin.changed` | `catalog_pin` | prior pins | new pins | Sibling version pins only |
 | `apex_operator.created` | `apex_operator` | NULL | `{id, email, displayName}` | Installer provisions first operator; password hash omitted |
+| `organization.created` | `organization` | NULL | `{id, external_id, name, slug, status}` | Suite registry row; identity / roster only — never sibling domain data (ADR 0012 §11) |
+| `organization.renamed` | `organization` | `{name: …}` | `{name: …}` | Identity only; supersedes the legacy `org_display_name.changed` / `suite_org_profile` path |
+| `organization.disabled` | `organization` | active snapshot | disabled snapshot | Soft-disable only (`OrganizationStatus`); hard delete forbidden (§7) |
+| `membership.granted` | `membership` | NULL | `{operator_id, organization_id, role}` | `organization_id` is null for a platform `superadmin` membership |
+| `membership.role_changed` | `membership` | `{role: …}` | `{role: …}` | Supersedes the pre-registered `apex_operator.role_changed` (never implemented) |
+| `membership.revoked` | `membership` | membership snapshot | NULL | Records link removal; the audit row itself stays append-only (§7) |
+
+The multi-tenant entity types `organization` / `membership` were registered
+2026-06-21 (milestone A0, decision §1); emitters land in milestone A2/A3.
+`suite_org_profile` is retained as legacy (declared-but-unused) and is **not**
+reused for these — see
+[`../milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md) §1.
 
 Phase 2+ actions (register before implementation): `app.added`, `app.removed`,
-`apex_operator.invited`, `apex_operator.role_changed`.
+`apex_operator.invited`. (`apex_operator.role_changed` is **superseded** by
+`membership.role_changed` above and will not be implemented.)
 
 ---
 

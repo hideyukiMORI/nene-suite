@@ -259,10 +259,15 @@ SSOT labels describe **sibling products**, not NeNe Suite itself. Suite is never
 | Control DB env var | **`NENE_SUITE_CONTROL_DATABASE_URL`** | `SUITE_DB_URL`, `AUDIT_DATABASE_URL` |
 | Install grouping key | **`install_session_id`** | `session_id` (alone), `wizard_id` |
 | Redacted placeholder | **`"[REDACTED]"`** | empty string, `***`, `null` for known secret keys |
+| Audit entity type — organization | **`organization`** | `tenant`, `org`, `suite_org_id` |
+| Audit entity type — membership | **`membership`** | `member`, `role_assignment` |
 
 Event types and `entity_type` values are registered in
 [`audit-trail.md`](./audit-trail.md) §4. Do not add actions in code without
 updating that section and [`schema/suite-audit-event.schema.json`](../../schema/suite-audit-event.schema.json).
+The multi-tenant entity types **`organization`** and **`membership`** were added
+2026-06-21 (milestone A0); the prohibited `tenant` / `suite_org_id` spellings stay
+prohibited (ADR 0015).
 
 ---
 
