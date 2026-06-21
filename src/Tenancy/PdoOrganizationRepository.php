@@ -32,6 +32,24 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
         );
     }
 
+    public function update(Organization $organization): void
+    {
+        $this->query->execute(
+            <<<'SQL'
+                UPDATE organizations
+                SET name = ?, slug = ?, status = ?, updated_at = ?
+                WHERE id = ?
+                SQL,
+            [
+                $organization->name,
+                $organization->slug,
+                $organization->status->value,
+                $organization->updatedAt,
+                $organization->id,
+            ],
+        );
+    }
+
     public function findById(string $id): ?Organization
     {
         return $this->hydrate($this->query->fetchOne('SELECT * FROM organizations WHERE id = ?', [$id]));

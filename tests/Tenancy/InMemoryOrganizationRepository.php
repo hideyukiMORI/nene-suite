@@ -17,6 +17,11 @@ final class InMemoryOrganizationRepository implements OrganizationRepositoryInte
         $this->byId[$organization->id] = $organization;
     }
 
+    public function update(Organization $organization): void
+    {
+        $this->byId[$organization->id] = $organization;
+    }
+
     public function findById(string $id): ?Organization
     {
         return $this->byId[$id] ?? null;

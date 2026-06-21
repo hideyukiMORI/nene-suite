@@ -110,7 +110,7 @@ code merge.
 | `org_display_name.changed` | `suite_org_profile` | `{org_name: …}` | `{org_name: …}` | Does not change tax registration |
 | `catalog_pin.changed` | `catalog_pin` | prior pins | new pins | Sibling version pins only |
 | `apex_operator.created` | `apex_operator` | NULL | `{id, email, displayName}` | Installer provisions first operator; password hash omitted |
-| `organization.created` | `organization` | NULL | `{id, external_id, name, slug, status}` | Suite registry row; identity / roster only — never sibling domain data (ADR 0012 §11) |
+| `organization.created` | `organization` | NULL | `{id, externalId, name, slug, status}` | Suite registry row; identity / roster only — never sibling domain data (ADR 0012 §11) |
 | `organization.renamed` | `organization` | `{name: …}` | `{name: …}` | Identity only; supersedes the legacy `org_display_name.changed` / `suite_org_profile` path |
 | `organization.disabled` | `organization` | active snapshot | disabled snapshot | Soft-disable only (`OrganizationStatus`); hard delete forbidden (§7) |
 | `membership.granted` | `membership` | NULL | `{operator_id, organization_id, role}` | `organization_id` is null for a platform `superadmin` membership |
