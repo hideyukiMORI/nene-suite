@@ -20,7 +20,7 @@ final readonly class CreateOperatorHandler
 {
     public function __construct(
         private BearerTokenAuthenticator $authenticator,
-        private CreateOperatorUseCaseInterface $useCase,
+        private ProvisionApexOperatorUseCaseInterface $useCase,
         private JsonResponseFactory $response,
     ) {
     }

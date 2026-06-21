@@ -15,6 +15,9 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderFactoryInterface;
+use NeNeSuite\Tenancy\GrantMembershipUseCaseInterface;
+use NeNeSuite\Tenancy\MembershipRepositoryInterface;
+use NeNeSuite\Tenancy\OrganizationRepositoryInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class AuthServiceProvider implements ServiceProviderInterface
@@ -203,6 +206,38 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ProvisionApexOperatorUseCaseInterface::class,
+                static function (ContainerInterface $container): ProvisionApexOperatorUseCaseInterface {
+                    $createOperator = $container->get(CreateOperatorUseCaseInterface::class);
+                    $organizations = $container->get(OrganizationRepositoryInterface::class);
+                    $grantMembership = $container->get(GrantMembershipUseCaseInterface::class);
+                    $memberships = $container->get(MembershipRepositoryInterface::class);
+                    $orgExternalId = $container->get(RuntimeServiceProvider::SUITE_ORG_EXTERNAL_ID);
+
+                    if (!$createOperator instanceof CreateOperatorUseCaseInterface) {
+                        throw new LogicException('CreateOperator use case service is invalid.');
+                    }
+
+                    if (!$organizations instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    if (!$grantMembership instanceof GrantMembershipUseCaseInterface) {
+                        throw new LogicException('GrantMembership use case service is invalid.');
+                    }
+
+                    if (!$memberships instanceof MembershipRepositoryInterface) {
+                        throw new LogicException('Membership repository service is invalid.');
+                    }
+
+                    if (!is_string($orgExternalId) || $orgExternalId === '') {
+                        throw new LogicException('Suite org external id service is invalid.');
+                    }
+
+                    return new ProvisionApexOperatorUseCase($createOperator, $organizations, $grantMembership, $memberships, $orgExternalId);
+                },
+            )
+            ->set(
                 OperatorEmailConflictExceptionHandler::class,
                 static function (ContainerInterface $container): OperatorEmailConflictExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -230,15 +265,15 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 CreateOperatorHandler::class,
                 static function (ContainerInterface $container): CreateOperatorHandler {
                     $authenticator = $container->get(BearerTokenAuthenticator::class);
-                    $useCase = $container->get(CreateOperatorUseCaseInterface::class);
+                    $useCase = $container->get(ProvisionApexOperatorUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
 
                     if (!$authenticator instanceof BearerTokenAuthenticator) {
                         throw new LogicException('Bearer token authenticator service is invalid.');
                     }
 
-                    if (!$useCase instanceof CreateOperatorUseCaseInterface) {
-                        throw new LogicException('CreateOperator use case service is invalid.');
+                    if (!$useCase instanceof ProvisionApexOperatorUseCaseInterface) {
+                        throw new LogicException('ProvisionApexOperator use case service is invalid.');
                     }
 
                     if (!$response instanceof JsonResponseFactory) {
