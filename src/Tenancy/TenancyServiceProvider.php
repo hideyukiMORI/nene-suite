@@ -13,6 +13,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\Auth\BearerTokenAuthenticator;
+use NeNeSuite\Auth\OperatorRepositoryInterface;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderFactoryInterface;
 use Psr\Container\ContainerInterface;
@@ -177,6 +178,22 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
                 ),
             )
             ->set(
+                ListOrganizationMembershipsUseCaseInterface::class,
+                static fn (ContainerInterface $container): ListOrganizationMembershipsUseCaseInterface => new ListOrganizationMembershipsUseCase(
+                    self::membershipRepository($container),
+                    self::operatorRepository($container),
+                ),
+            )
+            ->set(
+                ListOrganizationMembershipsHandler::class,
+                static fn (ContainerInterface $container): ListOrganizationMembershipsHandler => new ListOrganizationMembershipsHandler(
+                    self::superadminGuard($container),
+                    self::listOrganizationMembershipsUseCase($container),
+                    self::organizationRepository($container),
+                    self::responseFactory($container),
+                ),
+            )
+            ->set(
                 GrantMembershipHandler::class,
                 static fn (ContainerInterface $container): GrantMembershipHandler => new GrantMembershipHandler(
                     self::superadminGuard($container),
@@ -207,6 +224,7 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
             ->set(
                 'nene-suite.route_registrar.memberships',
                 static fn (ContainerInterface $container): MembershipRouteRegistrar => new MembershipRouteRegistrar(
+                    self::listOrganizationMembershipsHandler($container),
                     self::grantMembershipHandler($container),
                     self::changeMembershipRoleHandler($container),
                     self::revokeMembershipHandler($container),
@@ -519,6 +537,50 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
 
         if (!$handler instanceof RevokeMembershipHandler) {
             throw new LogicException('Revoke membership handler service is invalid.');
+        }
+
+        return $handler;
+    }
+
+    private static function membershipRepository(ContainerInterface $container): MembershipRepositoryInterface
+    {
+        $repository = $container->get(MembershipRepositoryInterface::class);
+
+        if (!$repository instanceof MembershipRepositoryInterface) {
+            throw new LogicException('Membership repository service is invalid.');
+        }
+
+        return $repository;
+    }
+
+    private static function operatorRepository(ContainerInterface $container): OperatorRepositoryInterface
+    {
+        $repository = $container->get(OperatorRepositoryInterface::class);
+
+        if (!$repository instanceof OperatorRepositoryInterface) {
+            throw new LogicException('Operator repository service is invalid.');
+        }
+
+        return $repository;
+    }
+
+    private static function listOrganizationMembershipsUseCase(ContainerInterface $container): ListOrganizationMembershipsUseCaseInterface
+    {
+        $useCase = $container->get(ListOrganizationMembershipsUseCaseInterface::class);
+
+        if (!$useCase instanceof ListOrganizationMembershipsUseCaseInterface) {
+            throw new LogicException('List organization memberships use case service is invalid.');
+        }
+
+        return $useCase;
+    }
+
+    private static function listOrganizationMembershipsHandler(ContainerInterface $container): ListOrganizationMembershipsHandler
+    {
+        $handler = $container->get(ListOrganizationMembershipsHandler::class);
+
+        if (!$handler instanceof ListOrganizationMembershipsHandler) {
+            throw new LogicException('List organization memberships handler service is invalid.');
         }
 
         return $handler;
