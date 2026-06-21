@@ -8,12 +8,13 @@ use LogicException;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Auth\TokenVerifierInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Http\RuntimeServiceProvider;
-use NeNeSuite\SuiteAudit\SuiteAuditRecorderInterface;
+use NeNeSuite\SuiteAudit\SuiteAuditRecorderFactoryInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class AuthServiceProvider implements ServiceProviderInterface
@@ -33,6 +34,10 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
 
                     return new PdoOperatorRepository($query);
                 },
+            )
+            ->set(
+                OperatorRepositoryFactoryInterface::class,
+                static fn (ContainerInterface $container): OperatorRepositoryFactoryInterface => new PdoOperatorRepositoryFactory(),
             )
             ->set(
                 BearerTokenAuthenticator::class,
@@ -168,28 +173,33 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
             ->set(
                 CreateOperatorUseCaseInterface::class,
                 static function (ContainerInterface $container): CreateOperatorUseCaseInterface {
-                    $operators = $container->get(OperatorRepositoryInterface::class);
+                    $transactions = $container->get(DatabaseTransactionManagerInterface::class);
+                    $operators = $container->get(OperatorRepositoryFactoryInterface::class);
+                    $audit = $container->get(SuiteAuditRecorderFactoryInterface::class);
                     $hasher = $container->get(PasswordHasher::class);
-                    $audit = $container->get(SuiteAuditRecorderInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
 
-                    if (!$operators instanceof OperatorRepositoryInterface) {
-                        throw new LogicException('Operator repository service is invalid.');
+                    if (!$transactions instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('Database transaction manager service is invalid.');
+                    }
+
+                    if (!$operators instanceof OperatorRepositoryFactoryInterface) {
+                        throw new LogicException('Operator repository factory service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderFactoryInterface) {
+                        throw new LogicException('Suite audit recorder factory service is invalid.');
                     }
 
                     if (!$hasher instanceof PasswordHasher) {
                         throw new LogicException('Password hasher service is invalid.');
                     }
 
-                    if (!$audit instanceof SuiteAuditRecorderInterface) {
-                        throw new LogicException('Suite audit recorder service is invalid.');
-                    }
-
                     if (!is_string($suiteId) || $suiteId === '') {
                         throw new LogicException('Suite id service is invalid.');
                     }
 
-                    return new CreateOperatorUseCase($operators, $hasher, $audit, $suiteId);
+                    return new CreateOperatorUseCase($transactions, $operators, $audit, $hasher, $suiteId);
                 },
             )
             ->set(

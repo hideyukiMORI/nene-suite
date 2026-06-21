@@ -36,6 +36,18 @@ final readonly class SuiteAuditServiceProvider implements ServiceProviderInterfa
                 },
             )
             ->set(
+                SuiteAuditRecorderFactoryInterface::class,
+                static function (ContainerInterface $container): SuiteAuditRecorderFactoryInterface {
+                    $sanitizer = $container->get(SuiteAuditSanitizer::class);
+
+                    if (!$sanitizer instanceof SuiteAuditSanitizer) {
+                        throw new LogicException('Suite audit sanitizer service is invalid.');
+                    }
+
+                    return new PdoSuiteAuditRecorderFactory($sanitizer);
+                },
+            )
+            ->set(
                 SuiteAuditEventReaderInterface::class,
                 static function (ContainerInterface $container): SuiteAuditEventReaderInterface {
                     $query = $container->get(DatabaseQueryExecutorInterface::class);
