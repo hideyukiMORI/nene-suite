@@ -24,7 +24,7 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 | `NENE_SUITE_APEX_URL` | `https://ops.example.com/` | Login / app launcher |
 | `NENE_SUITE_ISSUER_URL` | `https://ops.example.com/api/auth` | Token mint endpoint base |
 | `NENE_SUITE_JWT_SECRET` | `(random 32+ bytes hex)` | Copied to each app's `NENE2_LOCAL_JWT_SECRET`. **Fail-closed: if unset the apex refuses to boot** unless `NENE_SUITE_ALLOW_DEV_SECRET=1` (dev only) |
-| `NENE_SUITE_ORG_EXTERNAL_ID` | `01JYYYYYYYYYYYYYYYYYYYY` | Written to `organizations.external_id` |
+| `NENE_SUITE_ORG_EXTERNAL_ID` | `01JYYYYYYYYYYYYYYYYYYYY` | Federation key; equals `organizations.external_id`. On a pre-A4 upgrade the startup backfill (A5) seeds the org row's `external_id` from this value when it is a valid ULID; if it is malformed a fresh ULID is minted and the row diverges from the env (the serving backfill does not rewrite `.env`) — set the env to the row's `external_id` (or re-run install) and restart |
 | `NENE_SUITE_ORG_NAME` | `Example KK` | Initial org display name |
 | `NENE_SUITE_INSTALLED_APPS` | `nene-invoice,nene-clear` | Subset of catalog ids |
 | `NENE_SUITE_ALLOW_DEV_SECRET` | `1` | **Dev / local only.** Permits the built-in dev JWT secret when `NENE_SUITE_JWT_SECRET` is unset. Never set in production / staging |
