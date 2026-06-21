@@ -32,6 +32,11 @@ use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use NeNeSuite\SuiteEnv\SuiteEnvServiceProvider;
 use NeNeSuite\Tenancy\ForbiddenExceptionHandler;
+use NeNeSuite\Tenancy\MembershipConflictExceptionHandler;
+use NeNeSuite\Tenancy\MembershipInvariantExceptionHandler;
+use NeNeSuite\Tenancy\MembershipNotFoundExceptionHandler;
+use NeNeSuite\Tenancy\MembershipRouteRegistrar;
+use NeNeSuite\Tenancy\MembershipValidationExceptionHandler;
 use NeNeSuite\Tenancy\OrganizationNotFoundExceptionHandler;
 use NeNeSuite\Tenancy\OrganizationRouteRegistrar;
 use NeNeSuite\Tenancy\OrganizationSlugConflictExceptionHandler;
@@ -76,6 +81,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $suiteAudit = $container->get('nene-suite.route_registrar.suite_audit');
                     $installedApps = $container->get('nene-suite.route_registrar.installed_apps');
                     $tenancy = $container->get('nene-suite.route_registrar.tenancy');
+                    $memberships = $container->get('nene-suite.route_registrar.memberships');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -105,6 +111,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Tenancy route registrar service is invalid.');
                     }
 
+                    if (!$memberships instanceof MembershipRouteRegistrar) {
+                        throw new LogicException('Membership route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
                         $installSession,
@@ -113,6 +123,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $suiteAudit,
                         $installedApps,
                         $tenancy,
+                        $memberships,
                     ];
                 },
             )
@@ -130,6 +141,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $organizationValidation = $container->get(OrganizationValidationExceptionHandler::class);
                     $organizationSlugConflict = $container->get(OrganizationSlugConflictExceptionHandler::class);
                     $organizationNotFound = $container->get(OrganizationNotFoundExceptionHandler::class);
+                    $membershipValidation = $container->get(MembershipValidationExceptionHandler::class);
+                    $membershipConflict = $container->get(MembershipConflictExceptionHandler::class);
+                    $membershipInvariant = $container->get(MembershipInvariantExceptionHandler::class);
+                    $membershipNotFound = $container->get(MembershipNotFoundExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
@@ -175,6 +190,22 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Organization not found exception handler service is invalid.');
                     }
 
+                    if (!$membershipValidation instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Membership validation exception handler service is invalid.');
+                    }
+
+                    if (!$membershipConflict instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Membership conflict exception handler service is invalid.');
+                    }
+
+                    if (!$membershipInvariant instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Membership invariant exception handler service is invalid.');
+                    }
+
+                    if (!$membershipNotFound instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Membership not found exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
                         $installSessionConflict,
@@ -187,6 +218,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $organizationValidation,
                         $organizationSlugConflict,
                         $organizationNotFound,
+                        $membershipValidation,
+                        $membershipConflict,
+                        $membershipInvariant,
+                        $membershipNotFound,
                     ];
                 },
             );
