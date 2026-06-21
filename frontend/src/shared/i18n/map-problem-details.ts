@@ -12,6 +12,14 @@ export function mapProblemDetailsToMessageKey(error: AppError): MessageKey | nul
       return 'suite.org.error.validation'
     case `${PROBLEM_BASE}organization-not-found`:
       return 'suite.org.error.notFound'
+    case `${PROBLEM_BASE}membership-conflict`:
+      return 'suite.member.error.conflict'
+    case `${PROBLEM_BASE}membership-invariant`:
+      return 'suite.member.error.invariant'
+    case `${PROBLEM_BASE}membership-validation-failed`:
+      return 'suite.member.error.validation'
+    case `${PROBLEM_BASE}membership-not-found`:
+      return 'suite.member.error.notFound'
     default:
       break
   }
