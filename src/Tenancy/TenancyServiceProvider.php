@@ -60,6 +60,37 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
                     self::auditRecorderFactory($container),
                     self::suiteId($container),
                 ),
+            )
+            ->set(
+                MembershipRepositoryFactoryInterface::class,
+                static fn (ContainerInterface $container): MembershipRepositoryFactoryInterface => new PdoMembershipRepositoryFactory(),
+            )
+            ->set(
+                GrantMembershipUseCaseInterface::class,
+                static fn (ContainerInterface $container): GrantMembershipUseCaseInterface => new GrantMembershipUseCase(
+                    self::transactionManager($container),
+                    self::membershipRepositoryFactory($container),
+                    self::auditRecorderFactory($container),
+                    self::suiteId($container),
+                ),
+            )
+            ->set(
+                ChangeMembershipRoleUseCaseInterface::class,
+                static fn (ContainerInterface $container): ChangeMembershipRoleUseCaseInterface => new ChangeMembershipRoleUseCase(
+                    self::transactionManager($container),
+                    self::membershipRepositoryFactory($container),
+                    self::auditRecorderFactory($container),
+                    self::suiteId($container),
+                ),
+            )
+            ->set(
+                RevokeMembershipUseCaseInterface::class,
+                static fn (ContainerInterface $container): RevokeMembershipUseCaseInterface => new RevokeMembershipUseCase(
+                    self::transactionManager($container),
+                    self::membershipRepositoryFactory($container),
+                    self::auditRecorderFactory($container),
+                    self::suiteId($container),
+                ),
             );
     }
 
@@ -91,6 +122,17 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
 
         if (!$factory instanceof OrganizationRepositoryFactoryInterface) {
             throw new LogicException('Organization repository factory service is invalid.');
+        }
+
+        return $factory;
+    }
+
+    private static function membershipRepositoryFactory(ContainerInterface $container): MembershipRepositoryFactoryInterface
+    {
+        $factory = $container->get(MembershipRepositoryFactoryInterface::class);
+
+        if (!$factory instanceof MembershipRepositoryFactoryInterface) {
+            throw new LogicException('Membership repository factory service is invalid.');
         }
 
         return $factory;

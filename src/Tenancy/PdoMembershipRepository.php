@@ -31,9 +31,32 @@ final readonly class PdoMembershipRepository implements MembershipRepositoryInte
         );
     }
 
+    public function updateRole(Membership $membership): void
+    {
+        $this->query->execute(
+            'UPDATE memberships SET role = ?, updated_at = ? WHERE id = ?',
+            [$membership->role->value, $membership->updatedAt, $membership->id],
+        );
+    }
+
+    public function delete(string $id): void
+    {
+        $this->query->execute('DELETE FROM memberships WHERE id = ?', [$id]);
+    }
+
     public function findById(string $id): ?Membership
     {
         return $this->hydrate($this->query->fetchOne('SELECT * FROM memberships WHERE id = ?', [$id]));
+    }
+
+    /**
+     * @return list<Membership>
+     */
+    public function findPlatformMemberships(): array
+    {
+        return $this->hydrateAll($this->query->fetchAll(
+            'SELECT * FROM memberships WHERE organization_id IS NULL ORDER BY created_at ASC, id ASC',
+        ));
     }
 
     /**

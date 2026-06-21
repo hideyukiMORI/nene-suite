@@ -17,9 +17,30 @@ final class InMemoryMembershipRepository implements MembershipRepositoryInterfac
         $this->byId[$membership->id] = $membership;
     }
 
+    public function updateRole(Membership $membership): void
+    {
+        $this->byId[$membership->id] = $membership;
+    }
+
+    public function delete(string $id): void
+    {
+        unset($this->byId[$id]);
+    }
+
     public function findById(string $id): ?Membership
     {
         return $this->byId[$id] ?? null;
+    }
+
+    /**
+     * @return list<Membership>
+     */
+    public function findPlatformMemberships(): array
+    {
+        return array_values(array_filter(
+            $this->byId,
+            static fn (Membership $membership): bool => $membership->organizationId === null,
+        ));
     }
 
     /**
