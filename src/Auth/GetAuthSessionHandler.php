@@ -22,9 +22,14 @@ final readonly class GetAuthSessionHandler
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $operatorId = $this->authenticator->operatorId($request);
-        $operator = $this->useCase->execute($operatorId);
+        $principal = $this->authenticator->principal($request);
+        $operator = $this->useCase->execute($principal->operatorId);
 
-        return $this->response->create(OperatorView::toArray($operator));
+        return $this->response->create([
+            ...OperatorView::toArray($operator),
+            'orgExternalId' => $principal->orgExternalId,
+            'role' => $principal->role?->value,
+            'superadmin' => $principal->isSuperadmin,
+        ]);
     }
 }

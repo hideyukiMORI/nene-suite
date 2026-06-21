@@ -719,11 +719,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Operator'
+                $ref: '#/components/schemas/AuthSessionContext'
               example:
                 id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
                 email: operator@example.com
                 displayName: Example Operator
+                orgExternalId: 01J8XR0G7Q9V2H7K3N5M0B8ORG
+                role: admin
+                superadmin: true
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -915,6 +918,40 @@ components:
           format: date-time
         operator:
           $ref: '#/components/schemas/Operator'
+        orgExternalId:
+          type: [string, 'null']
+          description: Active organization's federation key (null if the session has no active org).
+        role:
+          type: [string, 'null']
+          enum: [admin, member, viewer, null]
+          description: The operator's role in the active organization (null if none). `superadmin` is the separate platform dimension below.
+        superadmin:
+          type: boolean
+          description: Whether the operator is a platform superadmin (cross-organization).
+
+    AuthSessionContext:
+      type: object
+      additionalProperties: false
+      required: [id, email]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        email:
+          type: string
+          format: email
+        displayName:
+          type: [string, 'null']
+          maxLength: 320
+        orgExternalId:
+          type: [string, 'null']
+          description: Active organization's federation key (null if the session has no active org).
+        role:
+          type: [string, 'null']
+          enum: [admin, member, viewer, null]
+          description: The operator's role in the active organization (null if none).
+        superadmin:
+          type: boolean
+          description: Whether the operator is a platform superadmin (cross-organization).
 
     HealthResponse:
       type: object

@@ -43,15 +43,37 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static fn (ContainerInterface $container): OperatorRepositoryFactoryInterface => new PdoOperatorRepositoryFactory(),
             )
             ->set(
+                OperatorSessionContextResolver::class,
+                static function (ContainerInterface $container): OperatorSessionContextResolver {
+                    $memberships = $container->get(MembershipRepositoryInterface::class);
+                    $organizations = $container->get(OrganizationRepositoryInterface::class);
+
+                    if (!$memberships instanceof MembershipRepositoryInterface) {
+                        throw new LogicException('Membership repository service is invalid.');
+                    }
+
+                    if (!$organizations instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new OperatorSessionContextResolver($memberships, $organizations);
+                },
+            )
+            ->set(
                 BearerTokenAuthenticator::class,
                 static function (ContainerInterface $container): BearerTokenAuthenticator {
                     $verifier = $container->get(TokenVerifierInterface::class);
+                    $resolver = $container->get(OperatorSessionContextResolver::class);
 
                     if (!$verifier instanceof TokenVerifierInterface) {
                         throw new LogicException('Token verifier service is invalid.');
                     }
 
-                    return new BearerTokenAuthenticator($verifier);
+                    if (!$resolver instanceof OperatorSessionContextResolver) {
+                        throw new LogicException('Operator session context resolver service is invalid.');
+                    }
+
+                    return new BearerTokenAuthenticator($verifier, $resolver);
                 },
             )
             ->set(
@@ -61,6 +83,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     $hasher = $container->get(PasswordHasher::class);
                     $issuer = $container->get(TokenIssuerInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+                    $sessionContext = $container->get(OperatorSessionContextResolver::class);
 
                     if (!$operators instanceof OperatorRepositoryInterface) {
                         throw new LogicException('Operator repository service is invalid.');
@@ -78,7 +101,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Suite id service is invalid.');
                     }
 
-                    return new CreateAuthSessionUseCase($operators, $hasher, $issuer, $suiteId);
+                    if (!$sessionContext instanceof OperatorSessionContextResolver) {
+                        throw new LogicException('Operator session context resolver service is invalid.');
+                    }
+
+                    return new CreateAuthSessionUseCase($operators, $hasher, $issuer, $suiteId, $sessionContext);
                 },
             )
             ->set(

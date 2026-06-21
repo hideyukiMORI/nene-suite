@@ -9,57 +9,113 @@ use NeNeSuite\Auth\CreateAuthSessionInput;
 use NeNeSuite\Auth\CreateAuthSessionUseCase;
 use NeNeSuite\Auth\InvalidCredentialsException;
 use NeNeSuite\Auth\Operator;
+use NeNeSuite\Auth\OperatorSessionContextResolver;
 use NeNeSuite\Auth\PasswordHasher;
+use NeNeSuite\Tenancy\Membership;
+use NeNeSuite\Tenancy\Organization;
+use NeNeSuite\Tenancy\OrganizationStatus;
+use NeNeSuite\Tenancy\Role;
+use NeNeSuite\Tests\Tenancy\InMemoryMembershipRepository;
+use NeNeSuite\Tests\Tenancy\InMemoryOrganizationRepository;
 use PHPUnit\Framework\TestCase;
 
 final class CreateAuthSessionUseCaseTest extends TestCase
 {
     private const SUITE_ID = '01J8XRDEV000000000000000ZA';
     private const OPERATOR_ID = '01J8XR0G7Q9V2H7K3N5M0B8TCA';
+    private const ORG_ID = '01J8XRDORG00000000000000ZA';
+    private const ORG_EXTERNAL_ID = '01J8XRDEXT0000000000000ZAB';
+    private const NOW = '2026-05-30T09:48:46Z';
 
-    public function testIssuesTokenForValidCredentials(): void
+    public function testIssuesTokenWithNullContextForOperatorWithoutMemberships(): void
     {
-        $hasher = new PasswordHasher();
         $operators = new InMemoryOperatorRepository();
-        $operators->save($this->operator($hasher->hash('s3cret-pass')));
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
         $verifier = new LocalBearerTokenVerifier('test-secret');
 
-        $useCase = new CreateAuthSessionUseCase($operators, $hasher, $verifier, self::SUITE_ID);
-        $output = $useCase->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass'));
+        $output = $this->useCase($operators, $verifier)
+            ->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass'));
 
         self::assertSame(self::OPERATOR_ID, $output->operator->id);
         self::assertGreaterThan(time(), $output->expiresAt);
+        self::assertNull($output->orgExternalId);
+        self::assertNull($output->role);
+        self::assertFalse($output->superadmin);
 
         $claims = $verifier->verify($output->token);
         self::assertSame(self::OPERATOR_ID, $claims['sub']);
         self::assertSame(self::SUITE_ID, $claims['suite_id']);
+        self::assertNull($claims['org_external_id']);
+        self::assertNull($claims['role']);
+        self::assertFalse($claims['superadmin']);
+    }
+
+    public function testIssuesTokenWithActiveOrgContextAndSuperadmin(): void
+    {
+        $operators = new InMemoryOperatorRepository();
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
+        $verifier = new LocalBearerTokenVerifier('test-secret');
+
+        $memberships = new InMemoryMembershipRepository();
+        $memberships->save(new Membership('01J0SUP', self::OPERATOR_ID, null, Role::Superadmin, self::NOW, self::NOW));
+        $memberships->save(new Membership('01J0ADM', self::OPERATOR_ID, self::ORG_ID, Role::Admin, self::NOW, self::NOW));
+
+        $output = $this->useCase($operators, $verifier, $memberships, $this->organizations())
+            ->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass'));
+
+        self::assertSame(self::ORG_EXTERNAL_ID, $output->orgExternalId);
+        self::assertSame(Role::Admin, $output->role);
+        self::assertTrue($output->superadmin);
+
+        $claims = $verifier->verify($output->token);
+        self::assertSame(self::ORG_EXTERNAL_ID, $claims['org_external_id']);
+        self::assertSame('admin', $claims['role']);
+        self::assertTrue($claims['superadmin']);
     }
 
     public function testRejectsWrongPassword(): void
     {
-        $hasher = new PasswordHasher();
         $operators = new InMemoryOperatorRepository();
-        $operators->save($this->operator($hasher->hash('s3cret-pass')));
-
-        $useCase = new CreateAuthSessionUseCase($operators, $hasher, new LocalBearerTokenVerifier('test-secret'), self::SUITE_ID);
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
 
         $this->expectException(InvalidCredentialsException::class);
 
-        $useCase->execute(new CreateAuthSessionInput('operator@example.com', 'wrong'));
+        $this->useCase($operators, new LocalBearerTokenVerifier('test-secret'))
+            ->execute(new CreateAuthSessionInput('operator@example.com', 'wrong'));
     }
 
     public function testRejectsUnknownEmail(): void
     {
-        $useCase = new CreateAuthSessionUseCase(
-            new InMemoryOperatorRepository(),
-            new PasswordHasher(),
-            new LocalBearerTokenVerifier('test-secret'),
-            self::SUITE_ID,
-        );
-
         $this->expectException(InvalidCredentialsException::class);
 
-        $useCase->execute(new CreateAuthSessionInput('nobody@example.com', 'whatever'));
+        $this->useCase(new InMemoryOperatorRepository(), new LocalBearerTokenVerifier('test-secret'))
+            ->execute(new CreateAuthSessionInput('nobody@example.com', 'whatever'));
+    }
+
+    private function useCase(
+        InMemoryOperatorRepository $operators,
+        LocalBearerTokenVerifier $verifier,
+        ?InMemoryMembershipRepository $memberships = null,
+        ?InMemoryOrganizationRepository $organizations = null,
+    ): CreateAuthSessionUseCase {
+        return new CreateAuthSessionUseCase(
+            $operators,
+            new PasswordHasher(),
+            $verifier,
+            self::SUITE_ID,
+            new OperatorSessionContextResolver(
+                $memberships ?? new InMemoryMembershipRepository(),
+                $organizations ?? new InMemoryOrganizationRepository(),
+            ),
+        );
+    }
+
+    private function organizations(): InMemoryOrganizationRepository
+    {
+        $organizations = new InMemoryOrganizationRepository();
+        $organizations->save(new Organization(self::ORG_ID, self::ORG_EXTERNAL_ID, 'Acme KK', 'acme-kk', OrganizationStatus::Active, self::NOW, self::NOW));
+
+        return $organizations;
     }
 
     private function operator(string $passwordHash): Operator
@@ -69,8 +125,8 @@ final class CreateAuthSessionUseCaseTest extends TestCase
             email: 'operator@example.com',
             passwordHash: $passwordHash,
             displayName: 'Example Operator',
-            createdAt: '2026-05-30T09:48:46Z',
-            updatedAt: '2026-05-30T09:48:46Z',
+            createdAt: self::NOW,
+            updatedAt: self::NOW,
         );
     }
 }

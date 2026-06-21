@@ -48,10 +48,18 @@ final class InMemoryMembershipRepository implements MembershipRepositoryInterfac
      */
     public function findByOperator(string $operatorId): array
     {
-        return array_values(array_filter(
+        $memberships = array_values(array_filter(
             $this->byId,
             static fn (Membership $membership): bool => $membership->operatorId === $operatorId,
         ));
+
+        // Mirror PdoMembershipRepository's ORDER BY created_at ASC, id ASC (oldest first).
+        usort(
+            $memberships,
+            static fn (Membership $a, Membership $b): int => [$a->createdAt, $a->id] <=> [$b->createdAt, $b->id],
+        );
+
+        return $memberships;
     }
 
     public function findByOperatorAndOrganization(string $operatorId, ?string $organizationId): ?Membership

@@ -50,6 +50,9 @@ final readonly class CreateAuthSessionHandler
                 'token' => $output->token,
                 'expiresAt' => gmdate('Y-m-d\TH:i:s\Z', $output->expiresAt),
                 'operator' => OperatorView::toArray($output->operator),
+                'orgExternalId' => $output->orgExternalId,
+                'role' => $output->role?->value,
+                'superadmin' => $output->superadmin,
             ],
             201,
         );
