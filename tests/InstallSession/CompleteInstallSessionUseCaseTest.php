@@ -61,6 +61,25 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         self::assertSame('completed', $completedEvent->afterJson['status']);
     }
 
+    public function testPrefersSessionOrgExternalIdOverInjectedFallback(): void
+    {
+        // The A4 installer bootstrap stamps the session with the minted organizations.external_id;
+        // completion must record that (in the manifest + completed session), not the injected placeholder.
+        $stamped = '01J8XRDSTAMPED00000000000A';
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->readySession(orgExternalId: $stamped));
+        $manifests = new InMemoryInstallManifestRepository();
+
+        $output = $this->useCase($sessions, $manifests)->execute(new CompleteInstallSessionInput(self::SESSION_ID));
+
+        self::assertSame($stamped, $output->session->orgExternalId);
+        self::assertNotSame(self::ORG_ID, $output->session->orgExternalId, 'the injected fallback is not used when the session carries one');
+
+        $manifest = $manifests->findById((string) $output->session->installManifestId);
+        self::assertNotNull($manifest);
+        self::assertSame($stamped, $manifest->body['org_external_id']);
+    }
+
     public function testPopulatesManifestAppsForConfiguredUrls(): void
     {
         $sessions = new InMemoryInstallSessionRepository();
@@ -167,6 +186,7 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         InstallSessionStatus $status = InstallSessionStatus::InProgress,
         bool $disclaimerAccepted = true,
         array $selectedApps = ['nene-invoice'],
+        ?string $orgExternalId = null,
     ): InstallSession {
         return new InstallSession(
             id: self::SESSION_ID,
@@ -177,7 +197,7 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
             selectedApps: $selectedApps,
             disclaimerAccepted: $disclaimerAccepted,
             disclaimerAcceptedAt: $disclaimerAccepted ? '2026-05-30T09:50:00Z' : null,
-            orgExternalId: null,
+            orgExternalId: $orgExternalId,
             orgDisplayName: 'Example Organization',
             installManifestId: null,
             failureCode: null,

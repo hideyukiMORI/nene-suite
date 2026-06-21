@@ -60,9 +60,14 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
             );
         }
 
+        // Prefer the org external_id stamped onto the session by the installer bootstrap
+        // (the minted organizations.external_id); fall back to the injected value for the
+        // wizard/HTTP path, which never stamps the session (milestone A4).
+        $orgExternalId = $session->orgExternalId ?? $this->orgExternalId;
+
         $manifest = $this->manifestFactory->create(
             $this->suiteId,
-            $this->orgExternalId,
+            $orgExternalId,
             $session->orgDisplayName,
             $session->disclaimerAcceptedAt,
             $this->manifestApps($session->selectedApps),
@@ -84,7 +89,7 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
 
         $now = gmdate('Y-m-d\TH:i:s\Z');
         $before = InstallSessionView::toArray($session);
-        $completed = $session->withCompleted($manifest->id, $this->orgExternalId, $now, $now);
+        $completed = $session->withCompleted($manifest->id, $orgExternalId, $now, $now);
 
         $this->sessions->update($completed);
 

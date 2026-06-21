@@ -29,9 +29,10 @@ use NeNeSuite\SuiteEnv\WriteEnvConfigUseCaseInterface;
  *  2. UpdateAppSelection (dependency-resolved)
  *  3. AcceptDisclaimer
  *  4. ProvisionAppDatabases — CREATE DATABASE per selected app
- *  5. WriteEnvConfig — write NENE_SUITE_* env file
- *  6. CreateOperator — initial apex operator
- *  7. CompleteInstallSession — write install manifest
+ *  5. CreateOperator — initial apex operator (before env write; needed for the membership grant)
+ *  6. BootstrapDefaultOrganization — default org + operator superadmin/admin; stamps session orgExternalId
+ *  7. WriteEnvConfig — write NENE_SUITE_* env file (now carries the org external_id)
+ *  8. CompleteInstallSession — write install manifest
  */
 final readonly class InstallerUseCase implements InstallerUseCaseInterface
 {
@@ -40,8 +41,9 @@ final readonly class InstallerUseCase implements InstallerUseCaseInterface
         private UpdateAppSelectionUseCaseInterface $updateSelection,
         private AcceptDisclaimerUseCaseInterface $acceptDisclaimer,
         private ProvisionAppDatabasesUseCaseInterface $provisionDatabases,
-        private WriteEnvConfigUseCaseInterface $writeEnvConfig,
         private CreateOperatorUseCaseInterface $createOperator,
+        private BootstrapDefaultOrganizationUseCaseInterface $bootstrapOrganization,
+        private WriteEnvConfigUseCaseInterface $writeEnvConfig,
         private CompleteInstallSessionUseCaseInterface $completeSession,
     ) {
     }
@@ -70,14 +72,22 @@ final readonly class InstallerUseCase implements InstallerUseCaseInterface
             installSessionId: $sessionId,
         ));
 
-        $envOutput = $this->writeEnvConfig->execute(new WriteEnvConfigInput(
-            installSessionId: $sessionId,
-        ));
-
         $operatorOutput = $this->createOperator->execute(new CreateOperatorInput(
             email: $input->operatorEmail,
             password: $input->operatorPassword,
             displayName: $input->operatorDisplayName,
+        ));
+
+        // Create the default org + operator memberships and stamp the session's org
+        // external_id BEFORE WriteEnvConfig, so the env/manifest carry the real value.
+        $this->bootstrapOrganization->execute(new BootstrapDefaultOrganizationInput(
+            installSessionId: $sessionId,
+            orgName: $input->orgName,
+            operatorId: $operatorOutput->operator->id,
+        ));
+
+        $envOutput = $this->writeEnvConfig->execute(new WriteEnvConfigInput(
+            installSessionId: $sessionId,
         ));
 
         $completeOutput = $this->completeSession->execute(new CompleteInstallSessionInput(
