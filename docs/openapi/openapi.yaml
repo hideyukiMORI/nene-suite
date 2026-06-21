@@ -811,6 +811,41 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   /api/v1/organizations/{id}/memberships:
+    get:
+      tags: [Memberships]
+      operationId: listMemberships
+      summary: List an organization's members.
+      description: |
+        Returns the operators with a membership in the organization, enriched with the
+        operator's email and display name. Platform-superadmin only. Read-only; no audit event.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      responses:
+        '200':
+          description: Organization members.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMemberList'
+              example:
+                members:
+                  - membershipId: 01J8XRMEM00000000000000ZAB
+                    operatorId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                    email: operator@example.com
+                    displayName: Example Operator
+                    role: admin
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
     post:
       tags: [Memberships]
       operationId: grantMembership
@@ -1273,6 +1308,35 @@ components:
         role:
           type: string
           enum: [superadmin, admin, member, viewer]
+
+    OrganizationMember:
+      type: object
+      additionalProperties: false
+      required: [membershipId, operatorId, email, displayName, role]
+      properties:
+        membershipId:
+          $ref: '#/components/schemas/Ulid'
+        operatorId:
+          $ref: '#/components/schemas/Ulid'
+        email:
+          type: [string, 'null']
+          format: email
+        displayName:
+          type: [string, 'null']
+          maxLength: 320
+        role:
+          type: string
+          enum: [admin, member, viewer]
+
+    OrganizationMemberList:
+      type: object
+      additionalProperties: false
+      required: [members]
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationMember'
 
     GrantMembershipRequest:
       type: object

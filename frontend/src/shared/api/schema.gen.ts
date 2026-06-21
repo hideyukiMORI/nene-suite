@@ -372,7 +372,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List an organization's members.
+         * @description Returns the operators with a membership in the organization, enriched with the
+         *     operator's email and display name. Platform-superadmin only. Read-only; no audit event.
+         */
+        get: operations["listMemberships"];
         put?: never;
         /**
          * Grant an operator a membership in an organization.
@@ -485,6 +490,18 @@ export interface components {
             organizationId: components["schemas"]["Ulid"] | null;
             /** @enum {string} */
             role: "superadmin" | "admin" | "member" | "viewer";
+        };
+        OrganizationMember: {
+            membershipId: components["schemas"]["Ulid"];
+            operatorId: components["schemas"]["Ulid"];
+            /** Format: email */
+            email: string | null;
+            displayName: string | null;
+            /** @enum {string} */
+            role: "admin" | "member" | "viewer";
+        };
+        OrganizationMemberList: {
+            members: components["schemas"]["OrganizationMember"][];
         };
         GrantMembershipRequest: {
             operatorId: components["schemas"]["Ulid"];
@@ -1758,6 +1775,45 @@ export interface operations {
                      *     }
                      */
                     "application/json": components["schemas"]["Organization"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["OrganizationNotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listMemberships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization members. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "members": [
+                     *         {
+                     *           "membershipId": "01J8XRMEM00000000000000ZAB",
+                     *           "operatorId": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *           "email": "operator@example.com",
+                     *           "displayName": "Example Operator",
+                     *           "role": "admin"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["OrganizationMemberList"];
                 };
             };
             401: components["responses"]["Unauthorized"];
