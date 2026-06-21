@@ -55,7 +55,9 @@
         "install_manifest",
         "suite_org_profile",
         "catalog_pin",
-        "apex_operator"
+        "apex_operator",
+        "organization",
+        "membership"
       ]
     },
     "entity_id": {

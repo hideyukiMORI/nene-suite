@@ -1169,6 +1169,8 @@ components:
         - suite_org_profile
         - catalog_pin
         - apex_operator
+        - organization
+        - membership
 
     AuditSource:
       type: string
