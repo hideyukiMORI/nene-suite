@@ -10,6 +10,8 @@ use NeNeSuite\Auth\OperatorEmailConflictException;
 use NeNeSuite\Auth\OperatorValidationException;
 use NeNeSuite\Auth\PasswordHasher;
 use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorder;
+use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorderFactory;
+use NeNeSuite\Tests\Support\ImmediateTransactionManager;
 use PHPUnit\Framework\TestCase;
 
 final class CreateOperatorUseCaseTest extends TestCase
@@ -99,9 +101,10 @@ final class CreateOperatorUseCaseTest extends TestCase
         ?RecordingSuiteAuditRecorder $recorder = null,
     ): CreateOperatorUseCase {
         return new CreateOperatorUseCase(
-            operators: $operators ?? new InMemoryOperatorRepository(),
+            transactions: new ImmediateTransactionManager(),
+            operators: new InMemoryOperatorRepositoryFactory($operators ?? new InMemoryOperatorRepository()),
+            audit: new RecordingSuiteAuditRecorderFactory($recorder ?? new RecordingSuiteAuditRecorder()),
             hasher: new PasswordHasher(),
-            audit: $recorder ?? new RecordingSuiteAuditRecorder(),
             suiteId: self::SUITE_ID,
         );
     }
