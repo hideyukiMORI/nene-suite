@@ -296,6 +296,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all tenant organizations.
+         * @description Returns every tenant organization (oldest first). Platform-superadmin only.
+         *     Read-only; no audit event.
+         */
+        get: operations["listOrganizations"];
+        put?: never;
+        /**
+         * Create a tenant organization.
+         * @description Registers a new tenant organization. Platform-superadmin only. Mints an
+         *     external id and emits `organization.created` in the suite audit trail.
+         */
+        post: operations["createOrganization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Rename a tenant organization.
+         * @description Updates an organization's display name. Platform-superadmin only. Emits
+         *     `organization.renamed` in the suite audit trail.
+         */
+        patch: operations["renameOrganization"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{id}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Soft-disable a tenant organization.
+         * @description Marks an organization disabled (idempotent — already-disabled returns the
+         *     disabled organization). Platform-superadmin only. Emits
+         *     `organization.disabled` in the suite audit trail.
+         */
+        post: operations["disableOrganization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/session": {
         parameters: {
             query?: never;
@@ -339,6 +408,24 @@ export interface components {
          * @example 01J8XR4ZS6Q9V2H7K3N5M0B8TC
          */
         Ulid: string;
+        Organization: {
+            id: components["schemas"]["Ulid"];
+            externalId: components["schemas"]["Ulid"];
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            status: "active" | "disabled";
+        };
+        OrganizationList: {
+            organizations: components["schemas"]["Organization"][];
+        };
+        CreateOrganizationRequest: {
+            name: string;
+            slug: string;
+        };
+        RenameOrganizationRequest: {
+            name: string;
+        };
         /**
          * @description Catalog app id (`docs/explanation/terminology.md` §2.1).
          * @example nene-invoice
@@ -701,6 +788,60 @@ export interface components {
                  *       "status": 500,
                  *       "detail": "An unexpected error occurred. Please try again later.",
                  *       "instance": "/api/v1/install-sessions"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description Authenticated, but the operator lacks platform superadmin privileges. */
+        Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/forbidden",
+                 *       "title": "Forbidden",
+                 *       "status": 403,
+                 *       "detail": "Platform superadmin privileges are required.",
+                 *       "instance": "/api/v1/organizations"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description An organization with the requested slug already exists. */
+        OrganizationSlugConflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/organization-slug-conflict",
+                 *       "title": "Organization slug already exists",
+                 *       "status": 409,
+                 *       "detail": "An organization with this slug already exists.",
+                 *       "instance": "/api/v1/organizations"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description No organization with that id. */
+        OrganizationNotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/organization-not-found",
+                 *       "title": "Organization not found",
+                 *       "status": 404,
+                 *       "detail": "No organization exists for the requested id.",
+                 *       "instance": "/api/v1/organizations/01J8XR0G7Q9V2H7K3N5M0B8TCA"
                  *     }
                  */
                 "application/problem+json": components["schemas"]["ProblemDetails"];
@@ -1341,6 +1482,166 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listOrganizations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organizations. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "organizations": [
+                     *         {
+                     *           "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *           "externalId": "01J8XRDEXT0000000000000ZAB",
+                     *           "name": "Acme KK",
+                     *           "slug": "acme-kk",
+                     *           "status": "active"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["OrganizationList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    createOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "name": "Acme KK",
+                 *       "slug": "acme-kk"
+                 *     }
+                 */
+                "application/json": components["schemas"]["CreateOrganizationRequest"];
+            };
+        };
+        responses: {
+            /** @description Organization created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "externalId": "01J8XRDEXT0000000000000ZAB",
+                     *       "name": "Acme KK",
+                     *       "slug": "acme-kk",
+                     *       "status": "active"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Organization"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["OrganizationSlugConflict"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    renameOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "name": "Acme Kabushiki Kaisha"
+                 *     }
+                 */
+                "application/json": components["schemas"]["RenameOrganizationRequest"];
+            };
+        };
+        responses: {
+            /** @description Organization renamed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "externalId": "01J8XRDEXT0000000000000ZAB",
+                     *       "name": "Acme Kabushiki Kaisha",
+                     *       "slug": "acme-kk",
+                     *       "status": "active"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Organization"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["OrganizationNotFound"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    disableOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization disabled. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "externalId": "01J8XRDEXT0000000000000ZAB",
+                     *       "name": "Acme KK",
+                     *       "slug": "acme-kk",
+                     *       "status": "disabled"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Organization"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["OrganizationNotFound"];
             500: components["responses"]["ServerError"];
         };
     };
