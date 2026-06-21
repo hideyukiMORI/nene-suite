@@ -78,6 +78,8 @@ tags:
     description: Read-only orchestration audit trail (operator-authenticated).
   - name: Auth
     description: Apex operator authentication session (login / current operator / logout).
+  - name: Organizations
+    description: Platform-superadmin management of tenant organizations (cross-tenant).
 
 paths:
   /health:
@@ -655,6 +657,157 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/organizations:
+    post:
+      tags: [Organizations]
+      operationId: createOrganization
+      summary: Create a tenant organization.
+      description: |
+        Registers a new tenant organization. Platform-superadmin only. Mints an
+        external id and emits `organization.created` in the suite audit trail.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+            example:
+              name: Acme KK
+              slug: acme-kk
+      responses:
+        '201':
+          description: Organization created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              example:
+                id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                externalId: 01J8XRDEXT0000000000000ZAB
+                name: Acme KK
+                slug: acme-kk
+                status: active
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/OrganizationSlugConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Organizations]
+      operationId: listOrganizations
+      summary: List all tenant organizations.
+      description: |
+        Returns every tenant organization (oldest first). Platform-superadmin only.
+        Read-only; no audit event.
+      responses:
+        '200':
+          description: Organizations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationList'
+              example:
+                organizations:
+                  - id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                    externalId: 01J8XRDEXT0000000000000ZAB
+                    name: Acme KK
+                    slug: acme-kk
+                    status: active
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/organizations/{id}:
+    patch:
+      tags: [Organizations]
+      operationId: renameOrganization
+      summary: Rename a tenant organization.
+      description: |
+        Updates an organization's display name. Platform-superadmin only. Emits
+        `organization.renamed` in the suite audit trail.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenameOrganizationRequest'
+            example:
+              name: Acme Kabushiki Kaisha
+      responses:
+        '200':
+          description: Organization renamed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              example:
+                id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                externalId: 01J8XRDEXT0000000000000ZAB
+                name: Acme Kabushiki Kaisha
+                slug: acme-kk
+                status: active
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/organizations/{id}/disable:
+    post:
+      tags: [Organizations]
+      operationId: disableOrganization
+      summary: Soft-disable a tenant organization.
+      description: |
+        Marks an organization disabled (idempotent — already-disabled returns the
+        disabled organization). Platform-superadmin only. Emits
+        `organization.disabled` in the suite audit trail.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      responses:
+        '200':
+          description: Organization disabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              example:
+                id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                externalId: 01J8XRDEXT0000000000000ZAB
+                name: Acme KK
+                slug: acme-kk
+                status: disabled
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/auth/session:
     post:
       tags: [Auth]
@@ -845,6 +998,42 @@ components:
             status: 500
             detail: An unexpected error occurred. Please try again later.
             instance: /api/v1/install-sessions
+    Forbidden:
+      description: Authenticated, but the operator lacks platform superadmin privileges.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/forbidden
+            title: Forbidden
+            status: 403
+            detail: Platform superadmin privileges are required.
+            instance: /api/v1/organizations
+    OrganizationSlugConflict:
+      description: An organization with the requested slug already exists.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/organization-slug-conflict
+            title: Organization slug already exists
+            status: 409
+            detail: An organization with this slug already exists.
+            instance: /api/v1/organizations
+    OrganizationNotFound:
+      description: No organization with that id.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/organization-not-found
+            title: Organization not found
+            status: 404
+            detail: No organization exists for the requested id.
+            instance: /api/v1/organizations/01J8XR0G7Q9V2H7K3N5M0B8TCA
 
   schemas:
     Ulid:
@@ -852,6 +1041,56 @@ components:
       pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
       description: Crockford base32 ULID (26 chars). Matches `schema/*.schema.json`.
       example: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+
+    Organization:
+      type: object
+      additionalProperties: false
+      required: [id, externalId, name, slug, status]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        externalId:
+          $ref: '#/components/schemas/Ulid'
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        status:
+          type: string
+          enum: [active, disabled]
+
+    OrganizationList:
+      type: object
+      additionalProperties: false
+      required: [organizations]
+      properties:
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
+
+    CreateOrganizationRequest:
+      type: object
+      additionalProperties: false
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+
+    RenameOrganizationRequest:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 200
 
     CatalogId:
       type: string

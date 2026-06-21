@@ -31,6 +31,11 @@ use NeNeSuite\InstallSession\InstallSessionServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use NeNeSuite\SuiteEnv\SuiteEnvServiceProvider;
+use NeNeSuite\Tenancy\ForbiddenExceptionHandler;
+use NeNeSuite\Tenancy\OrganizationNotFoundExceptionHandler;
+use NeNeSuite\Tenancy\OrganizationRouteRegistrar;
+use NeNeSuite\Tenancy\OrganizationSlugConflictExceptionHandler;
+use NeNeSuite\Tenancy\OrganizationValidationExceptionHandler;
 use NeNeSuite\Tenancy\TenancyServiceProvider;
 use Psr\Container\ContainerInterface;
 
@@ -70,6 +75,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $auth = $container->get('nene-suite.route_registrar.auth');
                     $suiteAudit = $container->get('nene-suite.route_registrar.suite_audit');
                     $installedApps = $container->get('nene-suite.route_registrar.installed_apps');
+                    $tenancy = $container->get('nene-suite.route_registrar.tenancy');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -95,6 +101,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Installed apps route registrar service is invalid.');
                     }
 
+                    if (!$tenancy instanceof OrganizationRouteRegistrar) {
+                        throw new LogicException('Tenancy route registrar service is invalid.');
+                    }
+
                     return [
                         $appCatalog,
                         $installSession,
@@ -102,6 +112,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $auth,
                         $suiteAudit,
                         $installedApps,
+                        $tenancy,
                     ];
                 },
             )
@@ -115,6 +126,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $unauthorized = $container->get(UnauthorizedExceptionHandler::class);
                     $operatorEmailConflict = $container->get(OperatorEmailConflictExceptionHandler::class);
                     $operatorValidation = $container->get(OperatorValidationExceptionHandler::class);
+                    $forbidden = $container->get(ForbiddenExceptionHandler::class);
+                    $organizationValidation = $container->get(OrganizationValidationExceptionHandler::class);
+                    $organizationSlugConflict = $container->get(OrganizationSlugConflictExceptionHandler::class);
+                    $organizationNotFound = $container->get(OrganizationNotFoundExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
@@ -144,6 +159,22 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Operator validation exception handler service is invalid.');
                     }
 
+                    if (!$forbidden instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Forbidden exception handler service is invalid.');
+                    }
+
+                    if (!$organizationValidation instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Organization validation exception handler service is invalid.');
+                    }
+
+                    if (!$organizationSlugConflict instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Organization slug conflict exception handler service is invalid.');
+                    }
+
+                    if (!$organizationNotFound instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Organization not found exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
                         $installSessionConflict,
@@ -152,6 +183,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $unauthorized,
                         $operatorEmailConflict,
                         $operatorValidation,
+                        $forbidden,
+                        $organizationValidation,
+                        $organizationSlugConflict,
+                        $organizationNotFound,
                     ];
                 },
             );
