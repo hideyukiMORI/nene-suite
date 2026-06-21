@@ -14,5 +14,8 @@ export function toAuthSession(dto: AuthSessionDto): AuthSession {
     token: dto.token,
     expiresAt: dto.expiresAt,
     operator: toOperator(dto.operator),
+    orgExternalId: dto.orgExternalId ?? null,
+    role: dto.role ?? null,
+    superadmin: dto.superadmin ?? false,
   }
 }

@@ -4,10 +4,16 @@ export interface Operator {
   displayName: string | null
 }
 
+/** Organization-scoped role (ADR 0012). The platform `superadmin` is a separate dimension. */
+export type OrgRole = 'admin' | 'member' | 'viewer'
+
 export interface AuthSession {
   token: string
   expiresAt: string
   operator: Operator
+  orgExternalId: string | null
+  role: OrgRole | null
+  superadmin: boolean
 }
 
 const STORAGE_KEY = 'nene-suite-session'
@@ -42,6 +48,20 @@ export const authStore = {
 
   getToken(): string | null {
     return this.getSession()?.token ?? null
+  },
+
+  // Active-org context (A6). Defaults fail closed so a pre-A6 persisted session
+  // (which lacks these fields) reads as a non-superadmin with no active org.
+  isSuperadmin(): boolean {
+    return this.getSession()?.superadmin ?? false
+  },
+
+  getRole(): OrgRole | null {
+    return this.getSession()?.role ?? null
+  },
+
+  getOrgExternalId(): string | null {
+    return this.getSession()?.orgExternalId ?? null
   },
 
   isAuthenticated(): boolean {

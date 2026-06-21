@@ -1,10 +1,11 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AuditEventsPage } from '@/pages/admin/audit-events/AuditEventsPage'
+import { OrganizationsPage } from '@/pages/admin/organizations/OrganizationsPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { InstallPage } from '@/pages/install/InstallPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
-import { RequireAuth } from './auth-gate'
+import { RequireAuth, RequireSuperadmin } from './auth-gate'
 import { RootErrorBoundary } from './root-error-boundary'
 
 const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
       { path: '/', element: <HomePage /> },
       { path: '/install', element: <InstallPage /> },
       { path: '/admin/audit-events', element: <AuditEventsPage /> },
+      {
+        element: <RequireSuperadmin />,
+        children: [{ path: '/admin/organizations', element: <OrganizationsPage /> }],
+      },
     ],
   },
   { path: '*', element: <NotFoundPage /> },
