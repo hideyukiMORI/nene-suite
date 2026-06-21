@@ -6,10 +6,13 @@ are already multi-tenant ([ADR 0015](../adr/0015-suite-hosted-multi-tenant-mode.
 the gap is the Suite. Today the Suite has a flat `operators` table and a session
 JWT carrying only `sub` + `suite_id` — no organization, membership, or role.
 
-**Status: M1 + M2 complete** (autonomous build, 2026-06-21). The full,
-dependency-verified build-out order is now recorded below (see
-**"Recommended build-out order (sequencing review — 2026-06-21)"**). The M3
-audit-vocabulary fork is **resolved — Option A (add `organization` + `membership`)**.
+**Status: Phase A (A0–A8b) COMPLETE** (2026-06-22; PRs #142–#168, all merged to `main` and
+deployed to staging). Every step of the dependency-verified build-out below shipped — plus
+**A8b** (member-list endpoint + membership console UI), one step beyond the recorded plan. The
+M3 audit-vocabulary fork was **resolved — Option A (add `organization` + `membership`)**. See the
+**[2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md)** for the full record,
+architecture map, invariants, deferred items, and Phase B next steps. Remaining: Phase B (hosted
+edition) and the deferred polish in the handover §7.
 Steps that change auth behavior (A6 / M4) still must not auto-merge unreviewed.
 
 ## Approach
@@ -120,6 +123,11 @@ harmless). Edit sites: `docs/openapi/openapi.yaml` (`AuditEntityType`),
 
 **OSS self-host is fully functional at A8 and may stop there, never regressing (ADR 0015 §8).**
 
+> **✅ Phase A shipped (2026-06-22).** A0 #142 · A1 #144 · A1.5 #146 · A2 #148 · A3 #150 ·
+> A4 #152 · A4.5 #154 · A5 #156 · A6 #158 · A7a #160 · A7b #162 · A8a #164 ·
+> A8b-1 (member-list endpoint) #166 · A8b-2 (membership console) #168. All merged, CI-green,
+> staging-verified. Full record + handover: [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md).
+
 ### §3. Phase B — hosted edition (edition-flagged off for OSS; ADR 0015 acceptance is the terminal gate)
 
 | id | Ships | Why here | Gate |
@@ -187,4 +195,4 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   (A4 + A4.5 + A5) **must** land before **A6 / M4** (JWT carries `org_external_id`
   + role; behavior change — review).
 
-Last updated: 2026-06-21
+Last updated: 2026-06-22 (Phase A complete)
