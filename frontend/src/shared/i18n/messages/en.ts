@@ -48,6 +48,7 @@ export const en = {
   'suite.nav.openMenu': 'Open navigation menu',
   'suite.nav.closeMenu': 'Close navigation menu',
   'suite.nav.appTitle': 'NeNe Suite',
+  'suite.nav.organizations': 'Organizations',
 
   // ── Auth (apex login) ────────────────────────────────────────────────────
   'suite.auth.subtitle': 'Sign in to manage your NeNe installation',
@@ -136,6 +137,35 @@ export const en = {
   'suite.audit.column.action': 'Action',
   'suite.audit.column.actor': 'Actor',
   'suite.audit.column.time': 'Time',
+
+  // ── Organizations (superadmin console) ───────────────────────────────────
+  'suite.org.title': 'Organizations',
+  'suite.org.description': 'Manage tenant organizations. Platform superadmin only.',
+  'suite.org.empty': 'No organizations yet.',
+  'suite.org.column.name': 'Name',
+  'suite.org.column.slug': 'Slug',
+  'suite.org.column.status': 'Status',
+  'suite.org.column.actions': 'Actions',
+  'suite.org.status.active': 'Active',
+  'suite.org.status.disabled': 'Disabled',
+  'suite.org.create.title': 'Create organization',
+  'suite.org.create.nameLabel': 'Name',
+  'suite.org.create.namePlaceholder': 'Acme KK',
+  'suite.org.create.slugLabel': 'Slug',
+  'suite.org.create.slugPlaceholder': 'acme-kk',
+  'suite.org.create.submit': 'Create',
+  'suite.org.create.submitting': 'Creating…',
+  'suite.org.rename.action': 'Rename',
+  'suite.org.rename.nameLabel': 'New name',
+  'suite.org.rename.submitting': 'Renaming…',
+  'suite.org.disable.action': 'Disable',
+  'suite.org.error.slugConflict': 'An organization with this slug already exists.',
+  'suite.org.error.validation': 'Check the organization name and slug.',
+  'suite.org.error.notFound': 'That organization no longer exists.',
+  'suite.org.indicator.superadmin': 'Superadmin',
+  'suite.org.indicator.activeOrg': 'Org: {{org}}',
+  'suite.org.indicator.noOrg': 'No active organization',
+  'suite.org.indicator.role': 'Role: {{role}}',
 }
 
 export type MessageCatalog = typeof en

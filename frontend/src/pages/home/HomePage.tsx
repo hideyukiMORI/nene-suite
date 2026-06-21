@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useSignOut } from '@/entities/auth'
+import { authStore, useSignOut } from '@/entities/auth'
+import { ActiveOrgIndicator } from '@/features/active-org-indicator'
 import { AppLauncher } from '@/features/app-launcher'
 import { useTranslation } from '@/shared/i18n'
 import { LocaleSwitcher, PageHeader } from '@/shared/ui'
@@ -25,6 +26,10 @@ export function HomePage() {
           <>
             <Link to="/install">{t('suite.nav.install')}</Link>
             <Link to="/admin/audit-events">{t('suite.nav.audit')}</Link>
+            {authStore.isSuperadmin() ? (
+              <Link to="/admin/organizations">{t('suite.nav.organizations')}</Link>
+            ) : null}
+            <ActiveOrgIndicator />
             <LocaleSwitcher />
             <button type="button" onClick={handleSignOut} disabled={signOut.isPending}>
               {t('suite.nav.logout')}

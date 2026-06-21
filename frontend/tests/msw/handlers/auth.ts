@@ -22,6 +22,9 @@ export const authHandlers = [
             email: VALID_EMAIL,
             displayName: 'Example Operator',
           },
+          orgExternalId: '01J8XR4ZS6Q9V2H7K3N5M0B8TC',
+          role: 'admin',
+          superadmin: true,
         },
         { status: 201 },
       )

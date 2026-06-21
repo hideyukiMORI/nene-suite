@@ -9,3 +9,12 @@ export function RequireAuth() {
 
   return <Outlet />
 }
+
+/** Fail closed: non-superadmins are sent home. Composed inside RequireAuth. */
+export function RequireSuperadmin() {
+  if (!authStore.isSuperadmin()) {
+    return <Navigate to="/" replace />
+  }
+
+  return <Outlet />
+}
