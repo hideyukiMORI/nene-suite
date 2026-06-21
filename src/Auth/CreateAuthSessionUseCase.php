@@ -20,6 +20,7 @@ final readonly class CreateAuthSessionUseCase implements CreateAuthSessionUseCas
         private PasswordHasher $passwordHasher,
         private TokenIssuerInterface $tokenIssuer,
         private string $suiteId,
+        private OperatorSessionContextResolver $sessionContext,
     ) {
     }
 
@@ -38,16 +39,30 @@ final readonly class CreateAuthSessionUseCase implements CreateAuthSessionUseCas
             throw new InvalidCredentialsException();
         }
 
+        // Resolve the active-org context (milestone A6) and carry it in the JWT claims so the
+        // authenticator can read role/org without a repo round-trip on every request.
+        $context = $this->sessionContext->resolve($operator->id);
+
         $issuedAt = time();
         $expiresAt = $issuedAt + self::TOKEN_TTL_SECONDS;
 
         $token = $this->tokenIssuer->issue([
             'sub' => $operator->id,
             'suite_id' => $this->suiteId,
+            'org_external_id' => $context->orgExternalId,
+            'role' => $context->role?->value,
+            'superadmin' => $context->isSuperadmin,
             'iat' => $issuedAt,
             'exp' => $expiresAt,
         ]);
 
-        return new CreateAuthSessionOutput($token, $expiresAt, $operator);
+        return new CreateAuthSessionOutput(
+            $token,
+            $expiresAt,
+            $operator,
+            $context->orgExternalId,
+            $context->role,
+            $context->isSuperadmin,
+        );
     }
 }

@@ -370,6 +370,30 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
             operator: components["schemas"]["Operator"];
+            /** @description Active organization's federation key (null if the session has no active org). */
+            orgExternalId?: string | null;
+            /**
+             * @description The operator's role in the active organization (null if none). `superadmin` is the separate platform dimension below.
+             * @enum {string|null}
+             */
+            role?: "admin" | "member" | "viewer" | null;
+            /** @description Whether the operator is a platform superadmin (cross-organization). */
+            superadmin?: boolean;
+        };
+        AuthSessionContext: {
+            id: components["schemas"]["Ulid"];
+            /** Format: email */
+            email: string;
+            displayName?: string | null;
+            /** @description Active organization's federation key (null if the session has no active org). */
+            orgExternalId?: string | null;
+            /**
+             * @description The operator's role in the active organization (null if none).
+             * @enum {string|null}
+             */
+            role?: "admin" | "member" | "viewer" | null;
+            /** @description Whether the operator is a platform superadmin (cross-organization). */
+            superadmin?: boolean;
         };
         HealthResponse: {
             /** @enum {string} */
@@ -1339,10 +1363,13 @@ export interface operations {
                      * @example {
                      *       "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
                      *       "email": "operator@example.com",
-                     *       "displayName": "Example Operator"
+                     *       "displayName": "Example Operator",
+                     *       "orgExternalId": "01J8XR0G7Q9V2H7K3N5M0B8ORG",
+                     *       "role": "admin",
+                     *       "superadmin": true
                      *     }
                      */
-                    "application/json": components["schemas"]["Operator"];
+                    "application/json": components["schemas"]["AuthSessionContext"];
                 };
             };
             401: components["responses"]["Unauthorized"];
