@@ -113,7 +113,7 @@ code merge.
 | `organization.created` | `organization` | NULL | `{id, externalId, name, slug, status}` | Suite registry row; identity / roster only — never sibling domain data (ADR 0012 §11) |
 | `organization.renamed` | `organization` | `{name: …}` | `{name: …}` | Identity only; supersedes the legacy `org_display_name.changed` / `suite_org_profile` path |
 | `organization.disabled` | `organization` | active snapshot | disabled snapshot | Soft-disable only (`OrganizationStatus`); hard delete forbidden (§7) |
-| `membership.granted` | `membership` | NULL | `{operator_id, organization_id, role}` | `organization_id` is null for a platform `superadmin` membership |
+| `membership.granted` | `membership` | NULL | `{operatorId, organizationId, role}` | `organizationId` is null for a platform `superadmin` membership |
 | `membership.role_changed` | `membership` | `{role: …}` | `{role: …}` | Supersedes the pre-registered `apex_operator.role_changed` (never implemented) |
 | `membership.revoked` | `membership` | membership snapshot | NULL | Records link removal; the audit row itself stays append-only (§7) |
 

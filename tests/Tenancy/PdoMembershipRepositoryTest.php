@@ -113,6 +113,59 @@ final class PdoMembershipRepositoryTest extends TestCase
         self::assertSame([], $repository->findByOperator('01J0OP0000000000000000000A'));
     }
 
+    public function testUpdateRolePersistsAndPreservesImmutableFields(): void
+    {
+        $repository = new PdoMembershipRepository($this->executor);
+        $repository->save($this->membership('01J0MEM0000000000000000ADM', '01J0ORG000000000000000000A', Role::Admin));
+
+        $repository->updateRole(new Membership(
+            id: '01J0MEM0000000000000000ADM',
+            operatorId: '01J0OP0000000000000000000A',
+            organizationId: '01J0ORG000000000000000000A',
+            role: Role::Member,
+            createdAt: '2026-06-21T00:00:00Z',
+            updatedAt: '2026-06-22T09:00:00Z',
+        ));
+
+        $found = $repository->findById('01J0MEM0000000000000000ADM');
+
+        self::assertNotNull($found);
+        self::assertSame(Role::Member, $found->role);
+        self::assertSame('2026-06-22T09:00:00Z', $found->updatedAt);
+        // operator_id, organization_id and created_at are immutable.
+        self::assertSame('01J0OP0000000000000000000A', $found->operatorId);
+        self::assertSame('01J0ORG000000000000000000A', $found->organizationId);
+        self::assertSame('2026-06-21T00:00:00Z', $found->createdAt);
+    }
+
+    public function testDeleteRemovesMembership(): void
+    {
+        $repository = new PdoMembershipRepository($this->executor);
+        $repository->save($this->membership('01J0MEM0000000000000000ADM', '01J0ORG000000000000000000A', Role::Admin));
+
+        $repository->delete('01J0MEM0000000000000000ADM');
+
+        self::assertNull($repository->findById('01J0MEM0000000000000000ADM'));
+    }
+
+    public function testFindPlatformMembershipsReturnsOnlyNullOrganization(): void
+    {
+        $repository = new PdoMembershipRepository($this->executor);
+        $repository->save($this->membership('01J0MEM00000000000000SUPER', null, Role::Superadmin));
+        $repository->save($this->membership(
+            id: '01J0MEM0000000000000000ADM',
+            operatorId: '01J0OP0000000000000000000B',
+            organizationId: '01J0ORG000000000000000000A',
+            role: Role::Admin,
+        ));
+
+        $platform = $repository->findPlatformMemberships();
+
+        self::assertCount(1, $platform);
+        self::assertSame('01J0MEM00000000000000SUPER', $platform[0]->id);
+        self::assertNull($platform[0]->organizationId);
+    }
+
     private function membership(
         string $id,
         ?string $organizationId,
