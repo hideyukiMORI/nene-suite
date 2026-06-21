@@ -8,6 +8,12 @@ interface OrganizationRepositoryInterface
 {
     public function save(Organization $organization): void;
 
+    /**
+     * Persists changes to an existing organization's mutable fields (name, slug,
+     * status, updated_at). `external_id` and `created_at` are immutable.
+     */
+    public function update(Organization $organization): void;
+
     public function findById(string $id): ?Organization;
 
     public function findByExternalId(string $externalId): ?Organization;

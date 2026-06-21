@@ -91,6 +91,32 @@ final class PdoOrganizationRepositoryTest extends TestCase
         self::assertSame(OrganizationStatus::Disabled, $found->status);
     }
 
+    public function testUpdatePersistsMutableFieldsAndPreservesImmutableOnes(): void
+    {
+        $repository = new PdoOrganizationRepository($this->executor);
+        $repository->save($this->organization());
+
+        $repository->update(new Organization(
+            id: '01J0XR0G7Q9V2H7K3N5M0B8ORG',
+            externalId: '01J0YYYYYYYYYYYYYYYYYYYYYY',
+            name: 'Renamed KK',
+            slug: 'example-kk',
+            status: OrganizationStatus::Disabled,
+            createdAt: '2026-06-21T00:00:00Z',
+            updatedAt: '2026-06-22T12:00:00Z',
+        ));
+
+        $found = $repository->findById('01J0XR0G7Q9V2H7K3N5M0B8ORG');
+
+        self::assertNotNull($found);
+        self::assertSame('Renamed KK', $found->name);
+        self::assertSame(OrganizationStatus::Disabled, $found->status);
+        self::assertSame('2026-06-22T12:00:00Z', $found->updatedAt);
+        // external_id and created_at are immutable — update() must not touch them.
+        self::assertSame('01J0YYYYYYYYYYYYYYYYYYYYYY', $found->externalId);
+        self::assertSame('2026-06-21T00:00:00Z', $found->createdAt);
+    }
+
     private function organization(OrganizationStatus $status = OrganizationStatus::Active): Organization
     {
         return new Organization(
