@@ -9,8 +9,10 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use NeNeSuite\AppSelection\UpdateAppSelectionUseCaseInterface;
 use NeNeSuite\Auth\CreateOperatorUseCaseInterface;
+use NeNeSuite\Auth\OperatorRepositoryInterface;
 use NeNeSuite\DatabaseProvision\ProvisionAppDatabasesUseCaseInterface;
 use NeNeSuite\Http\RuntimeServiceProvider;
+use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
 use NeNeSuite\InstallSession\AcceptDisclaimerUseCaseInterface;
 use NeNeSuite\InstallSession\CompleteInstallSessionUseCaseInterface;
 use NeNeSuite\InstallSession\InstallSessionRepositoryInterface;
@@ -72,6 +74,68 @@ final readonly class InstallerServiceProvider implements ServiceProviderInterfac
                         $grantMembership,
                         $memberships,
                         $suiteId,
+                    );
+                },
+            )
+            ->set(
+                BackfillTenancyUseCaseInterface::class,
+                static function (ContainerInterface $container): BackfillTenancyUseCaseInterface {
+                    $operators = $container->get(OperatorRepositoryInterface::class);
+                    $organizations = $container->get(OrganizationRepositoryInterface::class);
+                    $memberships = $container->get(MembershipRepositoryInterface::class);
+                    $createOrganization = $container->get(CreateOrganizationUseCaseInterface::class);
+                    $grantMembership = $container->get(GrantMembershipUseCaseInterface::class);
+                    $sessions = $container->get(InstallSessionRepositoryInterface::class);
+                    $manifests = $container->get(InstallManifestRepositoryInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+                    $orgExternalId = $container->get(RuntimeServiceProvider::SUITE_ORG_EXTERNAL_ID);
+
+                    if (!$operators instanceof OperatorRepositoryInterface) {
+                        throw new LogicException('Operator repository service is invalid.');
+                    }
+
+                    if (!$organizations instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    if (!$memberships instanceof MembershipRepositoryInterface) {
+                        throw new LogicException('Membership repository service is invalid.');
+                    }
+
+                    if (!$createOrganization instanceof CreateOrganizationUseCaseInterface) {
+                        throw new LogicException('CreateOrganization use case service is invalid.');
+                    }
+
+                    if (!$grantMembership instanceof GrantMembershipUseCaseInterface) {
+                        throw new LogicException('GrantMembership use case service is invalid.');
+                    }
+
+                    if (!$sessions instanceof InstallSessionRepositoryInterface) {
+                        throw new LogicException('Install session repository service is invalid.');
+                    }
+
+                    if (!$manifests instanceof InstallManifestRepositoryInterface) {
+                        throw new LogicException('Install manifest repository service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    if (!is_string($orgExternalId) || $orgExternalId === '') {
+                        throw new LogicException('Suite org external id service is invalid.');
+                    }
+
+                    return new BackfillTenancyUseCase(
+                        $operators,
+                        $organizations,
+                        $memberships,
+                        $createOrganization,
+                        $grantMembership,
+                        $sessions,
+                        $manifests,
+                        $suiteId,
+                        $orgExternalId,
                     );
                 },
             )

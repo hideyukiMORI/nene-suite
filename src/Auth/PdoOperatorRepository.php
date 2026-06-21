@@ -42,6 +42,24 @@ final readonly class PdoOperatorRepository implements OperatorRepositoryInterfac
     }
 
     /**
+     * @return list<Operator>
+     */
+    public function all(): array
+    {
+        $operators = [];
+
+        foreach ($this->query->fetchAll('SELECT * FROM operators ORDER BY created_at ASC, id ASC') as $row) {
+            $operator = $this->hydrate($row);
+
+            if ($operator !== null) {
+                $operators[] = $operator;
+            }
+        }
+
+        return $operators;
+    }
+
+    /**
      * @param array<string, mixed>|null $row
      */
     private function hydrate(?array $row): ?Operator

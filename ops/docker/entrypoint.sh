@@ -34,6 +34,13 @@ if [ "${1:-apache2-foreground}" = "apache2-foreground" ]; then
   # so a fresh install before the secret is written is unaffected. `set -e` aborts on failure.
   echo "[entrypoint] verifying apex JWT signing secret (fail-closed)..."
   php ops/docker/preflight-jwt-secret.php
+
+  # Backfill tenancy onto pre-A4 installs (milestone A5): give existing operators their
+  # default-org membership before A6 reads one. Idempotent; reads tenancy tables, so it MUST
+  # run after `phinx migrate`. Warn-and-continue (the script exits 0 even on failure) so a
+  # backfill issue never aborts the boot under `set -e`.
+  echo "[entrypoint] backfilling tenancy memberships (idempotent; ADR 0014)..."
+  php ops/docker/backfill-tenancy.php
 fi
 
 # Hand off to the official PHP image entrypoint so its setup still runs.

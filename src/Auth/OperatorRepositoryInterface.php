@@ -11,4 +11,11 @@ interface OperatorRepositoryInterface
     public function findById(string $id): ?Operator;
 
     public function findByEmail(string $email): ?Operator;
+
+    /**
+     * All operators, oldest first (created_at ASC, id ASC).
+     *
+     * @return list<Operator>
+     */
+    public function all(): array;
 }

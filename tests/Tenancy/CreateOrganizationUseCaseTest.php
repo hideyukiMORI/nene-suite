@@ -13,6 +13,7 @@ use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorder;
 use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorderFactory;
 use NeNeSuite\Tests\Support\ImmediateTransactionManager;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Ulid;
 
 final class CreateOrganizationUseCaseTest extends TestCase
 {
@@ -81,6 +82,31 @@ final class CreateOrganizationUseCaseTest extends TestCase
         $this->expectException(OrganizationValidationException::class);
 
         $this->useCase()->execute(new CreateOrganizationInput('Name', 'Not A Slug!'));
+    }
+
+    public function testUsesAndCanonicalisesAProvidedExternalId(): void
+    {
+        // A valid (lowercase) ULID seed is used and canonicalised to uppercase Crockford.
+        $output = $this->useCase()->execute(new CreateOrganizationInput('Acme KK', 'acme-kk', null, '01j8xrdext0000000000000zab'));
+
+        self::assertSame('01J8XRDEXT0000000000000ZAB', $output->organization->externalId);
+    }
+
+    public function testMintsAFreshExternalIdWhenTheSeedIsMalformed(): void
+    {
+        $output = $this->useCase()->execute(new CreateOrganizationInput('Acme KK', 'acme-kk', null, 'not-a-ulid'));
+
+        self::assertNotSame('not-a-ulid', $output->organization->externalId);
+        self::assertTrue(Ulid::isValid($output->organization->externalId));
+    }
+
+    public function testMintsAFreshExternalIdByDefault(): void
+    {
+        $first = $this->useCase()->execute(new CreateOrganizationInput('One', 'one'))->organization->externalId;
+        $second = $this->useCase()->execute(new CreateOrganizationInput('Two', 'two'))->organization->externalId;
+
+        self::assertTrue(Ulid::isValid($first));
+        self::assertNotSame($first, $second);
     }
 
     private function useCase(

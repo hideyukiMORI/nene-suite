@@ -51,7 +51,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
                 $now = gmdate('Y-m-d\TH:i:s\Z');
                 $organization = new Organization(
                     id: (string) new Ulid(),
-                    externalId: (string) new Ulid(),
+                    externalId: $this->resolveExternalId($input->externalId),
                     name: $name,
                     slug: $slug,
                     status: OrganizationStatus::Active,
@@ -107,5 +107,20 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
         }
 
         return $slug;
+    }
+
+    /**
+     * Resolves the federation key (`external_id`): a valid ULID seed is canonicalised
+     * (uppercase Crockford base32, matching minted rows and `findByExternalId` lookups);
+     * null or a malformed seed falls open to a freshly minted ULID so a misconfigured
+     * `NENE_SUITE_ORG_EXTERNAL_ID` never aborts organization creation.
+     */
+    private function resolveExternalId(?string $provided): string
+    {
+        if ($provided !== null && Ulid::isValid($provided)) {
+            return (new Ulid($provided))->toBase32();
+        }
+
+        return (string) new Ulid();
     }
 }

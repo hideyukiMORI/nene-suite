@@ -32,4 +32,19 @@ final class InMemoryOperatorRepository implements OperatorRepositoryInterface
 
         return null;
     }
+
+    /**
+     * @return list<Operator>
+     */
+    public function all(): array
+    {
+        $operators = array_values($this->byId);
+
+        usort(
+            $operators,
+            static fn (Operator $a, Operator $b): int => [$a->createdAt, $a->id] <=> [$b->createdAt, $b->id],
+        );
+
+        return $operators;
+    }
 }
