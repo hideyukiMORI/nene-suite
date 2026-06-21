@@ -9,6 +9,13 @@
       <directory>tests</directory>
     </testsuite>
   </testsuites>
+  <php>
+    <!-- Tests build the runtime container (e.g. OpenApiContractTest), which resolves the
+         apex token verifier. Permit the built-in dev JWT secret so a clean checkout with no
+         NENE_SUITE_JWT_SECRET does not fail closed. The throw path is covered by
+         tests/Http/JwtSecretResolverTest.php, which drives the resolver directly. -->
+    <env name="NENE_SUITE_ALLOW_DEV_SECRET" value="1"/>
+  </php>
   <source>
     <include>
       <directory>src</directory>

@@ -107,7 +107,7 @@ harmless). Edit sites: `docs/openapi/openapi.yaml` (`AuditEntityType`),
 | --- | --- | --- | :---: | --- |
 | **A0** | Audit vocab: add `organization` + `membership` across the 4 sites + reconcile `apex_operator.role_changed`; regen `schema.gen.ts` | A2/A3 emitters need a legal closed-enum type | No | compliance + terminology sign-off; CI drift check (openapi↔schema↔gen) |
 | **A1** | `TransactionRunner` unit-of-work (begin/commit/rollback over Nene2 `DatabaseQueryExecutor`) + in-memory double; retrofit `CreateOperatorUseCase` (today `save()`-then-`record()`) | New dual-writes must be born atomic (ADR 0007 §5); A4 needs operator+org+membership atomic | No | ADR 0007 §5; reentrant vs installer outer pseudo-txn |
-| **A1.5** | Fail-closed signing key: forbid the hardcoded `nene-suite-dev-secret` fallback when `NENE_SUITE_JWT_SECRET` is unset (`src/Http/RuntimeServiceProvider.php:58,149`); keep an explicit env-gated dev mode; basic login rate-limit | A7 exposes a role-gated superadmin surface; a forgeable hardcoded secret is a compromise even pre-public (all 3 critics: blocker/major) | Config | security review; phased required-env release (boot error + operator notice **before** removal) |
+| **A1.5** | Fail-closed signing key: `src/Http/JwtSecretResolver.php` removes the silent `nene-suite-dev-secret` fallback — a missing `NENE_SUITE_JWT_SECRET` aborts apex boot **immediately (no grace)** unless `NENE_SUITE_ALLOW_DEV_SECRET=1` (explicit dev opt-in); a serving-only entrypoint preflight enforces it at container start. Login rate-limit split to a follow-up (needs its own persistence design) | A7 exposes a role-gated superadmin surface; a forgeable hardcoded secret is a compromise even pre-public (all 3 critics: blocker/major) | Config | security review; staging/prod `.env.suite` must set the secret (operator action) |
 | **A2** | `CreateOrganization` (ULID id + stable `external_id` UUID = ADR 0012 federation key), `RenameOrganization`, `DisableOrganization` (fills unreachable `OrganizationStatus.Disabled`, soft-only) — dark (not in `ROUTE_REGISTRARS`) | Memberships reference orgs; bootstrap/backfill need a create path; `external_id` format frozen here | No | ADR 0007 §5; ADR 0012 §5/§11 (no hard-delete) |
 | **A3** | `GrantMembership` / `RevokeMembership` / `ChangeMembershipRole`; migration adding `UNIQUE(operator_id, organization_id)` + repo upsert/`updateRole` (today `save()` is INSERT-only); last-superadmin-revoke guard | Bootstrap grants a membership; role-change has no path today; NULL org is index-distinct so invariants live in the use case | No | ADR 0007 §5; Role invariant |
 | **A4** | Installer bootstrap: after first operator, `CreateOrganization(NENE_SUITE_ORG_NAME)` + `GrantMembership(Superadmin)`; write `external_id` back so runtime `NENE_SUITE_ORG_EXTERNAL_ID` == the row; idempotent re-run | Fresh installs must satisfy the org+membership invariant before any reader (A6); A4 is the org-id source of truth | No (one org + one superadmin = existing OSS default) | ADR 0015 §8 no-regress; install re-run idempotency |
@@ -123,7 +123,7 @@ harmless). Edit sites: `docs/openapi/openapi.yaml` (`AuditEntityType`),
 
 | id | Ships | Why here | Gate |
 | --- | --- | --- | --- |
-| **B1** | Production auth remainder: asymmetric JWKS + token revocation (fail-closed secret + basic rate-limit already in A1.5) | Reuse ADR 0012 JWKS; public-exposure prerequisite | ADR 0012 JWKS; security review; edition flag keeps self-host on env-secret HS256 |
+| **B1** | Production auth remainder: asymmetric JWKS + token revocation + login rate-limit (fail-closed secret already in A1.5; rate-limit deferred here) | Reuse ADR 0012 JWKS; public-exposure prerequisite | ADR 0012 JWKS; security review; edition flag keeps self-host on env-secret HS256 |
 | **B2** | App org-resolution + asymmetric federation assertion (`org_external_id`); choose subdomain vs custom_domain | Needs B1 keys; drive the apps' existing resolution modes, don't reinvent (ADR 0015 §4) | ADR 0012; ADR 0015 §4 open question |
 | **B3** | Public signup + abuse controls (`free.nene-suite.com`) | Needs B1 hardening; reuses A2/A3; route flag default-off, depends on B6 (merged ≠ exposed) | ADR 0015 signup/abuse open question |
 | **B4** | Entitlement/quota + house-ads (ADR 0013, house-ads only) | Needs signup/orgs to meter | ADR 0013; CI smoke: OSS build with all hosted flags off |
@@ -144,7 +144,7 @@ harmless). Edit sites: `docs/openapi/openapi.yaml` (`AuditEntityType`),
 
 1. **A0** — audit-vocab edit (Option A) + governance sign-off + `npm run codegen` + confirm the CI drift check. Zero-dependency; unblocks everything.
 2. **A1** — `TransactionRunner` + retrofit `CreateOperatorUseCase` into one transaction (the A4 foundation). Parallelizable with A0.
-3. **A1.5** — make a missing `NENE_SUITE_JWT_SECRET` a required-env boot error (keep an env-gated dev mode) + basic login rate-limit. Must precede A7.
+3. **A1.5** — make a missing `NENE_SUITE_JWT_SECRET` a required-env boot error immediately (env-gated dev mode via `NENE_SUITE_ALLOW_DEV_SECRET`). Must precede A7. Login rate-limit deferred to a follow-up / B1.
 
 Spine: **A0 / A1 / A1.5 (parallel roots) → A2 → A3 → A4 → A4.5 → A5 → A6 → A7 → A8**,
 then **B1 → B2 → {B3, B5} → B4 → B6**.

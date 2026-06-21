@@ -132,6 +132,7 @@ All suite orchestrator variables use prefix **`NENE_SUITE_`** (not `NENE2_SUITE_
 | JWT issuer base | `NENE_SUITE_ISSUER_URL` | `ISSUER_URL`, `AUTH_URL` |
 | Federation JWKS endpoint | `NENE_SUITE_JWKS_URL` | `JWKS_URL`, `JWK_URI`, `NENE_SUITE_JWK_URL` |
 | Shared HMAC secret | `NENE_SUITE_JWT_SECRET` | `JWT_SECRET`, `NENE_JWT_SECRET` |
+| Dev JWT-secret opt-in | `NENE_SUITE_ALLOW_DEV_SECRET` | `ALLOW_DEV_SECRET`, `NENE_SUITE_DEV_SECRET`, `SUITE_ALLOW_DEV_SECRET` |
 | Org federation UUID | `NENE_SUITE_ORG_EXTERNAL_ID` | `ORG_UUID`, `TENANT_ID`, `NENE_ORG_ID` |
 | Org display name | `NENE_SUITE_ORG_NAME` | `ORG_NAME`, `COMPANY_NAME` |
 | Installed app list | `NENE_SUITE_INSTALLED_APPS` | `INSTALLED_APPS`, `APPS` |
@@ -340,4 +341,4 @@ Message catalogs: [`../development/i18n.md`](../development/i18n.md).
 
 ---
 
-Last updated: 2026-05-29
+Last updated: 2026-06-21
