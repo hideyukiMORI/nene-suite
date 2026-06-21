@@ -159,6 +159,7 @@ export const en = {
   'suite.org.rename.nameLabel': 'New name',
   'suite.org.rename.submitting': 'Renaming…',
   'suite.org.disable.action': 'Disable',
+  'suite.org.members': 'Members',
   'suite.org.error.slugConflict': 'An organization with this slug already exists.',
   'suite.org.error.validation': 'Check the organization name and slug.',
   'suite.org.error.notFound': 'That organization no longer exists.',
@@ -166,6 +167,28 @@ export const en = {
   'suite.org.indicator.activeOrg': 'Org: {{org}}',
   'suite.org.indicator.noOrg': 'No active organization',
   'suite.org.indicator.role': 'Role: {{role}}',
+
+  // ── Memberships (superadmin console) ─────────────────────────────────────
+  'suite.member.title': 'Members',
+  'suite.member.description': 'Manage who belongs to this organization and their role.',
+  'suite.member.empty': 'No members yet.',
+  'suite.member.column.operator': 'Operator',
+  'suite.member.column.role': 'Role',
+  'suite.member.column.actions': 'Actions',
+  'suite.member.role.admin': 'Admin',
+  'suite.member.role.member': 'Member',
+  'suite.member.role.viewer': 'Viewer',
+  'suite.member.grant.title': 'Add member',
+  'suite.member.grant.operatorIdLabel': 'Operator ID',
+  'suite.member.grant.operatorIdPlaceholder': '01J8XR0G7Q9V2H7K3N5M0B8TCA',
+  'suite.member.grant.roleLabel': 'Role',
+  'suite.member.grant.submit': 'Add',
+  'suite.member.grant.submitting': 'Adding…',
+  'suite.member.revoke.action': 'Remove',
+  'suite.member.error.conflict': 'This operator is already a member of the organization.',
+  'suite.member.error.invariant': 'The organization must keep at least one admin.',
+  'suite.member.error.validation': 'Check the operator ID and role.',
+  'suite.member.error.notFound': 'That membership no longer exists.',
 }
 
 export type MessageCatalog = typeof en

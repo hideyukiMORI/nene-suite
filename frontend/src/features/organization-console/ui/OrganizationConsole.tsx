@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import type { Organization, RenameOrganizationInput } from '@/entities/organization'
 import { useTranslation } from '@/shared/i18n'
 import { ErrorState, LoadingState } from '@/shared/ui'
@@ -125,6 +126,9 @@ function OrganizationRow({
       <td>{organization.slug}</td>
       <td>{t(`suite.org.status.${organization.status}`)}</td>
       <td>
+        <Link to={`/admin/organizations/${organization.id}/memberships`}>
+          {t('suite.org.members')}
+        </Link>
         <form onSubmit={(event) => void handleSubmit(submitRename)(event)} noValidate>
           <label>
             {t('suite.org.rename.nameLabel')}
