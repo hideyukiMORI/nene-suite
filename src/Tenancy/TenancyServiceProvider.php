@@ -199,6 +199,7 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
                     self::superadminGuard($container),
                     self::grantMembershipUseCase($container),
                     self::organizationRepository($container),
+                    self::operatorRepository($container),
                     self::responseFactory($container),
                     self::requestIdHolder($container),
                 ),

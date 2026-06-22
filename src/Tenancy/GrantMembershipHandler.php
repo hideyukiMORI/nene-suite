@@ -8,13 +8,15 @@ use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use Nene2\Routing\Router;
+use NeNeSuite\Auth\OperatorRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * POST /api/v1/organizations/{id}/memberships — operationId grantMembership. Platform-superadmin
  * only. The use case does not check referential existence (milestone A3 docblock), so this
- * handler resolves the organization from the path and 404s before granting.
+ * handler resolves the organization from the path (404 if unknown) and verifies the body's
+ * operatorId references an existing operator (422 if not) before granting.
  */
 final readonly class GrantMembershipHandler
 {
@@ -24,6 +26,7 @@ final readonly class GrantMembershipHandler
         private SuperadminGuard $guard,
         private GrantMembershipUseCaseInterface $useCase,
         private OrganizationRepositoryInterface $organizations,
+        private OperatorRepositoryInterface $operators,
         private JsonResponseFactory $response,
         private RequestIdHolder $requestIdHolder,
     ) {
@@ -45,6 +48,10 @@ final readonly class GrantMembershipHandler
         $operatorId = is_string($body['operatorId'] ?? null) ? trim((string) $body['operatorId']) : '';
         if (preg_match(self::ULID_PATTERN, $operatorId) !== 1) {
             throw new MembershipValidationException('operatorId', 'operatorId must be a valid ULID.');
+        }
+
+        if ($this->operators->findById($operatorId) === null) {
+            throw new MembershipValidationException('operatorId', 'operatorId does not reference an existing operator.');
         }
 
         $role = MembershipRoleParser::parse($body['role'] ?? null);

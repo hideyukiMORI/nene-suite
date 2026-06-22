@@ -18,6 +18,7 @@ use NeNeSuite\SuiteAudit\SuiteAuditRecorderFactoryInterface;
 use NeNeSuite\Tenancy\GrantMembershipUseCaseInterface;
 use NeNeSuite\Tenancy\MembershipRepositoryInterface;
 use NeNeSuite\Tenancy\OrganizationRepositoryInterface;
+use NeNeSuite\Tenancy\SuperadminGuard;
 use Psr\Container\ContainerInterface;
 
 final readonly class AuthServiceProvider implements ServiceProviderInterface
@@ -135,6 +136,18 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     }
 
                     return new GetAuthSessionUseCase($operators);
+                },
+            )
+            ->set(
+                ListOperatorsUseCaseInterface::class,
+                static function (ContainerInterface $container): ListOperatorsUseCaseInterface {
+                    $operators = $container->get(OperatorRepositoryInterface::class);
+
+                    if (!$operators instanceof OperatorRepositoryInterface) {
+                        throw new LogicException('Operator repository service is invalid.');
+                    }
+
+                    return new ListOperatorsUseCase($operators);
                 },
             )
             ->set(
@@ -311,12 +324,35 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ListOperatorsHandler::class,
+                static function (ContainerInterface $container): ListOperatorsHandler {
+                    $guard = $container->get(SuperadminGuard::class);
+                    $useCase = $container->get(ListOperatorsUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$guard instanceof SuperadminGuard) {
+                        throw new LogicException('Superadmin guard service is invalid.');
+                    }
+
+                    if (!$useCase instanceof ListOperatorsUseCaseInterface) {
+                        throw new LogicException('ListOperators use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ListOperatorsHandler($guard, $useCase, $response);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.auth',
                 static function (ContainerInterface $container): AuthRouteRegistrar {
                     $create = $container->get(CreateAuthSessionHandler::class);
                     $get = $container->get(GetAuthSessionHandler::class);
                     $delete = $container->get(DeleteAuthSessionHandler::class);
                     $createOperator = $container->get(CreateOperatorHandler::class);
+                    $listOperators = $container->get(ListOperatorsHandler::class);
 
                     if (!$create instanceof CreateAuthSessionHandler) {
                         throw new LogicException('CreateAuthSession handler service is invalid.');
@@ -334,7 +370,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('CreateOperator handler service is invalid.');
                     }
 
-                    return new AuthRouteRegistrar($create, $get, $delete, $createOperator);
+                    if (!$listOperators instanceof ListOperatorsHandler) {
+                        throw new LogicException('ListOperators handler service is invalid.');
+                    }
+
+                    return new AuthRouteRegistrar($create, $get, $delete, $createOperator, $listOperators);
                 },
             );
     }

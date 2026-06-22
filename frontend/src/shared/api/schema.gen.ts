@@ -281,7 +281,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List all apex operators.
+         * @description Returns every apex operator (oldest first), without any secret material.
+         *     Platform-superadmin only — drives the membership console's operator picker.
+         *     Read-only; no audit event.
+         */
+        get: operations["listOperators"];
         put?: never;
         /**
          * Create an apex operator.
@@ -521,6 +527,9 @@ export interface components {
             /** Format: email */
             email: string;
             displayName?: string | null;
+        };
+        OperatorList: {
+            operators: components["schemas"]["Operator"][];
         };
         CreateOperatorRequest: {
             /** Format: email */
@@ -1561,6 +1570,40 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listOperators: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operators. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "operators": [
+                     *         {
+                     *           "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *           "email": "admin@example.com",
+                     *           "displayName": "Suite Admin"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["OperatorList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["ServerError"];
         };
     };

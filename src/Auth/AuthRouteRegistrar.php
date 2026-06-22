@@ -14,6 +14,7 @@ final readonly class AuthRouteRegistrar
         private GetAuthSessionHandler $getHandler,
         private DeleteAuthSessionHandler $deleteHandler,
         private CreateOperatorHandler $createOperatorHandler,
+        private ListOperatorsHandler $listOperatorsHandler,
     ) {
     }
 
@@ -23,6 +24,7 @@ final readonly class AuthRouteRegistrar
         $getHandler = $this->getHandler;
         $deleteHandler = $this->deleteHandler;
         $createOperatorHandler = $this->createOperatorHandler;
+        $listOperatorsHandler = $this->listOperatorsHandler;
 
         $router->post(
             '/api/v1/auth/session',
@@ -39,6 +41,10 @@ final readonly class AuthRouteRegistrar
         $router->post(
             '/api/v1/operators',
             static fn (ServerRequestInterface $request) => $createOperatorHandler->handle($request),
+        );
+        $router->get(
+            '/api/v1/operators',
+            static fn (ServerRequestInterface $request) => $listOperatorsHandler->handle($request),
         );
     }
 }

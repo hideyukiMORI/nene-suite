@@ -18,6 +18,7 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
   const { t } = useTranslation()
   const {
     members,
+    operators,
     isLoading,
     isError,
     grantMember,
@@ -50,27 +51,41 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
     <div>
       <form onSubmit={(event) => void handleSubmit(submitGrant)(event)} noValidate>
         <h3>{t('suite.member.grant.title')}</h3>
-        <label>
-          {t('suite.member.grant.operatorIdLabel')}
-          <input
-            placeholder={t('suite.member.grant.operatorIdPlaceholder')}
-            {...register('operatorId', { required: true })}
-          />
-        </label>
-        <label>
-          {t('suite.member.grant.roleLabel')}
-          <select {...register('role', { required: true })}>
-            {ROLES.map((role) => (
-              <option key={role} value={role}>
-                {t(`suite.member.role.${role}`)}
-              </option>
-            ))}
-          </select>
-        </label>
-        {grantErrorKey !== null ? <p role="alert">{t(grantErrorKey)}</p> : null}
-        <button type="submit" disabled={isGranting}>
-          {isGranting ? t('suite.member.grant.submitting') : t('suite.member.grant.submit')}
-        </button>
+        {operators.length === 0 ? (
+          <p>{t('suite.member.grant.noOperators')}</p>
+        ) : (
+          <>
+            <label>
+              {t('suite.member.grant.operatorLabel')}
+              <select {...register('operatorId', { required: true })}>
+                <option value="" disabled>
+                  {t('suite.member.grant.operatorPlaceholder')}
+                </option>
+                {operators.map((operator) => (
+                  <option key={operator.id} value={operator.id}>
+                    {operator.displayName !== null
+                      ? `${operator.displayName} (${operator.email})`
+                      : operator.email}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('suite.member.grant.roleLabel')}
+              <select {...register('role', { required: true })}>
+                {ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {t(`suite.member.role.${role}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {grantErrorKey !== null ? <p role="alert">{t(grantErrorKey)}</p> : null}
+            <button type="submit" disabled={isGranting}>
+              {isGranting ? t('suite.member.grant.submitting') : t('suite.member.grant.submit')}
+            </button>
+          </>
+        )}
       </form>
 
       {members.length === 0 ? (
@@ -115,7 +130,7 @@ function MemberRow({ member, onChangeRole, onRevoke, isChanging, isRevoking }: M
 
   return (
     <tr>
-      <td>{member.email ?? member.operatorId}</td>
+      <td>{member.email ?? t('suite.member.stale', { operatorId: member.operatorId })}</td>
       <td>
         <label>
           {t('suite.member.column.role')}
