@@ -15,6 +15,7 @@ use NeNeSuite\AppSelection\AppSelectionServiceProvider;
 use NeNeSuite\Auth\AuthRouteRegistrar;
 use NeNeSuite\Auth\AuthServiceProvider;
 use NeNeSuite\Auth\InvalidCredentialsExceptionHandler;
+use NeNeSuite\Auth\LoginRateLimitedExceptionHandler;
 use NeNeSuite\Auth\OperatorEmailConflictExceptionHandler;
 use NeNeSuite\Auth\OperatorValidationExceptionHandler;
 use NeNeSuite\Auth\UnauthorizedExceptionHandler;
@@ -134,6 +135,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $installSessionConflict = $container->get(InstallSessionConflictExceptionHandler::class);
                     $installSessionNotReady = $container->get(InstallSessionNotReadyExceptionHandler::class);
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
+                    $loginRateLimited = $container->get(LoginRateLimitedExceptionHandler::class);
                     $unauthorized = $container->get(UnauthorizedExceptionHandler::class);
                     $operatorEmailConflict = $container->get(OperatorEmailConflictExceptionHandler::class);
                     $operatorValidation = $container->get(OperatorValidationExceptionHandler::class);
@@ -160,6 +162,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
                     if (!$invalidCredentials instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Invalid credentials exception handler service is invalid.');
+                    }
+
+                    if (!$loginRateLimited instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Login rate limited exception handler service is invalid.');
                     }
 
                     if (!$unauthorized instanceof DomainExceptionHandlerInterface) {
@@ -211,6 +217,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $installSessionConflict,
                         $installSessionNotReady,
                         $invalidCredentials,
+                        $loginRateLimited,
                         $unauthorized,
                         $operatorEmailConflict,
                         $operatorValidation,

@@ -21,23 +21,34 @@ final readonly class CreateAuthSessionUseCase implements CreateAuthSessionUseCas
         private TokenIssuerInterface $tokenIssuer,
         private string $suiteId,
         private OperatorSessionContextResolver $sessionContext,
+        private LoginRateLimiter $rateLimiter,
     ) {
     }
 
     public function execute(CreateAuthSessionInput $input): CreateAuthSessionOutput
     {
+        // Per-IP rate limit (B1.2): checked before any credential work, so a blocked client gets
+        // 429 without revealing whether the email exists.
+        $this->rateLimiter->ensureWithinLimit($input->clientIp);
+
         $operator = $this->operators->findByEmail($input->email);
 
         if ($operator === null) {
             // Spend comparable time so unknown emails are not distinguishable by timing.
             $this->passwordHasher->verifyDummy($input->password);
+            $this->rateLimiter->recordFailure($input->clientIp);
 
             throw new InvalidCredentialsException();
         }
 
         if (!$this->passwordHasher->verify($input->password, $operator->passwordHash)) {
+            $this->rateLimiter->recordFailure($input->clientIp);
+
             throw new InvalidCredentialsException();
         }
+
+        // Successful login clears the client's failure window.
+        $this->rateLimiter->clear($input->clientIp);
 
         // Resolve the active-org context (milestone A6) and carry it in the JWT claims so the
         // authenticator can read role/org without a repo round-trip on every request.

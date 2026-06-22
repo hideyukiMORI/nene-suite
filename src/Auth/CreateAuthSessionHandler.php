@@ -19,6 +19,7 @@ final readonly class CreateAuthSessionHandler
     public function __construct(
         private CreateAuthSessionUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ClientIpResolver $clientIpResolver,
     ) {
     }
 
@@ -43,7 +44,7 @@ final readonly class CreateAuthSessionHandler
             throw new ValidationException($errors);
         }
 
-        $output = $this->useCase->execute(new CreateAuthSessionInput($email, $password));
+        $output = $this->useCase->execute(new CreateAuthSessionInput($email, $password, $this->clientIpResolver->resolve($request)));
 
         return $this->response->create(
             [

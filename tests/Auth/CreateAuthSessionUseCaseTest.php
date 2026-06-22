@@ -8,6 +8,8 @@ use Nene2\Auth\LocalBearerTokenVerifier;
 use NeNeSuite\Auth\CreateAuthSessionInput;
 use NeNeSuite\Auth\CreateAuthSessionUseCase;
 use NeNeSuite\Auth\InvalidCredentialsException;
+use NeNeSuite\Auth\LoginRateLimitedException;
+use NeNeSuite\Auth\LoginRateLimiter;
 use NeNeSuite\Auth\Operator;
 use NeNeSuite\Auth\OperatorSessionContextResolver;
 use NeNeSuite\Auth\PasswordHasher;
@@ -92,11 +94,45 @@ final class CreateAuthSessionUseCaseTest extends TestCase
             ->execute(new CreateAuthSessionInput('nobody@example.com', 'whatever'));
     }
 
+    public function testRejectsLoginFromRateLimitedClientIp(): void
+    {
+        $operators = new InMemoryOperatorRepository();
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
+
+        // Pre-fill the client IP to the cap; even correct credentials must be refused with 429.
+        $attempts = new InMemoryLoginAttemptRepository();
+        $now = time();
+        $attempts->recordFailure('ip:203.0.113.7', 900, $now);
+        $attempts->recordFailure('ip:203.0.113.7', 900, $now);
+
+        $this->expectException(LoginRateLimitedException::class);
+
+        $this->useCase($operators, new LocalBearerTokenVerifier('test-secret'), rateLimiter: new LoginRateLimiter($attempts, 2, 900))
+            ->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass', '203.0.113.7'));
+    }
+
+    public function testSuccessfulLoginClearsTheClientIpWindow(): void
+    {
+        $operators = new InMemoryOperatorRepository();
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
+
+        $attempts = new InMemoryLoginAttemptRepository();
+        $now = time();
+        $attempts->recordFailure('ip:203.0.113.7', 900, $now);
+        $limiter = new LoginRateLimiter($attempts, 3, 900);
+
+        $this->useCase($operators, new LocalBearerTokenVerifier('test-secret'), rateLimiter: $limiter)
+            ->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass', '203.0.113.7'));
+
+        self::assertSame(0, $attempts->countWithinWindow('ip:203.0.113.7', 900, $now));
+    }
+
     private function useCase(
         InMemoryOperatorRepository $operators,
         LocalBearerTokenVerifier $verifier,
         ?InMemoryMembershipRepository $memberships = null,
         ?InMemoryOrganizationRepository $organizations = null,
+        ?LoginRateLimiter $rateLimiter = null,
     ): CreateAuthSessionUseCase {
         return new CreateAuthSessionUseCase(
             $operators,
@@ -107,6 +143,7 @@ final class CreateAuthSessionUseCaseTest extends TestCase
                 $memberships ?? new InMemoryMembershipRepository(),
                 $organizations ?? new InMemoryOrganizationRepository(),
             ),
+            $rateLimiter ?? new LoginRateLimiter(new InMemoryLoginAttemptRepository()),
         );
     }
 
