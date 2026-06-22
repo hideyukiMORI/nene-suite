@@ -28,4 +28,19 @@ final class InMemoryFederationSigningKeyRepository implements FederationSigningK
 
         return null;
     }
+
+    /**
+     * @return list<FederationSigningKey>
+     */
+    public function findPublishable(): array
+    {
+        return array_values(array_filter(
+            $this->byId,
+            static fn (FederationSigningKey $key): bool => in_array(
+                $key->status,
+                [FederationSigningKeyStatus::Active, FederationSigningKeyStatus::Retiring],
+                true,
+            ),
+        ));
+    }
 }

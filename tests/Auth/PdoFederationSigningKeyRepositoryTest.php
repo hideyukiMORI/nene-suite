@@ -84,4 +84,24 @@ final class PdoFederationSigningKeyRepositoryTest extends TestCase
 
         self::assertNull($repository->findActive());
     }
+
+    public function testFindPublishableReturnsActiveAndRetiringOnly(): void
+    {
+        $repository = new PdoFederationSigningKeyRepository($this->executor);
+        $repository->save($this->key('01J8XR4ZS6Q9V2H7K3N5M0B8TA', 'kid-active', FederationSigningKeyStatus::Active));
+        $repository->save($this->key('01J8XR4ZS6Q9V2H7K3N5M0B8TB', 'kid-retiring', FederationSigningKeyStatus::Retiring));
+        $repository->save($this->key('01J8XR4ZS6Q9V2H7K3N5M0B8TC', 'kid-retired', FederationSigningKeyStatus::Retired));
+        $repository->save($this->key('01J8XR4ZS6Q9V2H7K3N5M0B8TD', 'kid-revoked', FederationSigningKeyStatus::Revoked));
+
+        $kids = array_map(static fn (FederationSigningKey $key): string => $key->kid, $repository->findPublishable());
+
+        self::assertCount(2, $kids);
+        self::assertContains('kid-active', $kids);
+        self::assertContains('kid-retiring', $kids);
+    }
+
+    private function key(string $id, string $kid, FederationSigningKeyStatus $status): FederationSigningKey
+    {
+        return new FederationSigningKey($id, $kid, 'ES256', '{"kid":"' . $kid . '"}', $status, self::NOW, self::NOW, null);
+    }
 }
