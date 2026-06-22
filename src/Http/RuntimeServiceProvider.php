@@ -50,6 +50,9 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
     public const SUITE_BASE_URL = 'nene-suite.suite_base_url';
 
+    /** Product edition (ADR 0015): {@see Edition::Oss} (default) or {@see Edition::Hosted}. */
+    public const EDITION = 'nene-suite.edition';
+
     /** Stable placeholder suite id used until the installer writes NENE_SUITE_ID. */
     private const DEV_SUITE_ID = '01J8XRDEV000000000000000ZA';
 
@@ -75,6 +78,12 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
             ->set(
                 self::SUITE_BASE_URL,
                 static fn (ContainerInterface $container): string => self::env('NENE_SUITE_BASE_URL', 'http://localhost/'),
+            )
+            ->set(
+                self::EDITION,
+                // Fail-closed: only the exact string `hosted` enables the hosted edition; unset,
+                // empty, or any other value resolves to Oss (Edition::fromEnv).
+                static fn (ContainerInterface $container): Edition => Edition::fromEnv(self::env('NENE_SUITE_EDITION', 'oss')),
             )
             ->set(
                 ConfigLoader::class,
