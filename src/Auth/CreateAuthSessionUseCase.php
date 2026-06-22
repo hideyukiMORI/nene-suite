@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeSuite\Auth;
 
 use Nene2\Auth\TokenIssuerInterface;
+use Symfony\Component\Uid\Ulid;
 
 /**
  * Logs an operator in: verifies email + password and issues a short-lived apex
@@ -63,6 +64,7 @@ final readonly class CreateAuthSessionUseCase implements CreateAuthSessionUseCas
             'org_external_id' => $context->orgExternalId,
             'role' => $context->role?->value,
             'superadmin' => $context->isSuperadmin,
+            'jti' => (string) new Ulid(),
             'iat' => $issuedAt,
             'exp' => $expiresAt,
         ]);

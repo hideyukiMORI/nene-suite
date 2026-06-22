@@ -90,7 +90,7 @@ final class SwitchActiveOrganizationHandlerTest extends TestCase
         $psr17 = new Psr17Factory();
 
         return new SwitchActiveOrganizationHandler(
-            new BearerTokenAuthenticator($verifier, new OperatorSessionContextResolver($memberships, $organizations)),
+            new BearerTokenAuthenticator($verifier, new OperatorSessionContextResolver($memberships, $organizations), new InMemoryRevokedTokenRepository()),
             new SwitchActiveOrganizationUseCase($operators, $memberships, $organizations, $verifier, self::SUITE_ID),
             new JsonResponseFactory($psr17, $psr17),
         );

@@ -111,10 +111,46 @@ final class BearerTokenAuthenticatorTest extends TestCase
         self::assertFalse($principal->isSuperadmin);
     }
 
+    public function testRejectsTokenWithRevokedJti(): void
+    {
+        $verifier = new LocalBearerTokenVerifier('test-secret');
+        $token = $verifier->issue(['sub' => self::OPERATOR_ID, 'jti' => '01J0REVOKED0000000000000ZA', 'exp' => time() + 60]);
+        $revoked = new InMemoryRevokedTokenRepository();
+        $revoked->revoke('01J0REVOKED0000000000000ZA', time() + 60, '2026-01-01T00:00:00Z', 'logout');
+
+        $this->expectException(UnauthorizedException::class);
+        $this->authenticator($verifier, revokedTokens: $revoked)->operatorId($this->request("Bearer {$token}"));
+    }
+
+    public function testAllowsTokenWhoseJtiIsNotRevoked(): void
+    {
+        $verifier = new LocalBearerTokenVerifier('test-secret');
+        $token = $verifier->issue(['sub' => self::OPERATOR_ID, 'jti' => '01J0LIVE00000000000000000ZA', 'exp' => time() + 60]);
+        $revoked = new InMemoryRevokedTokenRepository();
+        $revoked->revoke('01J0OTHER000000000000000ZAB', time() + 60, '2026-01-01T00:00:00Z', 'logout');
+
+        $operatorId = $this->authenticator($verifier, revokedTokens: $revoked)->operatorId($this->request("Bearer {$token}"));
+
+        self::assertSame(self::OPERATOR_ID, $operatorId);
+    }
+
+    public function testAllowsPreB13TokenWithoutJtiEvenWhenOthersRevoked(): void
+    {
+        $verifier = new LocalBearerTokenVerifier('test-secret');
+        $token = $verifier->issue(['sub' => self::OPERATOR_ID, 'exp' => time() + 60]);
+        $revoked = new InMemoryRevokedTokenRepository();
+        $revoked->revoke('01J0OTHER000000000000000ZAB', time() + 60, '2026-01-01T00:00:00Z', 'logout');
+
+        $operatorId = $this->authenticator($verifier, revokedTokens: $revoked)->operatorId($this->request("Bearer {$token}"));
+
+        self::assertSame(self::OPERATOR_ID, $operatorId);
+    }
+
     private function authenticator(
         LocalBearerTokenVerifier $verifier,
         ?InMemoryMembershipRepository $memberships = null,
         ?InMemoryOrganizationRepository $organizations = null,
+        ?InMemoryRevokedTokenRepository $revokedTokens = null,
     ): BearerTokenAuthenticator {
         return new BearerTokenAuthenticator(
             $verifier,
@@ -122,6 +158,7 @@ final class BearerTokenAuthenticatorTest extends TestCase
                 $memberships ?? new InMemoryMembershipRepository(),
                 $organizations ?? new InMemoryOrganizationRepository(),
             ),
+            $revokedTokens ?? new InMemoryRevokedTokenRepository(),
         );
     }
 

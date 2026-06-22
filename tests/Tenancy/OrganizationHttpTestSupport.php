@@ -11,6 +11,7 @@ use Nene2\Routing\Router;
 use NeNeSuite\Auth\BearerTokenAuthenticator;
 use NeNeSuite\Auth\OperatorSessionContextResolver;
 use NeNeSuite\Tenancy\SuperadminGuard;
+use NeNeSuite\Tests\Auth\InMemoryRevokedTokenRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,6 +30,7 @@ trait OrganizationHttpTestSupport
         return new SuperadminGuard(new BearerTokenAuthenticator(
             new LocalBearerTokenVerifier(self::TOKEN_SECRET),
             new OperatorSessionContextResolver(new InMemoryMembershipRepository(), new InMemoryOrganizationRepository()),
+            new InMemoryRevokedTokenRepository(),
         ));
     }
 
