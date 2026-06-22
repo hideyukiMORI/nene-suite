@@ -44,6 +44,14 @@ Copy-pasting sibling product domain rules is wrong — suite is orchestrator-onl
 4. **Framework dependency:** `hideyukimori/nene2` via Composer for HTTP runtime;
    do not reimplement middleware, routing, or Problem Details in suite `src/`.
 
+   **4.1 Vetted third-party crypto (B1.4).** Security-sensitive primitives MUST use a
+   vetted library rather than a hand-rolled implementation. `firebase/php-jwt` (^7) is
+   adopted for asymmetric **ES256** federation assertions (ADR 0012): hand-rolling ECDSA
+   over `openssl_sign` mishandles the ASN.1/DER ↔ JOSE R‖S signature encoding (a classic
+   verification/malleability trap). It is wrapped behind the NENE2 `TokenIssuerInterface` /
+   `TokenVerifierInterface` seam (`AssertionTokenIssuer` / `AssertionTokenVerifier`), never
+   called directly from handlers. `ext-openssl` and `ext-json` are declared hard requirements.
+
 5. **Self-review:** PRs touching implementation **MUST** name checklists from
    [`self-review.md`](../development/self-review.md) and `docs/review/`.
 

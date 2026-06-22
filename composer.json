@@ -5,6 +5,9 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4.1 <9.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "firebase/php-jwt": "^7.1",
         "hideyukimori/nene2": "@dev",
         "robmorgan/phinx": "^0.16.11",
         "symfony/uid": "^8.1",
