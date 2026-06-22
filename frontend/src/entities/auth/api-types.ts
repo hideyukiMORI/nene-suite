@@ -4,3 +4,7 @@ import type { components } from '@/shared/api/schema.gen'
 export type OperatorDto = components['schemas']['Operator']
 export type CreateAuthSessionRequestDto = components['schemas']['CreateAuthSessionRequest']
 export type AuthSessionDto = components['schemas']['AuthSession']
+export type SessionOrganizationDto = components['schemas']['SessionOrganization']
+export type SessionOrganizationListDto = components['schemas']['SessionOrganizationList']
+export type SwitchActiveOrganizationRequestDto =
+  components['schemas']['SwitchActiveOrganizationRequest']

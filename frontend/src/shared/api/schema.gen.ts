@@ -457,6 +457,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/session/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the current operator's organizations.
+         * @description Returns the organizations the bearer-token operator belongs to (oldest first),
+         *     each with the operator's role, to drive the active-organization switcher.
+         *     Operator self-service. Read-only; no audit event.
+         */
+        get: operations["listSessionOrganizations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/session/active-organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Switch the session's active organization.
+         * @description Re-scopes the operator's session to an organization they belong to and returns a
+         *     fresh apex JWT carrying that organization's context. Operator self-service. An
+         *     unknown organization, or one the operator is not a member of, returns 404 — the
+         *     existence of organizations is not revealed to non-members.
+         */
+        put: operations["switchActiveOrganization"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -530,6 +575,20 @@ export interface components {
         };
         OperatorList: {
             operators: components["schemas"]["Operator"][];
+        };
+        /** @description An organization the current operator belongs to, with their role in it. */
+        SessionOrganization: {
+            organizationId: components["schemas"]["Ulid"];
+            externalId: components["schemas"]["Ulid"];
+            name: string;
+            slug: string;
+            role: components["schemas"]["RoleEnum"];
+        };
+        SessionOrganizationList: {
+            organizations: components["schemas"]["SessionOrganization"][];
+        };
+        SwitchActiveOrganizationRequest: {
+            organizationId: components["schemas"]["Ulid"];
         };
         CreateOperatorRequest: {
             /** Format: email */
@@ -2091,6 +2150,88 @@ export interface operations {
                 content?: never;
             };
             401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listSessionOrganizations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The operator's organizations. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "organizations": [
+                     *         {
+                     *           "organizationId": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *           "externalId": "01J8XRDEXT0000000000000ZAB",
+                     *           "name": "Acme KK",
+                     *           "slug": "acme-kk",
+                     *           "role": "admin"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["SessionOrganizationList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    switchActiveOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "organizationId": "01J8XR0G7Q9V2H7K3N5M0B8TCA"
+                 *     }
+                 */
+                "application/json": components["schemas"]["SwitchActiveOrganizationRequest"];
+            };
+        };
+        responses: {
+            /** @description Active organization switched; a new session is issued. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature",
+                     *       "expiresAt": "2026-05-30T11:48:46Z",
+                     *       "operator": {
+                     *         "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *         "email": "operator@example.com",
+                     *         "displayName": "Example Operator"
+                     *       },
+                     *       "orgExternalId": "01J8XRDEXT0000000000000ZAB",
+                     *       "role": "admin",
+                     *       "superadmin": false
+                     *     }
+                     */
+                    "application/json": components["schemas"]["AuthSession"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["OrganizationNotFound"];
+            422: components["responses"]["ValidationFailed"];
             500: components["responses"]["ServerError"];
         };
     };

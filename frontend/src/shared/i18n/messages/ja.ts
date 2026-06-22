@@ -148,6 +148,8 @@ export const ja: Partial<MessageCatalog> = {
   'suite.org.indicator.activeOrg': '組織: {{org}}',
   'suite.org.indicator.noOrg': 'アクティブな組織なし',
   'suite.org.indicator.role': 'ロール: {{role}}',
+  'suite.org.switcher.label': 'アクティブな組織',
+  'suite.org.switcher.placeholder': '組織を選択',
 
   // ── メンバー（スーパー管理者コンソール） ──────────────────────────────────
   'suite.member.title': 'メンバー',

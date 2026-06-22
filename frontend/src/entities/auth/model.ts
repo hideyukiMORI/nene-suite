@@ -7,6 +7,15 @@ export interface Operator {
 /** Organization-scoped role (ADR 0012). The platform `superadmin` is a separate dimension. */
 export type OrgRole = 'admin' | 'member' | 'viewer'
 
+/** One organization the current operator belongs to, with their role in it (switcher option). */
+export interface SessionOrganization {
+  organizationId: string
+  externalId: string
+  name: string
+  slug: string
+  role: OrgRole
+}
+
 export interface AuthSession {
   token: string
   expiresAt: string

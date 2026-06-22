@@ -1083,6 +1083,78 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/auth/session/organizations:
+    get:
+      tags: [Auth]
+      operationId: listSessionOrganizations
+      summary: List the current operator's organizations.
+      description: |
+        Returns the organizations the bearer-token operator belongs to (oldest first),
+        each with the operator's role, to drive the active-organization switcher.
+        Operator self-service. Read-only; no audit event.
+      responses:
+        '200':
+          description: The operator's organizations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionOrganizationList'
+              example:
+                organizations:
+                  - organizationId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                    externalId: 01J8XRDEXT0000000000000ZAB
+                    name: Acme KK
+                    slug: acme-kk
+                    role: admin
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/auth/session/active-organization:
+    put:
+      tags: [Auth]
+      operationId: switchActiveOrganization
+      summary: Switch the session's active organization.
+      description: |
+        Re-scopes the operator's session to an organization they belong to and returns a
+        fresh apex JWT carrying that organization's context. Operator self-service. An
+        unknown organization, or one the operator is not a member of, returns 404 — the
+        existence of organizations is not revealed to non-members.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwitchActiveOrganizationRequest'
+            example:
+              organizationId: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+      responses:
+        '200':
+          description: Active organization switched; a new session is issued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature
+                expiresAt: '2026-05-30T11:48:46Z'
+                operator:
+                  id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                  email: operator@example.com
+                  displayName: Example Operator
+                orgExternalId: 01J8XRDEXT0000000000000ZAB
+                role: admin
+                superadmin: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1412,6 +1484,43 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Operator'
+
+    SessionOrganization:
+      type: object
+      additionalProperties: false
+      required: [organizationId, externalId, name, slug, role]
+      description: An organization the current operator belongs to, with their role in it.
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
+        externalId:
+          $ref: '#/components/schemas/Ulid'
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+
+    SessionOrganizationList:
+      type: object
+      additionalProperties: false
+      required: [organizations]
+      properties:
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionOrganization'
+
+    SwitchActiveOrganizationRequest:
+      type: object
+      additionalProperties: false
+      required: [organizationId]
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/Ulid'
 
     CreateOperatorRequest:
       type: object
