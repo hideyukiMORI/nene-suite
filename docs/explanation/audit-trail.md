@@ -116,6 +116,13 @@ code merge.
 | `membership.granted` | `membership` | NULL | `{operatorId, organizationId, role}` | `organizationId` is null for a platform `superadmin` membership |
 | `membership.role_changed` | `membership` | `{role: …}` | `{role: …}` | Supersedes the pre-registered `apex_operator.role_changed` (never implemented) |
 | `membership.revoked` | `membership` | membership snapshot | NULL | Records link removal; the audit row itself stays append-only (§7) |
+| `federation_signing_key.generated` | `federation_signing_key` | NULL | `{kid, alg, status}` | Public key material only — the **private key never enters the suite DB or audit** (hosted edition, ADR 0012 / milestone B1.5) |
+| `federation_signing_key.rotated` | `federation_signing_key` | prior active `{kid, status}` | new active `{kid, status}` | Time-driven rotation (B1.8); old key kept in JWKS ≥ max assertion TTL before retiring |
+| `federation_signing_key.revoked` | `federation_signing_key` | active/retiring snapshot | revoked snapshot | Emergency revoke (B1.8); drops the kid from JWKS immediately |
+
+The `federation_signing_key` entity type was registered 2026-06-22 (milestone B1.5)
+for the hosted-edition federation IdP key lifecycle; the `.generated` emitter lands
+in B1.5, `.rotated` / `.revoked` in B1.8. Only public key material is ever recorded.
 
 The multi-tenant entity types `organization` / `membership` were registered
 2026-06-21 (milestone A0, decision §1); emitters land in milestone A2/A3.

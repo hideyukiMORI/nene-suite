@@ -57,7 +57,8 @@
         "catalog_pin",
         "apex_operator",
         "organization",
-        "membership"
+        "membership",
+        "federation_signing_key"
       ]
     },
     "entity_id": {
