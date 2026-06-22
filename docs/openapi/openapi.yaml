@@ -658,6 +658,32 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Auth]
+      operationId: listOperators
+      summary: List all apex operators.
+      description: |
+        Returns every apex operator (oldest first), without any secret material.
+        Platform-superadmin only — drives the membership console's operator picker.
+        Read-only; no audit event.
+      responses:
+        '200':
+          description: Operators.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorList'
+              example:
+                operators:
+                  - id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                    email: admin@example.com
+                    displayName: Suite Admin
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/v1/organizations:
     post:
@@ -1376,6 +1402,16 @@ components:
         displayName:
           type: [string, 'null']
           maxLength: 320
+
+    OperatorList:
+      type: object
+      additionalProperties: false
+      required: [operators]
+      properties:
+        operators:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operator'
 
     CreateOperatorRequest:
       type: object

@@ -17,4 +17,17 @@ describe('useMembershipConsole', () => {
     expect(result.current.members[0]?.email).toBe('operator@example.com')
     expect(result.current.members[0]?.role).toBe('admin')
   })
+
+  it('exposes the operator list for the picker', async () => {
+    const { result } = renderHookWithProviders(() => useMembershipConsole(ORG_ID))
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.operators.length).toBeGreaterThan(0)
+    expect(result.current.operators.some((operator) => operator.email === 'new@example.com')).toBe(
+      true,
+    )
+  })
 })

@@ -7,6 +7,7 @@ import {
   type MembershipRole,
   type OrganizationMember,
 } from '@/entities/membership'
+import { useOperators, type Operator } from '@/entities/operator'
 import { mapProblemDetailsToMessageKey, type MessageKey } from '@/shared/i18n'
 
 export interface GrantMemberFields {
@@ -16,6 +17,7 @@ export interface GrantMemberFields {
 
 export interface UseMembershipConsoleResult {
   members: OrganizationMember[]
+  operators: Operator[]
   isLoading: boolean
   isError: boolean
   grantMember: (fields: GrantMemberFields) => void
@@ -30,14 +32,16 @@ export interface UseMembershipConsoleResult {
 /** Glue between the membership entity hooks and the console UI (no JSX). */
 export function useMembershipConsole(organizationId: string): UseMembershipConsoleResult {
   const query = useOrganizationMembers(organizationId)
+  const operatorsQuery = useOperators()
   const grant = useGrantMembership(organizationId)
   const change = useChangeMembershipRole(organizationId)
   const revoke = useRevokeMembership(organizationId)
 
   return {
     members: query.data ?? [],
-    isLoading: query.isLoading,
-    isError: query.isError,
+    operators: operatorsQuery.data ?? [],
+    isLoading: query.isLoading || operatorsQuery.isLoading,
+    isError: query.isError || operatorsQuery.isError,
     grantMember: (fields) => {
       grant.mutate(fields)
     },

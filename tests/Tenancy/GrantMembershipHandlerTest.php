@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Tests\Tenancy;
 
+use NeNeSuite\Auth\Operator;
 use NeNeSuite\Auth\UnauthorizedException;
 use NeNeSuite\Tenancy\ForbiddenException;
 use NeNeSuite\Tenancy\GrantMembershipHandler;
@@ -15,6 +16,7 @@ use NeNeSuite\Tenancy\Organization;
 use NeNeSuite\Tenancy\OrganizationNotFoundException;
 use NeNeSuite\Tenancy\OrganizationStatus;
 use NeNeSuite\Tenancy\Role;
+use NeNeSuite\Tests\Auth\InMemoryOperatorRepository;
 use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorder;
 use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorderFactory;
 use NeNeSuite\Tests\Support\ImmediateTransactionManager;
@@ -88,6 +90,15 @@ final class GrantMembershipHandlerTest extends TestCase
         $this->handler()->handle($this->request('POST', $this->path(), $this->superadminToken(), ['role' => 'admin'], ['id' => self::ORG_ID]));
     }
 
+    public function testRejectsUnknownOperatorWithValidation(): void
+    {
+        $this->expectException(MembershipValidationException::class);
+
+        $this->handler(operators: new InMemoryOperatorRepository())->handle(
+            $this->request('POST', $this->path(), $this->superadminToken(), ['operatorId' => self::OP_ID, 'role' => 'admin'], ['id' => self::ORG_ID]),
+        );
+    }
+
     public function testRejectsDuplicateMembershipWithConflict(): void
     {
         $memberships = new InMemoryMembershipRepository();
@@ -104,6 +115,7 @@ final class GrantMembershipHandlerTest extends TestCase
         ?InMemoryMembershipRepository $memberships = null,
         ?RecordingSuiteAuditRecorder $recorder = null,
         ?InMemoryOrganizationRepository $organizations = null,
+        ?InMemoryOperatorRepository $operators = null,
     ): GrantMembershipHandler {
         return new GrantMembershipHandler(
             $this->guard(),
@@ -114,6 +126,7 @@ final class GrantMembershipHandlerTest extends TestCase
                 self::SUITE_ID,
             ),
             $organizations ?? $this->seededOrg(),
+            $operators ?? $this->seededOperator(),
             $this->jsonResponseFactory(),
             $this->requestIdHolder(),
         );
@@ -125,5 +138,13 @@ final class GrantMembershipHandlerTest extends TestCase
         $organizations->save(new Organization(self::ORG_ID, self::ORG_EXT, 'Acme', 'acme', OrganizationStatus::Active, '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z'));
 
         return $organizations;
+    }
+
+    private function seededOperator(): InMemoryOperatorRepository
+    {
+        $operators = new InMemoryOperatorRepository();
+        $operators->save(new Operator(self::OP_ID, 'operator@example.com', 'hash', 'Example Operator', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z'));
+
+        return $operators;
     }
 }
