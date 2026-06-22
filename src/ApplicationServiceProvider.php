@@ -14,12 +14,15 @@ use NeNeSuite\AppSelection\AppSelectionRouteRegistrar;
 use NeNeSuite\AppSelection\AppSelectionServiceProvider;
 use NeNeSuite\Auth\AuthRouteRegistrar;
 use NeNeSuite\Auth\AuthServiceProvider;
+use NeNeSuite\Auth\FederationRouteRegistrar;
 use NeNeSuite\Auth\InvalidCredentialsExceptionHandler;
 use NeNeSuite\Auth\LoginRateLimitedExceptionHandler;
 use NeNeSuite\Auth\OperatorEmailConflictExceptionHandler;
 use NeNeSuite\Auth\OperatorValidationExceptionHandler;
 use NeNeSuite\Auth\UnauthorizedExceptionHandler;
 use NeNeSuite\DatabaseProvision\DatabaseProvisionServiceProvider;
+use NeNeSuite\Http\Edition;
+use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstalledApps\InstalledAppsRouteRegistrar;
 use NeNeSuite\InstalledApps\InstalledAppsServiceProvider;
 use NeNeSuite\Installer\InstallerServiceProvider;
@@ -116,7 +119,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Membership route registrar service is invalid.');
                     }
 
-                    return [
+                    $registrars = [
                         $appCatalog,
                         $installSession,
                         $appSelection,
@@ -126,6 +129,22 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $tenancy,
                         $memberships,
                     ];
+
+                    // Edition-gated: the federation surface (JWKS) is registered only in the hosted
+                    // edition, so a self-hosted (OSS) install never constructs or serves it (B1.6).
+                    $edition = $container->get(RuntimeServiceProvider::EDITION);
+
+                    if ($edition instanceof Edition && $edition->isHosted()) {
+                        $federation = $container->get('nene-suite.route_registrar.federation');
+
+                        if (!$federation instanceof FederationRouteRegistrar) {
+                            throw new LogicException('Federation route registrar service is invalid.');
+                        }
+
+                        $registrars[] = $federation;
+                    }
+
+                    return $registrars;
                 },
             )
             ->set(

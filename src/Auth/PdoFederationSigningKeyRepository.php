@@ -42,6 +42,29 @@ final readonly class PdoFederationSigningKeyRepository implements FederationSign
     }
 
     /**
+     * @return list<FederationSigningKey>
+     */
+    public function findPublishable(): array
+    {
+        $keys = [];
+
+        $rows = $this->query->fetchAll(
+            'SELECT * FROM federation_signing_keys WHERE status IN (?, ?) ORDER BY created_at ASC, id ASC',
+            [FederationSigningKeyStatus::Active->value, FederationSigningKeyStatus::Retiring->value],
+        );
+
+        foreach ($rows as $row) {
+            $key = $this->hydrate($row);
+
+            if ($key !== null) {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
      * @param array<string, mixed>|null $row
      */
     private function hydrate(?array $row): ?FederationSigningKey

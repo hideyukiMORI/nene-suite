@@ -1159,6 +1159,48 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /.well-known/jwks.json:
+    get:
+      tags: [Auth]
+      operationId: getFederationJwks
+      summary: Federation signing key set (JWKS).
+      description: |
+        Published JSON Web Key Set of the suite's federation signing **public** keys (active +
+        retiring), so sibling apps can verify ES256 assertions and refresh on an unknown `kid`
+        (ADR 0012 §3). Public key material only; unauthenticated and cacheable. **Hosted edition
+        only** — absent (404) in a self-hosted install. Like `/health`, this non-`/api/v1` path is
+        documented but intentionally excluded from the served-route contract test.
+      security: []
+      responses:
+        '200':
+          description: The federation JWKS.
+          headers:
+            Cache-Control:
+              description: Public cache directive (short max-age).
+              schema:
+                type: string
+            ETag:
+              description: Strong validator over the published key set.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwkSet'
+              example:
+                keys:
+                  - kty: EC
+                    crv: P-256
+                    x: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
+                    y: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
+                    use: sig
+                    alg: ES256
+                    kid: NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs
+        '404':
+          description: Not served — the hosted federation surface is disabled (self-hosted edition).
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1609,6 +1651,43 @@ components:
         superadmin:
           type: boolean
           description: Whether the operator is a platform superadmin (cross-organization).
+
+    Jwk:
+      type: object
+      description: A public JSON Web Key (EC; RFC 7517 / 7518). Public material only — no private `d`.
+      required: [kty, crv, x, y, use, alg, kid]
+      properties:
+        kty:
+          type: string
+          enum: [EC]
+        crv:
+          type: string
+          enum: [P-256]
+        x:
+          type: string
+          description: base64url X coordinate (fixed 32-byte field size).
+        y:
+          type: string
+          description: base64url Y coordinate (fixed 32-byte field size).
+        use:
+          type: string
+          enum: [sig]
+        alg:
+          type: string
+          enum: [ES256]
+        kid:
+          type: string
+          description: RFC 7638 JWK thumbprint.
+
+    JwkSet:
+      type: object
+      additionalProperties: false
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/Jwk'
 
     HealthResponse:
       type: object

@@ -504,6 +504,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/.well-known/jwks.json": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Federation signing key set (JWKS).
+         * @description Published JSON Web Key Set of the suite's federation signing **public** keys (active +
+         *     retiring), so sibling apps can verify ES256 assertions and refresh on an unknown `kid`
+         *     (ADR 0012 §3). Public key material only; unauthenticated and cacheable. **Hosted edition
+         *     only** — absent (404) in a self-hosted install. Like `/health`, this non-`/api/v1` path is
+         *     documented but intentionally excluded from the served-route contract test.
+         */
+        get: operations["getFederationJwks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -635,6 +659,26 @@ export interface components {
             role?: "admin" | "member" | "viewer" | null;
             /** @description Whether the operator is a platform superadmin (cross-organization). */
             superadmin?: boolean;
+        };
+        /** @description A public JSON Web Key (EC; RFC 7517 / 7518). Public material only — no private `d`. */
+        Jwk: {
+            /** @enum {string} */
+            kty: "EC";
+            /** @enum {string} */
+            crv: "P-256";
+            /** @description base64url X coordinate (fixed 32-byte field size). */
+            x: string;
+            /** @description base64url Y coordinate (fixed 32-byte field size). */
+            y: string;
+            /** @enum {string} */
+            use: "sig";
+            /** @enum {string} */
+            alg: "ES256";
+            /** @description RFC 7638 JWK thumbprint. */
+            kid: string;
+        };
+        JwkSet: {
+            keys: components["schemas"]["Jwk"][];
         };
         HealthResponse: {
             /** @enum {string} */
@@ -2237,6 +2281,53 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["OrganizationNotFound"];
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getFederationJwks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The federation JWKS. */
+            200: {
+                headers: {
+                    /** @description Public cache directive (short max-age). */
+                    "Cache-Control"?: string;
+                    /** @description Strong validator over the published key set. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "keys": [
+                     *         {
+                     *           "kty": "EC",
+                     *           "crv": "P-256",
+                     *           "x": "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
+                     *           "y": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
+                     *           "use": "sig",
+                     *           "alg": "ES256",
+                     *           "kid": "NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["JwkSet"];
+                };
+            };
+            /** @description Not served — the hosted federation surface is disabled (self-hosted edition). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             500: components["responses"]["ServerError"];
         };
     };

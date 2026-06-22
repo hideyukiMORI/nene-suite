@@ -128,6 +128,47 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                FederationSigningKeyRepositoryInterface::class,
+                static function (ContainerInterface $container): FederationSigningKeyRepositoryInterface {
+                    $query = $container->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoFederationSigningKeyRepository($query);
+                },
+            )
+            ->set(
+                FederationJwksHandler::class,
+                static function (ContainerInterface $container): FederationJwksHandler {
+                    $keys = $container->get(FederationSigningKeyRepositoryInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$keys instanceof FederationSigningKeyRepositoryInterface) {
+                        throw new LogicException('Federation signing key repository service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new FederationJwksHandler($keys, $response);
+                },
+            )
+            ->set(
+                'nene-suite.route_registrar.federation',
+                static function (ContainerInterface $container): FederationRouteRegistrar {
+                    $jwksHandler = $container->get(FederationJwksHandler::class);
+
+                    if (!$jwksHandler instanceof FederationJwksHandler) {
+                        throw new LogicException('Federation JWKS handler service is invalid.');
+                    }
+
+                    return new FederationRouteRegistrar($jwksHandler);
+                },
+            )
+            ->set(
                 OperatorSessionContextResolver::class,
                 static function (ContainerInterface $container): OperatorSessionContextResolver {
                     $memberships = $container->get(MembershipRepositoryInterface::class);
