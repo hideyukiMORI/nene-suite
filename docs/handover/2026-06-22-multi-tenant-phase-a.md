@@ -27,8 +27,9 @@ a frontend superadmin console to drive it.
   (org console + switcher); **A8b** (member-list endpoint + membership console UI) is an
   extension beyond it.
 
-What is **not** done: the hosted/SaaS edition (Phase B), and the polish items in §7. ADR 0015
-is still a draft — its acceptance is the terminal Phase B gate.
+What is **not** done: the hosted/SaaS edition (Phase B). The §7 polish items are now resolved
+(PRs #172, #174) except i18n, which is en+ja by design. ADR 0015 is still a draft — its
+acceptance is the terminal Phase B gate.
 
 ---
 
@@ -226,20 +227,31 @@ the firewall (no token → 401/403) rather than full flows.
 
 ## 7. Deferred / known gaps
 
-Intentional Phase-A-skeleton limits, safe to ship, candidates for polish:
+These were the Phase-A-skeleton limits. The operator / grant / switcher / stale-label items were
+**resolved in post-Phase-A polish** (PRs #172 and #174); they are kept here, annotated, as the
+record of what the skeleton deliberately left out. The i18n item is an intentional, standing
+posture, not a gap to close.
 
-- **No list-operators endpoint** → membership *grant* takes a raw `operatorId` (ULID paste) in
-  the UI; there is no operator picker.
-- **Grant does not verify operator existence** (A7b; the A3 use-case docblock assigns referential
-  checks to the console). Organization existence *is* checked (→404); a grant against a
-  non-existent operatorId would still succeed.
-- **Org-switcher is read-only** (a badge). There is no backend to re-scope the active org in the
-  session JWT; the resolver always picks the oldest org-scoped membership.
-- **Stale membership** (operator removed) shows `operatorId` instead of an email in the member
-  list (the list endpoint degrades email/displayName to null).
-- **i18n** is en + ja only; the other four locales fall back to English.
+- ✅ **Resolved (PR #172) — list-operators endpoint + operator picker.** `GET /api/v1/operators`
+  (operationId `listOperators`, superadmin-gated) now backs a frontend operator picker, replacing
+  the raw `operatorId` ULID paste in the membership grant form.
+- ✅ **Resolved (PR #172) — grant verifies operator existence.** `GrantMembershipHandler` now
+  rejects a body `operatorId` that references no operator with **422** (mirroring the organization
+  →404 check), so a grant can no longer create a stale membership.
+- ✅ **Resolved (PR #174) — org-switcher re-scopes the session.**
+  `GET /api/v1/auth/session/organizations` lists the operator's orgs and
+  `PUT /api/v1/auth/session/active-organization` (operationId `switchActiveOrganization`) re-issues
+  the JWT for a membership-verified org (unknown org / non-member → 404, not leaking existence;
+  superadmin is recomputed, never assumed). The frontend `active-org-indicator` is now a switcher.
+  The login default is still the oldest org-scoped membership.
+- ✅ **Resolved (PR #172) — stale-membership label.** The member list renders
+  `Removed operator (id)` instead of a bare ULID when the operator was removed (the endpoint still
+  degrades email/displayName to null).
+- ⏸ **Retained by design — i18n is en + ja only;** `fr/de/pt-BR/zh-Hans` fall back to English.
+  Filling them is deliberately out of scope (ADR 0009 / memory `project_frontend_i18n_posture`):
+  the parity test stays ja-only so adding a key does not force translating the whole catalog.
 - **Milestone doc / run log** were stale through Phase A — git log is the source of truth for
-  what shipped. (This PR updates the milestone doc status.)
+  what shipped. (The Phase A handover PR updated the milestone doc status.)
 
 ---
 
@@ -249,8 +261,9 @@ Intentional Phase-A-skeleton limits, safe to ship, candidates for polish:
 2. **Phase B (hosted edition)** — per the milestone B1–B6 and ADR 0015: asymmetric JWKS federation
    (supersede HMAC), entitlement/quota (ADR 0013), signup/abuse + org-resolution (ADR 0015 open
    questions), house-ads, and finally **ADR 0015 acceptance** (the terminal B6 gate).
-3. **Polish** (any time) — the §7 gaps, most impactfully a list-operators endpoint + operator
-   picker to make the membership console fully usable, and operator-existence validation on grant.
+3. **Polish** — the §7 operator picker, grant operator-existence validation, stale-membership
+   label, and active-org switcher are **done** (PRs #172, #174). The only retained gap is i18n
+   (en+ja by design).
 
 ---
 
