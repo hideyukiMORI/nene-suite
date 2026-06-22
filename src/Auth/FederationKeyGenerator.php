@@ -29,18 +29,7 @@ final class FederationKeyGenerator
         $privatePem = '';
         openssl_pkey_export($resource, $privatePem);
 
-        $details = openssl_pkey_get_details($resource);
-
-        if (!is_array($details) || !is_array($details['ec'] ?? null) || !isset($details['ec']['x'], $details['ec']['y'])) {
-            throw new RuntimeException('Could not read EC public coordinates from the generated key.');
-        }
-
-        // openssl returns coordinates as minimal big-endian integers, so a leading-zero byte is
-        // dropped (~1/256 per coordinate). JWK requires the full field size, left zero-padded —
-        // otherwise the kid (RFC 7638 thumbprint over the coordinates) won't match a compliant
-        // verifier's, intermittently breaking federation.
-        $x = $this->base64Url($this->padCoordinate((string) $details['ec']['x']));
-        $y = $this->base64Url($this->padCoordinate((string) $details['ec']['y']));
+        [$x, $y] = $this->coordinates($resource);
         $kid = JwkThumbprint::computeEc('P-256', $x, $y);
 
         $publicJwk = [
@@ -59,6 +48,48 @@ final class FederationKeyGenerator
             kid: $kid,
             alg: self::ALG,
         );
+    }
+
+    /**
+     * The RFC 7638 thumbprint (`kid`) for an existing private key, used by the boot preflight to
+     * confirm the operator-supplied private key matches the active published key (B1.7).
+     */
+    public function kidForPrivateKey(string $privateKeyPem): string
+    {
+        // Operator-supplied input may be malformed; suppress the openssl warning and fail explicitly.
+        $resource = @openssl_pkey_get_private($privateKeyPem);
+
+        if ($resource === false) {
+            throw new RuntimeException('The federation private key is not a loadable private key.');
+        }
+
+        [$x, $y] = $this->coordinates($resource);
+
+        return JwkThumbprint::computeEc('P-256', $x, $y);
+    }
+
+    /**
+     * base64url X/Y coordinates from an EC key resource. openssl returns coordinates as minimal
+     * big-endian integers, so a leading-zero byte is dropped (~1/256 per coordinate). JWK requires
+     * the full field size, left zero-padded — otherwise the kid (RFC 7638 thumbprint over the
+     * coordinates) won't match a compliant verifier's, intermittently breaking federation.
+     *
+     * @param \OpenSSLAsymmetricKey $resource
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function coordinates(\OpenSSLAsymmetricKey $resource): array
+    {
+        $details = openssl_pkey_get_details($resource);
+
+        if (!is_array($details) || !is_array($details['ec'] ?? null) || !isset($details['ec']['x'], $details['ec']['y'])) {
+            throw new RuntimeException('Could not read EC public coordinates — not a P-256 key.');
+        }
+
+        return [
+            $this->base64Url($this->padCoordinate((string) $details['ec']['x'])),
+            $this->base64Url($this->padCoordinate((string) $details['ec']['y'])),
+        ];
     }
 
     private function padCoordinate(string $coordinate): string

@@ -35,6 +35,13 @@ if [ "${1:-apache2-foreground}" = "apache2-foreground" ]; then
   echo "[entrypoint] verifying apex JWT signing secret (fail-closed)..."
   php ops/docker/preflight-jwt-secret.php
 
+  # Hosted edition only (milestone B1.7): fail closed if the federation signing key is missing or
+  # inconsistent with the active published key. Self-skips for OSS (exits 0). Reads the
+  # federation_signing_keys table, so it MUST run after `phinx migrate`. `set -e` aborts on a
+  # hosted misconfig.
+  echo "[entrypoint] verifying federation signing key (hosted edition; fail-closed)..."
+  php ops/docker/preflight-federation-key.php
+
   # Backfill tenancy onto pre-A4 installs (milestone A5): give existing operators their
   # default-org membership before A6 reads one. Idempotent; reads tenancy tables, so it MUST
   # run after `phinx migrate`. Warn-and-continue (the script exits 0 even on failure) so a
