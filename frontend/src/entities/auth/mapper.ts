@@ -1,5 +1,10 @@
-import type { AuthSessionDto, OperatorDto } from './api-types'
-import type { AuthSession, Operator } from './model'
+import type {
+  AuthSessionDto,
+  OperatorDto,
+  SessionOrganizationDto,
+  SessionOrganizationListDto,
+} from './api-types'
+import type { AuthSession, Operator, SessionOrganization } from './model'
 
 export function toOperator(dto: OperatorDto): Operator {
   return {
@@ -18,4 +23,18 @@ export function toAuthSession(dto: AuthSessionDto): AuthSession {
     role: dto.role ?? null,
     superadmin: dto.superadmin ?? false,
   }
+}
+
+export function toSessionOrganization(dto: SessionOrganizationDto): SessionOrganization {
+  return {
+    organizationId: dto.organizationId,
+    externalId: dto.externalId,
+    name: dto.name,
+    slug: dto.slug,
+    role: dto.role,
+  }
+}
+
+export function toSessionOrganizations(dto: SessionOrganizationListDto): SessionOrganization[] {
+  return dto.organizations.map(toSessionOrganization)
 }

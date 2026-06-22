@@ -15,6 +15,8 @@ final readonly class AuthRouteRegistrar
         private DeleteAuthSessionHandler $deleteHandler,
         private CreateOperatorHandler $createOperatorHandler,
         private ListOperatorsHandler $listOperatorsHandler,
+        private ListSessionOrganizationsHandler $listSessionOrganizationsHandler,
+        private SwitchActiveOrganizationHandler $switchActiveOrganizationHandler,
     ) {
     }
 
@@ -25,6 +27,8 @@ final readonly class AuthRouteRegistrar
         $deleteHandler = $this->deleteHandler;
         $createOperatorHandler = $this->createOperatorHandler;
         $listOperatorsHandler = $this->listOperatorsHandler;
+        $listSessionOrganizationsHandler = $this->listSessionOrganizationsHandler;
+        $switchActiveOrganizationHandler = $this->switchActiveOrganizationHandler;
 
         $router->post(
             '/api/v1/auth/session',
@@ -45,6 +49,14 @@ final readonly class AuthRouteRegistrar
         $router->get(
             '/api/v1/operators',
             static fn (ServerRequestInterface $request) => $listOperatorsHandler->handle($request),
+        );
+        $router->get(
+            '/api/v1/auth/session/organizations',
+            static fn (ServerRequestInterface $request) => $listSessionOrganizationsHandler->handle($request),
+        );
+        $router->put(
+            '/api/v1/auth/session/active-organization',
+            static fn (ServerRequestInterface $request) => $switchActiveOrganizationHandler->handle($request),
         );
     }
 }

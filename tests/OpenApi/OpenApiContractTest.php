@@ -35,6 +35,8 @@ final class OpenApiContractTest extends TestCase
         'createAuthSession',
         'getAuthSession',
         'deleteAuthSession',
+        'listSessionOrganizations',
+        'switchActiveOrganization',
         'listSuiteAuditEvents',
         'listInstalledApps',
         'createOperator',

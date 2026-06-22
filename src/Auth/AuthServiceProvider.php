@@ -151,6 +151,55 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ListSessionOrganizationsUseCaseInterface::class,
+                static function (ContainerInterface $container): ListSessionOrganizationsUseCaseInterface {
+                    $memberships = $container->get(MembershipRepositoryInterface::class);
+                    $organizations = $container->get(OrganizationRepositoryInterface::class);
+
+                    if (!$memberships instanceof MembershipRepositoryInterface) {
+                        throw new LogicException('Membership repository service is invalid.');
+                    }
+
+                    if (!$organizations instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new ListSessionOrganizationsUseCase($memberships, $organizations);
+                },
+            )
+            ->set(
+                SwitchActiveOrganizationUseCaseInterface::class,
+                static function (ContainerInterface $container): SwitchActiveOrganizationUseCaseInterface {
+                    $operators = $container->get(OperatorRepositoryInterface::class);
+                    $memberships = $container->get(MembershipRepositoryInterface::class);
+                    $organizations = $container->get(OrganizationRepositoryInterface::class);
+                    $issuer = $container->get(TokenIssuerInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+
+                    if (!$operators instanceof OperatorRepositoryInterface) {
+                        throw new LogicException('Operator repository service is invalid.');
+                    }
+
+                    if (!$memberships instanceof MembershipRepositoryInterface) {
+                        throw new LogicException('Membership repository service is invalid.');
+                    }
+
+                    if (!$organizations instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    if (!$issuer instanceof TokenIssuerInterface) {
+                        throw new LogicException('Token issuer service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    return new SwitchActiveOrganizationUseCase($operators, $memberships, $organizations, $issuer, $suiteId);
+                },
+            )
+            ->set(
                 GetAuthSessionHandler::class,
                 static function (ContainerInterface $container): GetAuthSessionHandler {
                     $authenticator = $container->get(BearerTokenAuthenticator::class);
@@ -346,6 +395,50 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ListSessionOrganizationsHandler::class,
+                static function (ContainerInterface $container): ListSessionOrganizationsHandler {
+                    $authenticator = $container->get(BearerTokenAuthenticator::class);
+                    $useCase = $container->get(ListSessionOrganizationsUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$authenticator instanceof BearerTokenAuthenticator) {
+                        throw new LogicException('Bearer token authenticator service is invalid.');
+                    }
+
+                    if (!$useCase instanceof ListSessionOrganizationsUseCaseInterface) {
+                        throw new LogicException('ListSessionOrganizations use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ListSessionOrganizationsHandler($authenticator, $useCase, $response);
+                },
+            )
+            ->set(
+                SwitchActiveOrganizationHandler::class,
+                static function (ContainerInterface $container): SwitchActiveOrganizationHandler {
+                    $authenticator = $container->get(BearerTokenAuthenticator::class);
+                    $useCase = $container->get(SwitchActiveOrganizationUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$authenticator instanceof BearerTokenAuthenticator) {
+                        throw new LogicException('Bearer token authenticator service is invalid.');
+                    }
+
+                    if (!$useCase instanceof SwitchActiveOrganizationUseCaseInterface) {
+                        throw new LogicException('SwitchActiveOrganization use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new SwitchActiveOrganizationHandler($authenticator, $useCase, $response);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.auth',
                 static function (ContainerInterface $container): AuthRouteRegistrar {
                     $create = $container->get(CreateAuthSessionHandler::class);
@@ -353,6 +446,8 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     $delete = $container->get(DeleteAuthSessionHandler::class);
                     $createOperator = $container->get(CreateOperatorHandler::class);
                     $listOperators = $container->get(ListOperatorsHandler::class);
+                    $listSessionOrganizations = $container->get(ListSessionOrganizationsHandler::class);
+                    $switchActiveOrganization = $container->get(SwitchActiveOrganizationHandler::class);
 
                     if (!$create instanceof CreateAuthSessionHandler) {
                         throw new LogicException('CreateAuthSession handler service is invalid.');
@@ -374,7 +469,23 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ListOperators handler service is invalid.');
                     }
 
-                    return new AuthRouteRegistrar($create, $get, $delete, $createOperator, $listOperators);
+                    if (!$listSessionOrganizations instanceof ListSessionOrganizationsHandler) {
+                        throw new LogicException('ListSessionOrganizations handler service is invalid.');
+                    }
+
+                    if (!$switchActiveOrganization instanceof SwitchActiveOrganizationHandler) {
+                        throw new LogicException('SwitchActiveOrganization handler service is invalid.');
+                    }
+
+                    return new AuthRouteRegistrar(
+                        $create,
+                        $get,
+                        $delete,
+                        $createOperator,
+                        $listOperators,
+                        $listSessionOrganizations,
+                        $switchActiveOrganization,
+                    );
                 },
             );
     }

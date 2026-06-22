@@ -167,6 +167,8 @@ export const en = {
   'suite.org.indicator.activeOrg': 'Org: {{org}}',
   'suite.org.indicator.noOrg': 'No active organization',
   'suite.org.indicator.role': 'Role: {{role}}',
+  'suite.org.switcher.label': 'Active organization',
+  'suite.org.switcher.placeholder': 'Select organization',
 
   // ── Memberships (superadmin console) ─────────────────────────────────────
   'suite.member.title': 'Members',

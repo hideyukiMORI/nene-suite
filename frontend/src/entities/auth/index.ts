@@ -1,5 +1,5 @@
 export { authStore } from './model'
-export type { AuthSession, Operator, OrgRole } from './model'
-export { useSignIn, useSignOut } from './mutations'
-export { useCurrentOperator } from './queries'
+export type { AuthSession, Operator, OrgRole, SessionOrganization } from './model'
+export { useSignIn, useSignOut, useSwitchActiveOrganization } from './mutations'
+export { useCurrentOperator, useSessionOrganizations } from './queries'
 export { authKeys } from './query-keys'
