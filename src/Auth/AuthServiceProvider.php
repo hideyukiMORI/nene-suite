@@ -128,6 +128,65 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                RotateFederationSigningKeyUseCaseInterface::class,
+                static function (ContainerInterface $container): RotateFederationSigningKeyUseCaseInterface {
+                    $generator = $container->get(FederationKeyGenerator::class);
+                    $transactions = $container->get(DatabaseTransactionManagerInterface::class);
+                    $keys = $container->get(FederationSigningKeyRepositoryFactoryInterface::class);
+                    $audit = $container->get(SuiteAuditRecorderFactoryInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+
+                    if (!$generator instanceof FederationKeyGenerator) {
+                        throw new LogicException('Federation key generator service is invalid.');
+                    }
+
+                    if (!$transactions instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('Database transaction manager service is invalid.');
+                    }
+
+                    if (!$keys instanceof FederationSigningKeyRepositoryFactoryInterface) {
+                        throw new LogicException('Federation signing key repository factory service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderFactoryInterface) {
+                        throw new LogicException('Suite audit recorder factory service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    return new RotateFederationSigningKeyUseCase($generator, $transactions, $keys, $audit, $suiteId);
+                },
+            )
+            ->set(
+                RevokeFederationSigningKeyUseCaseInterface::class,
+                static function (ContainerInterface $container): RevokeFederationSigningKeyUseCaseInterface {
+                    $transactions = $container->get(DatabaseTransactionManagerInterface::class);
+                    $keys = $container->get(FederationSigningKeyRepositoryFactoryInterface::class);
+                    $audit = $container->get(SuiteAuditRecorderFactoryInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+
+                    if (!$transactions instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('Database transaction manager service is invalid.');
+                    }
+
+                    if (!$keys instanceof FederationSigningKeyRepositoryFactoryInterface) {
+                        throw new LogicException('Federation signing key repository factory service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderFactoryInterface) {
+                        throw new LogicException('Suite audit recorder factory service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    return new RevokeFederationSigningKeyUseCase($transactions, $keys, $audit, $suiteId);
+                },
+            )
+            ->set(
                 FederationSigningKeyRepositoryInterface::class,
                 static function (ContainerInterface $container): FederationSigningKeyRepositoryInterface {
                     $query = $container->get(DatabaseQueryExecutorInterface::class);

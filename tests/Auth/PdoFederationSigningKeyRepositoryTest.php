@@ -100,6 +100,24 @@ final class PdoFederationSigningKeyRepositoryTest extends TestCase
         self::assertContains('kid-retiring', $kids);
     }
 
+    public function testFindByKidAndUpdateStatus(): void
+    {
+        $repository = new PdoFederationSigningKeyRepository($this->executor);
+        $repository->save($this->key('01J8XR4ZS6Q9V2H7K3N5M0B8TC', 'kid-a', FederationSigningKeyStatus::Active));
+
+        self::assertSame('kid-a', $repository->findByKid('kid-a')?->kid);
+        self::assertNull($repository->findByKid('kid-missing'));
+
+        $repository->updateStatus('01J8XR4ZS6Q9V2H7K3N5M0B8TC', FederationSigningKeyStatus::Revoked, self::NOW);
+
+        self::assertNull($repository->findActive());
+        self::assertCount(1, $repository->findByStatus(FederationSigningKeyStatus::Revoked));
+        $revoked = $repository->findByKid('kid-a');
+        self::assertNotNull($revoked);
+        self::assertSame(FederationSigningKeyStatus::Revoked, $revoked->status);
+        self::assertSame(self::NOW, $revoked->retiredAt);
+    }
+
     private function key(string $id, string $kid, FederationSigningKeyStatus $status): FederationSigningKey
     {
         return new FederationSigningKey($id, $kid, 'ES256', '{"kid":"' . $kid . '"}', $status, self::NOW, self::NOW, null);

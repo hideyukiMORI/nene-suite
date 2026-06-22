@@ -43,4 +43,46 @@ final class InMemoryFederationSigningKeyRepository implements FederationSigningK
             ),
         ));
     }
+
+    public function findByKid(string $kid): ?FederationSigningKey
+    {
+        foreach ($this->byId as $key) {
+            if ($key->kid === $kid) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return list<FederationSigningKey>
+     */
+    public function findByStatus(FederationSigningKeyStatus $status): array
+    {
+        return array_values(array_filter(
+            $this->byId,
+            static fn (FederationSigningKey $key): bool => $key->status === $status,
+        ));
+    }
+
+    public function updateStatus(string $id, FederationSigningKeyStatus $status, ?string $retiredAt): void
+    {
+        $existing = $this->byId[$id] ?? null;
+
+        if ($existing === null) {
+            return;
+        }
+
+        $this->byId[$id] = new FederationSigningKey(
+            $existing->id,
+            $existing->kid,
+            $existing->alg,
+            $existing->publicJwk,
+            $status,
+            $existing->createdAt,
+            $existing->activatedAt,
+            $retiredAt,
+        );
+    }
 }
