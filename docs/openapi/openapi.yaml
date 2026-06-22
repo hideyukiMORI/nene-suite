@@ -1865,6 +1865,7 @@ components:
         - apex_operator
         - organization
         - membership
+        - federation_signing_key
 
     AuditSource:
       type: string

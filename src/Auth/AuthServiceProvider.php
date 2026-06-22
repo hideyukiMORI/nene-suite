@@ -88,6 +88,46 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                FederationKeyGenerator::class,
+                static fn (ContainerInterface $container): FederationKeyGenerator => new FederationKeyGenerator(),
+            )
+            ->set(
+                FederationSigningKeyRepositoryFactoryInterface::class,
+                static fn (ContainerInterface $container): FederationSigningKeyRepositoryFactoryInterface => new PdoFederationSigningKeyRepositoryFactory(),
+            )
+            ->set(
+                GenerateFederationSigningKeyUseCaseInterface::class,
+                static function (ContainerInterface $container): GenerateFederationSigningKeyUseCaseInterface {
+                    $generator = $container->get(FederationKeyGenerator::class);
+                    $transactions = $container->get(DatabaseTransactionManagerInterface::class);
+                    $keys = $container->get(FederationSigningKeyRepositoryFactoryInterface::class);
+                    $audit = $container->get(SuiteAuditRecorderFactoryInterface::class);
+                    $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+
+                    if (!$generator instanceof FederationKeyGenerator) {
+                        throw new LogicException('Federation key generator service is invalid.');
+                    }
+
+                    if (!$transactions instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('Database transaction manager service is invalid.');
+                    }
+
+                    if (!$keys instanceof FederationSigningKeyRepositoryFactoryInterface) {
+                        throw new LogicException('Federation signing key repository factory service is invalid.');
+                    }
+
+                    if (!$audit instanceof SuiteAuditRecorderFactoryInterface) {
+                        throw new LogicException('Suite audit recorder factory service is invalid.');
+                    }
+
+                    if (!is_string($suiteId) || $suiteId === '') {
+                        throw new LogicException('Suite id service is invalid.');
+                    }
+
+                    return new GenerateFederationSigningKeyUseCase($generator, $transactions, $keys, $audit, $suiteId);
+                },
+            )
+            ->set(
                 OperatorSessionContextResolver::class,
                 static function (ContainerInterface $container): OperatorSessionContextResolver {
                     $memberships = $container->get(MembershipRepositoryInterface::class);
