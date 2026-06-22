@@ -169,6 +169,23 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                FederationKeyPreflight::class,
+                static function (ContainerInterface $container): FederationKeyPreflight {
+                    $keys = $container->get(FederationSigningKeyRepositoryInterface::class);
+                    $generator = $container->get(FederationKeyGenerator::class);
+
+                    if (!$keys instanceof FederationSigningKeyRepositoryInterface) {
+                        throw new LogicException('Federation signing key repository service is invalid.');
+                    }
+
+                    if (!$generator instanceof FederationKeyGenerator) {
+                        throw new LogicException('Federation key generator service is invalid.');
+                    }
+
+                    return new FederationKeyPreflight($keys, $generator);
+                },
+            )
+            ->set(
                 OperatorSessionContextResolver::class,
                 static function (ContainerInterface $container): OperatorSessionContextResolver {
                     $memberships = $container->get(MembershipRepositoryInterface::class);

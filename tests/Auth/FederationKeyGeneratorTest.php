@@ -40,6 +40,14 @@ final class FederationKeyGeneratorTest extends TestCase
         self::assertNotSame($generator->generate()->kid, $generator->generate()->kid);
     }
 
+    public function testKidForPrivateKeyMatchesTheGeneratedKid(): void
+    {
+        $generator = new FederationKeyGenerator();
+        $generated = $generator->generate();
+
+        self::assertSame($generated->kid, $generator->kidForPrivateKey($generated->privateKeyPem));
+    }
+
     public function testCoordinatesAreZeroPaddedToFieldSize(): void
     {
         $generator = new FederationKeyGenerator();
