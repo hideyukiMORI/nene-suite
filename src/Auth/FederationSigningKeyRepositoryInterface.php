@@ -18,4 +18,14 @@ interface FederationSigningKeyRepositoryInterface
      * @return list<FederationSigningKey>
      */
     public function findPublishable(): array;
+
+    public function findByKid(string $kid): ?FederationSigningKey;
+
+    /**
+     * @return list<FederationSigningKey>
+     */
+    public function findByStatus(FederationSigningKeyStatus $status): array;
+
+    /** Transitions a key's lifecycle status (rotation/retire/revoke); other columns are immutable. */
+    public function updateStatus(string $id, FederationSigningKeyStatus $status, ?string $retiredAt): void;
 }

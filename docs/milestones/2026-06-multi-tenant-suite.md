@@ -222,6 +222,15 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   out-of-DB by default, key-lifecycle audit (`federation_signing_key`), and the
   `/.well-known` contract-test trap (keep out of `IMPLEMENTED_OPERATION_IDS`).
   Starting at **B1.0** (edition flag).
+- 2026-06-22: **B1 COMPLETE** — production auth + federation IdP key plane shipped
+  (PRs #178 B1.0 · #180 B1.1 · #182 B1.2 · #184 B1.3 · #186 B1.4 · #188 B1.5 ·
+  #190 B1.6 · #192 B1.7 · B1.8). Edition flag + OSS firewall + login rate-limit +
+  apex logout-revocation + ES256 assertion issuer/verifier + signing-key store/gen +
+  JWKS endpoint + hosted fail-closed preflight + key rotation/revoke + runbook
+  (`docs/ops/federation-key-management.md`). Each behaviorChange/crypto slice was
+  adversarially reviewed pre-merge; OSS serving behavior unchanged throughout
+  (edition-gated; `OssEditionFirewallTest`). **Next: B2** (sibling-side org
+  resolution + authorization-code assertion flow — cross-repo) per §3 / ADR 0012.
 
 ## State for resuming
 
@@ -239,4 +248,4 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   (A4 + A4.5 + A5) **must** land before **A6 / M4** (JWT carries `org_external_id`
   + role; behavior change — review).
 
-Last updated: 2026-06-22 (Phase A complete; §7 polish done; B1 build-out recorded, starting B1.0)
+Last updated: 2026-06-22 (Phase A complete; §7 polish done; **B1 complete** — IdP key plane shipped; next B2 cross-repo)
