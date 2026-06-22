@@ -139,6 +139,41 @@ harmless). Edit sites: `docs/openapi/openapi.yaml` (`AuditEntityType`),
 | **B5** | Whole-org export → self-host import round-trip; write + accept **NeNe Invoice ADR 0017** | Portability headline (ADR 0015 §5.1 launch prereq); needs B2 federation keys | tested round-trip is a launch prereq; import preserves `external_id` |
 | **B6** | **Legal re-review (西村法律事務所, data custody / 個人情報保護法) + ADR 0015 acceptance** (resolve open questions, register terminology) | Terminal launch gate; fans in B3/B4/B5 | legal sign-off; do not lean on disclaimers/ToS |
 
+### §3.1 — B1 detailed build-out (design review 2026-06-22: 3 architectures + 9 adversarial judges + synthesis)
+
+B1 = the Suite federation **key plane + verification primitives + OSS auth hardening — NO flow**.
+It implements ADR 0012 §3/§4 for **one** token only: the asymmetric, JWKS-published **suite
+federation assertion** (does not exist yet). The **apex operator session stays HS256 forever**
+(it never crosses a sibling trust boundary, so ADR 0012's blast-radius argument does not apply);
+the sibling local session is out of repo. Everything asymmetric is gated by `NENE_SUITE_EDITION`
+via **registration-time** capability gating (hosted-only services/routes are never constructed in
+`oss`), so a clean OSS build holds zero key material. The assertion-**minting** flow
+(authorization-code redirect, `aud`, org-resolution) is **B2**. merged ≠ exposed.
+
+| id | Ships | Depends | Behavior | Gate |
+| --- | --- | --- | :---: | --- |
+| **B1.0** | `NENE_SUITE_EDITION` flag (Edition enum + `RuntimeServiceProvider` key `nene-suite.edition`; default `oss`, unknown→`oss`; orthogonal to MODE/ALLOW_DEV_SECRET) + env-contract/terminology/`.env.suite.example` registration; dark | A8b | config | terminology+env sign-off; garbage→oss unit test; OSS unchanged |
+| **B1.1** | OSS-flags-off **CI smoke firewall** (apex HS256 login unchanged, no federation service resolves, JWKS 404) — standing gate on every later key-plane slice | B1.0 | none | green on clean OSS env; clears inherited `ALLOW_DEV_SECRET` |
+| **B1.2** | Persistent login rate-limit (`login_attempts`; per-IP hard + per-email soft velocity; 429+Retry-After; trusted-proxy IP; fail-open-on-store-error **with audit signal**, fail-closed-on-threshold) — **edition-independent OSS hardening**; closes the A1.5 deferral | none (independent root) | **yes** | A6/M4 review (no auto-merge); valid logins unaffected; spoof/enumeration tests |
+| **B1.3** | Apex logout-revocation (apex JWT gains `jti` + `revoked_tokens` denylist + `DeleteAuthSession` insert; rollover-safe) — **edition-independent OSS hardening** | B1.0 | **yes** | A6/M4 review; pre-jti token still authorizes; prune idempotency |
+| **B1.4** | `firebase/php-jwt` + hard-require `ext-openssl`/`ext-json` (ADR 0008 note) + EC-support assert; new **ES256** `AssertionTokenIssuer`/`Verifier` behind the NENE2 seam (strict alg-pin, kid required, forgery test matrix) — dark, never wired into the apex path | B1.0 | none | forgery matrix (alg-confusion/kid-swap/none/wrong-aud/expired); OSS never constructs it |
+| **B1.5** | `federation_signing_keys` store (public JWK + kid=RFC7638 thumbprint + status) + operator-run key-gen command (private key via env/secret = hosted default, **not** DB) + new audit `entity_type` **`federation_signing_key`** across all 4 closed-enum sites | B1.4 | none | A0 closed-enum same-PR; key-storage security review; exactly-one-active |
+| **B1.6** | `GET /.well-known/jwks.json` (op `getFederationJwks`) — public keys only, ETag/Cache; route registrar added to `ROUTE_REGISTRARS` **only when hosted**; documented in openapi but **NOT** in `IMPLEMENTED_OPERATION_IDS` (mirrors `getHealth`; `/.well-known` is outside the contract test's `/api/v1` filter) | B1.5 | api | dedicated route test; OSS→404; never publishes private/next/revoked material |
+| **B1.7** | Hosted key/KEK **fail-closed preflight** (entrypoint, edition-gated): aborts boot without a loadable private key / KEK, or if active-signing-key kid ≠ a published active JWKS row | B1.5,B1.6 | config | fail-closed security review; OSS skips entirely |
+| **B1.8** | **Time-driven** key rotation + emergency revoke (active→retiring with grace ≥ max assertion TTL; never idempotent-on-boot) + key-management/rotation/compromise runbook | B1.5,B1.6 | config | rotation-overlap test; over-rotation guard; compromise window bounded by sibling JWKS cache TTL |
+
+**B1 hard-ordering:** B1.0 (flag) → B1.1 (standing smoke gate) → B1.4 → B1.5 → B1.6 → {B1.7, B1.8}.
+B1.2/B1.3 root independently (edition-independent OSS hardening; behaviorChange:yes → A6/M4, no
+auto-merge). The apex HS256 path is **byte-unchanged** across all of B1 (ES256 is a separate
+binding — never substituted into `LocalBearerTokenVerifier`; alg-confusion guard).
+
+**Recommended decisions (confirm crypto ones at B1.4):** ES256 (P-256) signing · `firebase/php-jwt`
+behind the seam · private key **out of DB** (env/`_FILE`; DB AEAD+KEK only as fallback) · kid =
+RFC 7638 thumbprint · assertion TTL ~90s · assertion-`jti` revocation **deferred to B2** (B1 ships
+key-level revoke only) · rate-limit + logout-revocation ship to OSS. A security implementation ADR
+for the federation IdP (key mgmt/rotation/revocation) is a recommended **hard B1 exit gate** (ADR
+0012 schedules this key-handling review for implementation time = now).
+
 ### §4. Critical hard-ordering constraints
 
 - **A0 before A2/A3** — emitters need a legal closed-enum type.
@@ -178,6 +213,15 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   order above; resolved the M3 fork to **Option A**; split production-auth so the
   OSS-relevant fail-closed signing key (A1.5) precedes the superadmin HTTP surface
   (A7); added the operator-lockout firewall (A4 + A4.5 + A5 all before A6 / M4).
+- 2026-06-22: **Phase A complete** (A0–A8b, PRs #142–#168) + §7 deferred polish
+  resolved (PR #172 operator picker/grant-validation/stale-label, #174 active-org
+  switcher; #176 handover §7 doc).
+- 2026-06-22: **B1 design review** (3 architectures + 9 adversarial judges +
+  synthesis) — recorded the B1.0–B1.8 build-out in §3.1; key fixes vs the raw
+  designs: ES256 via `firebase/php-jwt` (no hand-rolled DER/JOSE), private key
+  out-of-DB by default, key-lifecycle audit (`federation_signing_key`), and the
+  `/.well-known` contract-test trap (keep out of `IMPLEMENTED_OPERATION_IDS`).
+  Starting at **B1.0** (edition flag).
 
 ## State for resuming
 
@@ -195,4 +239,4 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   (A4 + A4.5 + A5) **must** land before **A6 / M4** (JWT carries `org_external_id`
   + role; behavior change — review).
 
-Last updated: 2026-06-22 (Phase A complete)
+Last updated: 2026-06-22 (Phase A complete; §7 polish done; B1 build-out recorded, starting B1.0)

@@ -126,6 +126,7 @@ All suite orchestrator variables use prefix **`NENE_SUITE_`** (not `NENE2_SUITE_
 | Variable | Canonical | Never |
 | --- | --- | --- |
 | Mode flag | `NENE_SUITE_MODE` | `SUITE_MODE`, `NENE2_SUITE_MODE` |
+| Product edition | `NENE_SUITE_EDITION` | `SUITE_EDITION`, `NENE_EDITION`, `EDITION` |
 | Installation id | `NENE_SUITE_ID` | `SUITE_ID`, `INSTALL_ID` |
 | Public origin | `NENE_SUITE_BASE_URL` | `BASE_URL`, `NENE_BASE_URL` |
 | Launcher URL | `NENE_SUITE_APEX_URL` | `APEX_URL`, `NENE_APEX_URL` |

@@ -19,6 +19,7 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 | Variable | Example | Notes |
 | --- | --- | --- |
 | `NENE_SUITE_MODE` | `1` | Off = standalone semantics |
+| `NENE_SUITE_EDITION` | `oss` | Product edition ([ADR 0015](../adr/0015-suite-hosted-multi-tenant-mode.md)): `oss` (default, self-hosted single-org) or `hosted` (vendor multi-org "NeNe Cloud Free"). **Fail-closed: anything but the exact string `hosted` is `oss`.** Gates the Phase B federation/IdP key plane (`oss` constructs none of it). Orthogonal to `NENE_SUITE_MODE` and `NENE_SUITE_ALLOW_DEV_SECRET` |
 | `NENE_SUITE_ID` | `01JXXXXXXXXXXXXXXXXXXXX` | One per suite install on a host |
 | `NENE_SUITE_BASE_URL` | `https://ops.example.com/` | Trailing slash required |
 | `NENE_SUITE_APEX_URL` | `https://ops.example.com/` | Login / app launcher |
