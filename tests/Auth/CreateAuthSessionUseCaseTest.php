@@ -50,6 +50,9 @@ final class CreateAuthSessionUseCaseTest extends TestCase
         self::assertNull($claims['org_external_id']);
         self::assertNull($claims['role']);
         self::assertFalse($claims['superadmin']);
+        // B1.3: every issued apex token carries a jti so it can be revoked on logout.
+        self::assertIsString($claims['jti']);
+        self::assertNotSame('', $claims['jti']);
     }
 
     public function testIssuesTokenWithActiveOrgContextAndSuperadmin(): void

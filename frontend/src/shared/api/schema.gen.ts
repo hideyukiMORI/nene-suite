@@ -448,8 +448,10 @@ export interface paths {
         post: operations["createAuthSession"];
         /**
          * Log out — end the apex operator session.
-         * @description Ends the current session. JWTs are stateless in Phase 1, so clients MUST
-         *     discard the token; server-side revocation MAY be added in Phase 2.
+         * @description Ends the current session and denylists the presented token's `jti` so the
+         *     stateless JWT can no longer authenticate until it expires; clients should still
+         *     discard the token. A pre-revocation token without a `jti` has nothing to denylist
+         *     and still returns 204.
          */
         delete: operations["deleteAuthSession"];
         options?: never;

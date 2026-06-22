@@ -76,6 +76,18 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                RevokedTokenRepositoryInterface::class,
+                static function (ContainerInterface $container): RevokedTokenRepositoryInterface {
+                    $query = $container->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoRevokedTokenRepository($query);
+                },
+            )
+            ->set(
                 OperatorSessionContextResolver::class,
                 static function (ContainerInterface $container): OperatorSessionContextResolver {
                     $memberships = $container->get(MembershipRepositoryInterface::class);
@@ -97,6 +109,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): BearerTokenAuthenticator {
                     $verifier = $container->get(TokenVerifierInterface::class);
                     $resolver = $container->get(OperatorSessionContextResolver::class);
+                    $revokedTokens = $container->get(RevokedTokenRepositoryInterface::class);
 
                     if (!$verifier instanceof TokenVerifierInterface) {
                         throw new LogicException('Token verifier service is invalid.');
@@ -106,7 +119,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Operator session context resolver service is invalid.');
                     }
 
-                    return new BearerTokenAuthenticator($verifier, $resolver);
+                    if (!$revokedTokens instanceof RevokedTokenRepositoryInterface) {
+                        throw new LogicException('Revoked token repository service is invalid.');
+                    }
+
+                    return new BearerTokenAuthenticator($verifier, $resolver, $revokedTokens);
                 },
             )
             ->set(
@@ -267,17 +284,22 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 DeleteAuthSessionHandler::class,
                 static function (ContainerInterface $container): DeleteAuthSessionHandler {
                     $authenticator = $container->get(BearerTokenAuthenticator::class);
+                    $revokedTokens = $container->get(RevokedTokenRepositoryInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
 
                     if (!$authenticator instanceof BearerTokenAuthenticator) {
                         throw new LogicException('Bearer token authenticator service is invalid.');
                     }
 
+                    if (!$revokedTokens instanceof RevokedTokenRepositoryInterface) {
+                        throw new LogicException('Revoked token repository service is invalid.');
+                    }
+
                     if (!$response instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new DeleteAuthSessionHandler($authenticator, $response);
+                    return new DeleteAuthSessionHandler($authenticator, $revokedTokens, $response);
                 },
             )
             ->set(

@@ -23,7 +23,21 @@ final readonly class BearerTokenAuthenticator
     public function __construct(
         private TokenVerifierInterface $tokenVerifier,
         private OperatorSessionContextResolver $sessionContext,
+        private RevokedTokenRepositoryInterface $revokedTokens,
     ) {
+    }
+
+    /**
+     * The verified claims of the presented token (jti, exp, …). Used by logout to denylist the
+     * token. Throws like the other accessors on a missing/invalid/revoked token.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws UnauthorizedException
+     */
+    public function claims(ServerRequestInterface $request): array
+    {
+        return $this->verifiedClaims($request);
     }
 
     /**
@@ -77,10 +91,19 @@ final readonly class BearerTokenAuthenticator
         }
 
         try {
-            return $this->tokenVerifier->verify(trim($matches[1]));
+            $claims = $this->tokenVerifier->verify(trim($matches[1]));
         } catch (TokenVerificationException) {
             throw new UnauthorizedException();
         }
+
+        // B1.3 logout-revocation: a token carrying a denylisted `jti` is rejected. Pre-B1.3 tokens
+        // have no `jti` and are unaffected (rollover-safe, mirroring the A6 claim fallback).
+        $jti = $claims['jti'] ?? null;
+        if (is_string($jti) && $jti !== '' && $this->revokedTokens->isRevoked($jti)) {
+            throw new UnauthorizedException();
+        }
+
+        return $claims;
     }
 
     /**

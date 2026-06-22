@@ -8,6 +8,7 @@ use Nene2\Auth\TokenIssuerInterface;
 use NeNeSuite\Tenancy\MembershipRepositoryInterface;
 use NeNeSuite\Tenancy\OrganizationNotFoundException;
 use NeNeSuite\Tenancy\OrganizationRepositoryInterface;
+use Symfony\Component\Uid\Ulid;
 
 /**
  * Re-scopes the operator's session to a different organization (milestone §7 ③) and issues a
@@ -62,6 +63,7 @@ final readonly class SwitchActiveOrganizationUseCase implements SwitchActiveOrga
             'org_external_id' => $organization->externalId,
             'role' => $membership->role->value,
             'superadmin' => $isSuperadmin,
+            'jti' => (string) new Ulid(),
             'iat' => $issuedAt,
             'exp' => $expiresAt,
         ]);

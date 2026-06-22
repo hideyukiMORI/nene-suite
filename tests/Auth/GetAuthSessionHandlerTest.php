@@ -77,7 +77,7 @@ final class GetAuthSessionHandlerTest extends TestCase
 
         $psr17 = new Psr17Factory();
         $handler = new GetAuthSessionHandler(
-            new BearerTokenAuthenticator($verifier, new OperatorSessionContextResolver($memberships, $organizations)),
+            new BearerTokenAuthenticator($verifier, new OperatorSessionContextResolver($memberships, $organizations), new InMemoryRevokedTokenRepository()),
             new GetAuthSessionUseCase($operators),
             new JsonResponseFactory($psr17, $psr17),
         );

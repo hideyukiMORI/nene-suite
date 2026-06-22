@@ -67,7 +67,7 @@ final class ListSessionOrganizationsHandlerTest extends TestCase
         $psr17 = new Psr17Factory();
 
         return new ListSessionOrganizationsHandler(
-            new BearerTokenAuthenticator($verifier, new OperatorSessionContextResolver($memberships, $organizations)),
+            new BearerTokenAuthenticator($verifier, new OperatorSessionContextResolver($memberships, $organizations), new InMemoryRevokedTokenRepository()),
             new ListSessionOrganizationsUseCase($memberships, $organizations),
             new JsonResponseFactory($psr17, $psr17),
         );
