@@ -1040,6 +1040,8 @@ paths:
                 instance: /api/v1/auth/session
         '422':
           $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/ServerError'
     get:
@@ -1232,6 +1234,11 @@ components:
                 detail: 'tier must be one of: B'
     TooManyRequests:
       description: Rate limit exceeded for this public endpoint.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying (sent on login rate-limit responses).
+          schema:
+            type: integer
       content:
         application/problem+json:
           schema:

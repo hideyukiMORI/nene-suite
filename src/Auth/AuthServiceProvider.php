@@ -44,6 +44,38 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static fn (ContainerInterface $container): OperatorRepositoryFactoryInterface => new PdoOperatorRepositoryFactory(),
             )
             ->set(
+                LoginAttemptRepositoryInterface::class,
+                static function (ContainerInterface $container): LoginAttemptRepositoryInterface {
+                    $query = $container->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoLoginAttemptRepository($query);
+                },
+            )
+            ->set(
+                LoginRateLimiter::class,
+                static function (ContainerInterface $container): LoginRateLimiter {
+                    $attempts = $container->get(LoginAttemptRepositoryInterface::class);
+
+                    if (!$attempts instanceof LoginAttemptRepositoryInterface) {
+                        throw new LogicException('Login attempt repository service is invalid.');
+                    }
+
+                    return new LoginRateLimiter($attempts);
+                },
+            )
+            ->set(
+                ClientIpResolver::class,
+                static function (ContainerInterface $container): ClientIpResolver {
+                    $raw = $_SERVER['NENE_SUITE_TRUSTED_PROXIES'] ?? $_ENV['NENE_SUITE_TRUSTED_PROXIES'] ?? '';
+
+                    return new ClientIpResolver(ClientIpResolver::parseTrustedProxies(is_string($raw) ? $raw : ''));
+                },
+            )
+            ->set(
                 OperatorSessionContextResolver::class,
                 static function (ContainerInterface $container): OperatorSessionContextResolver {
                     $memberships = $container->get(MembershipRepositoryInterface::class);
@@ -85,6 +117,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     $issuer = $container->get(TokenIssuerInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
                     $sessionContext = $container->get(OperatorSessionContextResolver::class);
+                    $rateLimiter = $container->get(LoginRateLimiter::class);
 
                     if (!$operators instanceof OperatorRepositoryInterface) {
                         throw new LogicException('Operator repository service is invalid.');
@@ -106,7 +139,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Operator session context resolver service is invalid.');
                     }
 
-                    return new CreateAuthSessionUseCase($operators, $hasher, $issuer, $suiteId, $sessionContext);
+                    if (!$rateLimiter instanceof LoginRateLimiter) {
+                        throw new LogicException('Login rate limiter service is invalid.');
+                    }
+
+                    return new CreateAuthSessionUseCase($operators, $hasher, $issuer, $suiteId, $sessionContext, $rateLimiter);
                 },
             )
             ->set(
@@ -114,6 +151,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): CreateAuthSessionHandler {
                     $useCase = $container->get(CreateAuthSessionUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $clientIpResolver = $container->get(ClientIpResolver::class);
 
                     if (!$useCase instanceof CreateAuthSessionUseCaseInterface) {
                         throw new LogicException('CreateAuthSession use case service is invalid.');
@@ -123,7 +161,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new CreateAuthSessionHandler($useCase, $response);
+                    if (!$clientIpResolver instanceof ClientIpResolver) {
+                        throw new LogicException('Client IP resolver service is invalid.');
+                    }
+
+                    return new CreateAuthSessionHandler($useCase, $response, $clientIpResolver);
                 },
             )
             ->set(
@@ -248,6 +290,18 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     }
 
                     return new InvalidCredentialsExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                LoginRateLimitedExceptionHandler::class,
+                static function (ContainerInterface $container): LoginRateLimitedExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new LoginRateLimitedExceptionHandler($problemDetails);
                 },
             )
             ->set(

@@ -912,6 +912,8 @@ export interface components {
         /** @description Rate limit exceeded for this public endpoint. */
         TooManyRequests: {
             headers: {
+                /** @description Seconds to wait before retrying (sent on login rate-limit responses). */
+                "Retry-After"?: number;
                 [name: string]: unknown;
             };
             content: {
@@ -2130,6 +2132,7 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationFailed"];
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };

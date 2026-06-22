@@ -29,6 +29,7 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 | `NENE_SUITE_ORG_NAME` | `Example KK` | Initial org display name |
 | `NENE_SUITE_INSTALLED_APPS` | `nene-invoice,nene-clear` | Subset of catalog ids |
 | `NENE_SUITE_ALLOW_DEV_SECRET` | `1` | **Dev / local only.** Permits the built-in dev JWT secret when `NENE_SUITE_JWT_SECRET` is unset. Never set in production / staging |
+| `NENE_SUITE_TRUSTED_PROXIES` | `10.0.0.0/8,172.16.0.0/12` | CIDR list of trusted reverse proxies for login rate-limiting (B1.2). **Default empty = use the socket `REMOTE_ADDR`; `X-Forwarded-For` is ignored.** Only when `REMOTE_ADDR` is a listed proxy is the forwarded chain trusted (rightmost non-proxy hop). Set this to the shared Caddy/edge network CIDR when running behind a proxy, or the per-IP limit buckets every client under the proxy's IP |
 
 > **Fail-closed JWT secret (A1.5).** `NENE_SUITE_JWT_SECRET` is **required** to serve.
 > If it is empty/unset the apex runtime refuses to boot — immediately, with no grace
