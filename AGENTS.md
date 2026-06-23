@@ -17,6 +17,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Coding standards index:** `docs/development/coding-standards.md`
 - **Backend standards (binding):** `docs/development/backend-standards.md`
 - **Frontend standards (binding):** `docs/development/frontend-standards.md`
+- **Frontend IA / UI brief (design):** `docs/design/frontend-information-architecture.md` — apex shell surfaces + readiness
 - **Naming conventions (binding):** `docs/development/naming-conventions.md`
 - **Schema conventions (binding):** `docs/development/schema-conventions.md`
 - **Control DB reference (generated):** `docs/reference/schema.md` — data dictionary; regenerate with `composer schema:docs`
