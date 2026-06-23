@@ -111,6 +111,11 @@ Minimum required properties (register exact names in terminology §10):
 
 ## Database schema (SQL)
 
+A generated, human-readable data dictionary for every control-DB table lives at
+[`../reference/schema.md`](../reference/schema.md). It is produced from the
+`database/schema/*.sql` snapshots by `composer schema:docs` (verified fresh in CI via
+`composer schema:docs:check`) — never edit it by hand.
+
 ### Control DB tables
 
 Naming: **snake_case**, plural table names.
