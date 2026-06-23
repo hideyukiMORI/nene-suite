@@ -1,3 +1,4 @@
+-- GROUP: Install
 -- TABLE: Point-in-time install snapshots (JSON, no secrets) for audit alignment and operator export. content_hash is the SHA-256 of content_json.
 CREATE TABLE install_manifests (
   id CHAR(26) NOT NULL PRIMARY KEY,          -- ULID primary key.

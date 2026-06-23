@@ -1,3 +1,4 @@
+-- GROUP: Auth
 -- TABLE: Fixed-window login rate-limit counters. One row per attempt_key; ephemeral, reclaimed by opportunistic GC.
 CREATE TABLE login_attempts (
   attempt_key VARCHAR(160) NOT NULL PRIMARY KEY, -- Rate-limit key and primary key, e.g. ip:192.0.2.1.

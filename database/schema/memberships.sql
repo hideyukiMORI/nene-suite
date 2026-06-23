@@ -1,3 +1,4 @@
+-- GROUP: Tenancy
 -- TABLE: Operator-to-organization role assignments. organization_id is NULL for the platform superadmin; unique per (operator_id, organization_id).
 CREATE TABLE memberships (
   id CHAR(26) NOT NULL PRIMARY KEY,          -- ULID primary key.

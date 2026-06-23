@@ -1,3 +1,4 @@
+-- GROUP: Tenancy
 -- TABLE: Suite tenancy registry (SSOT). external_id is the federation UUID propagated to sibling apps; rows are status-flagged, never hard-deleted.
 CREATE TABLE organizations (
   id CHAR(26) NOT NULL PRIMARY KEY,          -- ULID primary key.

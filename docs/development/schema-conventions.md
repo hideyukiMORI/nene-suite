@@ -116,6 +116,22 @@ A generated, human-readable data dictionary for every control-DB table lives at
 `database/schema/*.sql` snapshots by `composer schema:docs` (verified fresh in CI via
 `composer schema:docs:check`) — never edit it by hand.
 
+#### Snapshot annotation convention (binding)
+
+Each `database/schema/{table}.sql` snapshot carries the metadata the generator needs.
+`composer schema:docs:check` **fails** (coverage lint) when any of these is missing:
+
+- `-- GROUP: <domain>` header — overview grouping (`Auth` \| `Tenancy` \| `Install` \|
+  `Audit` \| `Federation`; new groups append alphabetically). One per snapshot.
+- `-- TABLE: <purpose>` header — one-line table purpose.
+- A `-- <description>` trailing comment on **every** column (mirrors the MySQL/PostgreSQL
+  `COMMENT` applied by the schema-comment migration).
+- **Logical references** are written inside the column description as
+  `logical ref <table>.<column>`. The generator renders them as a Mermaid ER diagram when
+  the target column is that table's primary key. The control DB declares **no physical
+  foreign keys** (cross-DB FKs are prohibited; intra-DB references are enforced in the
+  use-case layer), so these annotations are the only relationship source.
+
 ### Control DB tables
 
 Naming: **snake_case**, plural table names.
