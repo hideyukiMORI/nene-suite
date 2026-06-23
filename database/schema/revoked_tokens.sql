@@ -1,3 +1,4 @@
+-- GROUP: Auth
 -- TABLE: Logout/revocation denylist of JWT jti values. Ephemeral; rows reclaimed once expires_at passes.
 CREATE TABLE revoked_tokens (
   jti CHAR(26) NOT NULL PRIMARY KEY,         -- JWT jti claim and primary key (ULID). Revocation is idempotent.

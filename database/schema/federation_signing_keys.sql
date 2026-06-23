@@ -1,3 +1,4 @@
+-- GROUP: Federation
 -- TABLE: Federation IdP signing keys: public JWK only (private key never stored). Exactly one row is active; status drives JWKS publication.
 CREATE TABLE federation_signing_keys (
   id CHAR(26) NOT NULL PRIMARY KEY,          -- ULID primary key.

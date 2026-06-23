@@ -1,3 +1,4 @@
+-- GROUP: Audit
 -- TABLE: Append-only audit trail of mutating suite actions (ADR 0007). before_json/after_json are sanitized snapshots with secrets redacted.
 CREATE TABLE suite_audit_events (
   id CHAR(26) NOT NULL PRIMARY KEY,          -- ULID primary key.

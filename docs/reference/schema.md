@@ -1,6 +1,7 @@
 # Control DB schema reference
 
-> **Generated — do not edit by hand.** Run `composer schema:docs` to regenerate.
+> **Generated — do not edit by hand.** Run `composer schema:docs` to regenerate;
+> `composer schema:docs:check` enforces coverage + freshness in CI.
 > Source: `database/schema/*.sql` (the same descriptions become MySQL/PostgreSQL
 > `COMMENT`s via the schema-comment migration — see ADR 0016 / ADR 0014).
 
@@ -9,17 +10,47 @@ product database, not here.
 
 ## Tables
 
-- [`federation_signing_keys`](#federation_signing_keys) — Federation IdP signing keys: public JWK only (private key never stored). Exactly one row is active; status drives JWKS publication.
+### Auth
+
+- [`login_attempts`](#login_attempts) — Fixed-window login rate-limit counters. One row per attempt_key; ephemeral, reclaimed by opportunistic GC.
+- [`operators`](#operators) — Apex login shell accounts (operators). password_hash is a bcrypt/argon hash, never plaintext.
+- [`revoked_tokens`](#revoked_tokens) — Logout/revocation denylist of JWT jti values. Ephemeral; rows reclaimed once expires_at passes.
+
+### Tenancy
+
+- [`memberships`](#memberships) — Operator-to-organization role assignments. organization_id is NULL for the platform superadmin; unique per (operator_id, organization_id).
+- [`organizations`](#organizations) — Suite tenancy registry (SSOT). external_id is the federation UUID propagated to sibling apps; rows are status-flagged, never hard-deleted.
+
+### Install
+
 - [`install_manifests`](#install_manifests) — Point-in-time install snapshots (JSON, no secrets) for audit alignment and operator export. content_hash is the SHA-256 of content_json.
 - [`install_sessions`](#install_sessions) — Installer run state (Tier B). One row per install run: in_progress to completed or failed. Holds no secrets.
-- [`login_attempts`](#login_attempts) — Fixed-window login rate-limit counters. One row per attempt_key; ephemeral, reclaimed by opportunistic GC.
-- [`memberships`](#memberships) — Operator-to-organization role assignments. organization_id is NULL for the platform superadmin; unique per (operator_id, organization_id).
-- [`operators`](#operators) — Apex login shell accounts (operators). password_hash is a bcrypt/argon hash, never plaintext.
-- [`organizations`](#organizations) — Suite tenancy registry (SSOT). external_id is the federation UUID propagated to sibling apps; rows are status-flagged, never hard-deleted.
-- [`revoked_tokens`](#revoked_tokens) — Logout/revocation denylist of JWT jti values. Ephemeral; rows reclaimed once expires_at passes.
+
+### Audit
+
 - [`suite_audit_events`](#suite_audit_events) — Append-only audit trail of mutating suite actions (ADR 0007). before_json/after_json are sanitized snapshots with secrets redacted.
 
+### Federation
+
+- [`federation_signing_keys`](#federation_signing_keys) — Federation IdP signing keys: public JWK only (private key never stored). Exactly one row is active; status drives JWKS publication.
+
+## Relationships
+
+Logical references only — the control DB declares no physical foreign keys
+(cross-DB FKs are prohibited; intra-DB references are enforced in the use-case layer).
+
+```mermaid
+erDiagram
+  install_manifests ||--o{ install_sessions : "install_manifest_id"
+  operators ||--o{ memberships : "operator_id"
+  organizations ||--o{ memberships : "organization_id"
+  operators ||--o{ suite_audit_events : "actor_user_id"
+  install_sessions ||--o{ suite_audit_events : "install_session_id"
+```
+
 ## `federation_signing_keys`
+
+_Group: Federation_
 
 Federation IdP signing keys: public JWK only (private key never stored). Exactly one row is active; status drives JWKS publication.
 
@@ -41,6 +72,8 @@ Federation IdP signing keys: public JWK only (private key never stored). Exactly
 
 ## `install_manifests`
 
+_Group: Install_
+
 Point-in-time install snapshots (JSON, no secrets) for audit alignment and operator export. content_hash is the SHA-256 of content_json.
 
 | Column | Type | Null | Key | Description |
@@ -56,6 +89,8 @@ Point-in-time install snapshots (JSON, no secrets) for audit alignment and opera
 - `idx_install_manifests_suite_id` (index) on `suite_id`
 
 ## `install_sessions`
+
+_Group: Install_
 
 Installer run state (Tier B). One row per install run: in_progress to completed or failed. Holds no secrets.
 
@@ -84,6 +119,8 @@ Installer run state (Tier B). One row per install run: in_progress to completed 
 
 ## `login_attempts`
 
+_Group: Auth_
+
 Fixed-window login rate-limit counters. One row per attempt_key; ephemeral, reclaimed by opportunistic GC.
 
 | Column | Type | Null | Key | Description |
@@ -97,6 +134,8 @@ Fixed-window login rate-limit counters. One row per attempt_key; ephemeral, recl
 - `idx_login_attempts_window` (index) on `window_started_at`
 
 ## `memberships`
+
+_Group: Tenancy_
 
 Operator-to-organization role assignments. organization_id is NULL for the platform superadmin; unique per (operator_id, organization_id).
 
@@ -116,6 +155,8 @@ Operator-to-organization role assignments. organization_id is NULL for the platf
 
 ## `operators`
 
+_Group: Auth_
+
 Apex login shell accounts (operators). password_hash is a bcrypt/argon hash, never plaintext.
 
 | Column | Type | Null | Key | Description |
@@ -132,6 +173,8 @@ Apex login shell accounts (operators). password_hash is a bcrypt/argon hash, nev
 - `idx_operators_email` (UNIQUE) on `email`
 
 ## `organizations`
+
+_Group: Tenancy_
 
 Suite tenancy registry (SSOT). external_id is the federation UUID propagated to sibling apps; rows are status-flagged, never hard-deleted.
 
@@ -152,6 +195,8 @@ Suite tenancy registry (SSOT). external_id is the federation UUID propagated to 
 
 ## `revoked_tokens`
 
+_Group: Auth_
+
 Logout/revocation denylist of JWT jti values. Ephemeral; rows reclaimed once expires_at passes.
 
 | Column | Type | Null | Key | Description |
@@ -167,6 +212,8 @@ Logout/revocation denylist of JWT jti values. Ephemeral; rows reclaimed once exp
 - `idx_revoked_tokens_expires` (index) on `expires_at`
 
 ## `suite_audit_events`
+
+_Group: Audit_
 
 Append-only audit trail of mutating suite actions (ADR 0007). before_json/after_json are sanitized snapshots with secrets redacted.
 

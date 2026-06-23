@@ -1,3 +1,4 @@
+-- GROUP: Install
 -- TABLE: Installer run state (Tier B). One row per install run: in_progress to completed or failed. Holds no secrets.
 CREATE TABLE install_sessions (
   id CHAR(26) NOT NULL PRIMARY KEY,              -- ULID primary key.

@@ -1,3 +1,4 @@
+-- GROUP: Auth
 -- TABLE: Apex login shell accounts (operators). password_hash is a bcrypt/argon hash, never plaintext.
 -- The -- annotations mirror the MySQL COMMENTs applied by the Phinx migration
 -- add_table_and_column_comments; SQLite (used by tests) ignores them.
