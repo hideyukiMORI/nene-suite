@@ -4,63 +4,58 @@ description: Start NeNe Suite backend (PHP 8800) and frontend (Vite 5188) for lo
 
 # Run NeNe Suite locally
 
-## Prerequisites
+ローカル起動は **Docker ランタイム**（CLAUDE.md クイックスタート準拠）に統一。
+起動手順は `run-local.sh` が「単一の真実」として所有する — このスキルはそれを実行するだけ。
+（グローバル個人スキル `/dev-up` もこの repo では同じ `run-local.sh` を検出して委譲する。）
 
-- PHP 8.4, Node 22, composer dependencies installed
-- `.env` exists at project root (copy from `.env.suite.example` and set DB to SQLite — see below)
-- Migrations run: `vendor/bin/phinx migrate -c phinx.php`
+## 起動
+
+```bash
+bash .claude/skills/run-local/run-local.sh
+```
+
+`run-local.sh` がやること（すべて冪等）:
+
+1. `docker compose --env-file .env.suite up -d` で backend を起動
+   （apex `8800` / MySQL `3389`）。`--env-file .env.suite` は必須 —
+   compose 冒頭の `${VAR:?...}` 補間は `.env` ではなく `.env.suite` から解決する
+   設計のため（`docs/ops/staging-deploy.md` 参照）。
+2. apex(`8800`) の HTTP 応答を待機（コンテナ entrypoint が `phinx migrate` を
+   流してからサーブ開始する）。
+3. frontend が未起動なら `cd frontend && npm run dev` を切り離して起動（Vite `5188`）。
+   既に `5188` が応答していれば触らない。
+4. backend / frontend の状態サマリを出す。いずれか失敗で非ゼロ終了。
 
 ## First-time setup
 
 ```bash
-# 1. Create .env (SQLite for local dev — same pattern as sibling apps)
-cp .env.suite.example .env
-# Edit .env: set DB_ADAPTER=sqlite, DB_NAME=var/nene_suite.sqlite,
-#            APP_ENV=local, NENE2_LOCAL_JWT_SECRET=<any string>
+# 1. secret ファイルを用意（VPS-local・未コミット）
+cp .env.suite.example .env.suite
+# .env.suite を編集: DB パスワード等の必須シークレットを埋める
 
-# 2. Run migrations
-vendor/bin/phinx migrate -c phinx.php
-# NOTE: Phinx creates var/nene_suite.sqlite.sqlite3; rename to match DB_NAME:
-mv var/nene_suite.sqlite.sqlite3 var/nene_suite.sqlite
+# 2. Docker エンジン（Docker Desktop）を起動しておく
 
-# 3. Create first operator (no HTTP endpoint for bootstrap — use CLI)
-php -r "
-require 'vendor/autoload.php';
-use NeNeSuite\Http\RuntimeContainerFactory;
-use NeNeSuite\Auth\CreateOperatorInput;
-use NeNeSuite\Auth\CreateOperatorUseCaseInterface;
-\$c = (new RuntimeContainerFactory(__DIR__))->create();
-\$out = \$c->get(CreateOperatorUseCaseInterface::class)
-           ->execute(new CreateOperatorInput('admin@example.com', 'yourpassword12', 'Admin'));
-echo 'Created: ' . \$out->operator->email . PHP_EOL;
-"
+# 3. 初回のみ: 組織ブートストラップ（最初の operator・disclaimer・app DB・manifest）。
+#    install.php はマイグレーションも適用する。
+docker compose --env-file .env.suite run --rm suite php installer/install.php
 ```
 
-## Start backend
+> スキーマのマイグレーションは冪等で、サーバ起動ごとにコンテナ entrypoint が
+> 自動適用する（[ADR 0014](../../../docs/adr/0014-schema-migration-lifecycle.md)）。
+> 通常の起動は `run-local.sh`（= `docker compose up -d`）だけでスキーマが最新になる。
+
+## Verify
 
 ```bash
-# IMPORTANT: use index.php as the router script (not -t flag).
-# -t public_html/ does NOT pass php://input to POST handlers correctly.
-php -S 0.0.0.0:8800 public_html/index.php > /tmp/nene-suite-backend.log 2>&1 &
+curl -o /dev/null -w "apex:  %{http_code}\n" http://localhost:8800/health
+curl -o /dev/null -w "vite:  %{http_code}\n" http://localhost:5188/
 ```
 
-Verify: `curl http://localhost:8800/health`
-
-## Start frontend
+## Stop
 
 ```bash
-cd frontend && npm run dev &
-# Vite listens on http://localhost:5188 (fixed in vite.config.ts)
-# API proxy: /api/* and /health → http://localhost:8800
-```
-
-Verify: `curl -o /dev/null -w "%{http_code}" http://localhost:5188/`
-
-## Stop all
-
-```bash
-pkill -f "php -S 0.0.0.0:8800"
-pkill -f "vite"
+docker compose --env-file .env.suite down   # backend
+pkill -f vite                               # frontend
 ```
 
 ## Key URLs
@@ -72,12 +67,12 @@ pkill -f "vite"
 | http://localhost:8800/api/v1/catalog/apps | App catalog (unauthenticated) |
 | http://localhost:8800/api/v1/auth/session | Login (POST) |
 
-## Known quirks
+## ポート（CLAUDE.md ポート表に固定）
 
-- **PHP built-in server + `-t` flag**: `php -S ... -t public_html/` does not
-  correctly pass `php://input` for POST requests. Always use the router-script
-  form: `php -S 0.0.0.0:8800 public_html/index.php`.
-- **Phinx SQLite naming**: Phinx appends `.sqlite3` to `DB_NAME` when creating
-  the file. After first `phinx migrate`, rename
-  `var/nene_suite.sqlite.sqlite3` → `var/nene_suite.sqlite` to match
-  NENE2's `PdoConnectionFactory` which uses `DB_NAME` literally.
+| Service | Port |
+|---|---|
+| Apex HTTP | **8800** |
+| MySQL (control DB) | **3389** |
+| Vite dev server | **5188** |
+</content>
+</invoke>
