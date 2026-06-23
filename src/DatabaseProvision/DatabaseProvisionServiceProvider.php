@@ -7,6 +7,7 @@ namespace NeNeSuite\DatabaseProvision;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use NeNeSuite\Http\ControlDatabaseConfigResolver;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstallSession\InstallSessionRepositoryInterface;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderInterface;
@@ -26,19 +27,32 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
             ->set(
                 DatabaseProvisionerInterface::class,
                 static function (ContainerInterface $container): DatabaseProvisionerInterface {
+                    // Provision with the same engine as the control DB (ADR 0016): derive
+                    // it from the control URL scheme so MySQL/PostgreSQL stay in sync.
+                    $engine = ControlDatabaseConfigResolver::controlAdapter() ?? 'mysql';
+                    $isPgsql = $engine === 'pgsql';
+
                     $host = self::env('NENE_SUITE_PROVISION_DB_HOST', '127.0.0.1');
-                    $port = self::env('NENE_SUITE_PROVISION_DB_PORT', '3306');
-                    $user = self::env('NENE_SUITE_PROVISION_DB_USER', 'root');
+                    $port = self::env('NENE_SUITE_PROVISION_DB_PORT', $isPgsql ? '5432' : '3306');
+                    $defaultUser = $isPgsql ? 'postgres' : 'root';
+                    $user = self::env('NENE_SUITE_PROVISION_DB_USER', $defaultUser);
                     $pass = self::env('NENE_SUITE_PROVISION_DB_PASSWORD', '');
 
-                    if ($user === 'root' && $pass === '' && $host === '127.0.0.1') {
+                    if ($user === $defaultUser && $pass === '' && $host === '127.0.0.1') {
                         throw new LogicException(
                             'NENE_SUITE_PROVISION_DB_USER and NENE_SUITE_PROVISION_DB_PASSWORD must be set to use ProvisionAppDatabasesUseCase.',
                         );
                     }
 
                     try {
-                        $dsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+                        if ($isPgsql) {
+                            // PostgreSQL requires connecting to an existing maintenance
+                            // database before issuing CREATE DATABASE for each app DB.
+                            $maintenanceDb = self::env('NENE_SUITE_PROVISION_DB_NAME', 'postgres');
+                            $dsn = "pgsql:host={$host};port={$port};dbname={$maintenanceDb}";
+                        } else {
+                            $dsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+                        }
                         $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
                     } catch (PDOException $e) {
                         throw new LogicException("Failed to connect to provisioning database: {$e->getMessage()}", 0, $e);

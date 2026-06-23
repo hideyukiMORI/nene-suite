@@ -16,13 +16,14 @@ RUN npm run build
 FROM php:8.4-apache
 
 # git/unzip are needed to fetch the NENE2 path dependency and let Composer
-# install dist archives.
+# install dist archives. libpq-dev provides the headers for the pdo_pgsql build.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git unzip \
+    && apt-get install -y --no-install-recommends git unzip libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PDO MySQL and required extensions
-RUN docker-php-ext-install pdo pdo_mysql
+# Install PDO drivers: MySQL (default) and PostgreSQL (ADR 0016 — control DB engine
+# is selected by the NENE_SUITE_CONTROL_DATABASE_URL scheme).
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite

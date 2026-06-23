@@ -140,6 +140,7 @@ All suite orchestrator variables use prefix **`NENE_SUITE_`** (not `NENE2_SUITE_
 | Org federation UUID | `NENE_SUITE_ORG_EXTERNAL_ID` | `ORG_UUID`, `TENANT_ID`, `NENE_ORG_ID` |
 | Org display name | `NENE_SUITE_ORG_NAME` | `ORG_NAME`, `COMPANY_NAME` |
 | Installed app list | `NENE_SUITE_INSTALLED_APPS` | `INSTALLED_APPS`, `APPS` |
+| Provisioning DB connection | `NENE_SUITE_PROVISION_DB_HOST` / `_PORT` / `_USER` / `_PASSWORD` / `_NAME` | `PROVISION_DB_*`, `ROOT_DB_*`, `DB_PROVISION_*` |
 
 ### 4.1 Sibling URL variables (pattern)
 

@@ -47,6 +47,17 @@ Suite:       NENE_SUITE_MODE=1          →  suite wrote NENE_SUITE_* + per-app 
 | --- | --- | --- |
 | `NENE_SUITE_CONTROL_DATABASE_URL` | `mysql://nene_suite:***@db/nene_suite` | **Suite only** — `suite_audit_events` + manifest metadata; not sibling app data. Resolution: [ADR 0011](../adr/0011-control-database-url-resolution.md) |
 
+The URL **scheme selects the database engine** ([ADR 0016](../adr/0016-postgresql-control-and-provisioning-support.md)):
+`mysql://` (default) or `pgsql://` (PostgreSQL — e.g. `pgsql://nene_suite:***@db:5432/nene_suite`).
+When the port is omitted it defaults per engine (MySQL 3306, PostgreSQL 5432).
+
+### Provisioning database (Tier B installer)
+
+| Variable | Example | Notes |
+| --- | --- | --- |
+| `NENE_SUITE_PROVISION_DB_HOST` / `_PORT` / `_USER` / `_PASSWORD` | `db` / `3306` / `root` / *secret* | Privileged connection used to `CREATE DATABASE` per installed app. Uses the **same engine** as the control DB (derived from the control URL scheme). PostgreSQL: port `5432`, a `CREATEDB` role. |
+| `NENE_SUITE_PROVISION_DB_NAME` | `postgres` | **PostgreSQL only** — maintenance database to connect to before issuing `CREATE DATABASE`. Ignored for MySQL. |
+
 ---
 
 ## Sibling URL variables

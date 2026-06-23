@@ -112,7 +112,7 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
             tier: InstallTier::from((string) $row['tier']),
             catalogRevision: (int) $row['catalog_revision'],
             selectedApps: $this->decodeSelectedApps($row['selected_apps_json'] ?? null),
-            disclaimerAccepted: (bool) $row['disclaimer_accepted'],
+            disclaimerAccepted: self::toBool($row['disclaimer_accepted']),
             disclaimerAcceptedAt: $this->nullableString($row['disclaimer_accepted_at'] ?? null),
             orgExternalId: $this->nullableString($row['org_external_id'] ?? null),
             orgDisplayName: $this->nullableString($row['org_display_name'] ?? null),
@@ -154,5 +154,23 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
     private function nullableString(mixed $value): ?string
     {
         return $value === null ? null : (string) $value;
+    }
+
+    /**
+     * Engine-agnostic boolean read. MySQL/SQLite store 1/0 (read back as int or '1'/'0'),
+     * while PostgreSQL returns boolean columns as 't'/'f'. A naive `(bool)` cast would turn
+     * the string 'f' into true, so normalize the known truthy representations explicitly.
+     */
+    private static function toBool(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value)) {
+            return $value !== 0;
+        }
+
+        return in_array(strtolower(trim((string) $value)), ['1', 't', 'true'], true);
     }
 }

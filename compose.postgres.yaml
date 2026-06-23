@@ -1,0 +1,46 @@
+# PostgreSQL overlay for NeNe Suite (ADR 0016).
+#
+# Runs the control DB on PostgreSQL instead of the default MySQL service in
+# docker-compose.yml. Use it as a second -f overlay:
+#
+#   docker compose -f docker-compose.yml -f compose.postgres.yaml --env-file .env.suite up -d
+#
+# Set NENE_SUITE_CONTROL_DB_PASSWORD (and the usual NENE_SUITE_* secrets) in .env.suite.
+# For simplicity this overlay uses a single superuser role (nene_suite) for both the
+# control connection and provisioning; production deployments may split the privileged
+# provisioning role from the unprivileged control role.
+services:
+  db:
+    image: postgres:16
+    # !override replaces the base (MySQL) lists/maps instead of merging — otherwise the
+    # base `${SUITE_DB_PORT}:3306` mapping would linger and clash with `:5432` on the host,
+    # and the MySQL env / data volume would be carried onto the postgres container.
+    environment: !override
+      POSTGRES_DB: nene_suite
+      POSTGRES_USER: nene_suite
+      POSTGRES_PASSWORD: ${NENE_SUITE_CONTROL_DB_PASSWORD:?NENE_SUITE_CONTROL_DB_PASSWORD is required}
+    ports: !override
+      - "${SUITE_DB_PORT:-3389}:5432"
+    healthcheck: !override
+      test: ["CMD-SHELL", "pg_isready -U nene_suite -d nene_suite"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    volumes: !override
+      - db_data_pg:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  suite:
+    environment:
+      # Control DB on PostgreSQL (scheme drives the adapter — ControlDatabaseConfigResolver).
+      NENE_SUITE_CONTROL_DATABASE_URL: >-
+        pgsql://nene_suite:${NENE_SUITE_CONTROL_DB_PASSWORD}@db:5432/nene_suite
+      # Provisioning connects to the maintenance DB (nene_suite) to CREATE app databases.
+      NENE_SUITE_PROVISION_DB_HOST: db
+      NENE_SUITE_PROVISION_DB_PORT: "5432"
+      NENE_SUITE_PROVISION_DB_USER: nene_suite
+      NENE_SUITE_PROVISION_DB_PASSWORD: ${NENE_SUITE_CONTROL_DB_PASSWORD}
+      NENE_SUITE_PROVISION_DB_NAME: nene_suite
+
+volumes:
+  db_data_pg:
