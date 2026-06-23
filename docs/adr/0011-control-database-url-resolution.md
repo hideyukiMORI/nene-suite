@@ -45,6 +45,10 @@ Example: `mysql://nene_suite:s3cret@db:3306/nene_suite`
 This matches the format already accepted by Phinx's `url` environment key and is
 consistent with `NENE_SUITE_PROVISION_DB_*` conventions.
 
+> **Extended by [ADR 0016](0016-postgresql-control-and-provisioning-support.md):** the URL
+> scheme also selects the engine — `pgsql://` (PostgreSQL) in addition to `mysql://`. The
+> default port is inferred per engine when omitted (MySQL 3306, PostgreSQL 5432).
+
 ### 2. Resolution priority
 
 Both `phinx.php` and `RuntimeServiceProvider` apply the same two-step resolver:
