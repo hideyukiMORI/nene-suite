@@ -1,6 +1,21 @@
 # Current TODO
 
-**Phase 0 — Governance and product design**
+**Status (2026-06-24).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
+(A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅.
+Control DB + provisioning are now PostgreSQL-capable (ADR 0016); the Origin consumption
+contract is fixed (ADR 0017). **Next: B2** — sibling-side org resolution +
+authorization-code assertion flow (cross-repo) — plus the Suite Origin client that
+consumes ADR 0017.
+
+The Phase A / B1 build-out is tracked in
+[`docs/milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md)
+and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); `main`'s git
+log is the authoritative shipped record. Gate state: PHPUnit **345** / vitest **38**, all
+green.
+
+---
+
+**Phase 0–1 — Governance, product design, and installer MVP** (historical log)
 
 ## Done
 
@@ -66,20 +81,30 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] 起動時 entrypoint で冪等 migrate（ADR 0014; phinx を require へ; `phinx.php` の生URLバグ修正）— PR #122
 - [x] ADR 0014（schema migration lifecycle）— PR #122
 - [x] ADR 0015（Suite hosted multi-tenant mode / 製品エディション / 自己ホスト移行可ポジショニング）draft — PR #124, #126
-- [ ] Operator provisioning HTTP endpoint — `CreateOperatorUseCase` はあるが Phase 1 では HTTP 未公開
-- [ ] Shared apex auth middleware — `BearerTokenAuthenticator` を 4 handler が直接呼ぶパターンのまま (Phase 2 で middleware 化)
-- [ ] `IntegrationWiring` — Phase 2 スコープ
-- [ ] `app_versions` pinning in manifest — Phase 2 スコープ
+- [x] Operator provisioning HTTP endpoint — `POST /api/v1/operators` + `ProvisionApexOperatorUseCase` (default-org `Admin` membership) — A4.5, PR #154
+- [ ] Shared apex auth middleware — **deferred by design.** Per-handler default-deny via `BearerTokenAuthenticator` / `SuperadminGuard` (first line of `handle()`) is the deliberate pattern while few endpoints need auth (handover §4.3). Revisit only if the authenticated-endpoint count grows.
+- [ ] `IntegrationWiring` — Phase 2 scope
+- [ ] `app_versions` pinning in manifest — Phase 2 scope (Origin consumption now contracted in ADR 0017; update determination is version-compare vs `manifest.latest.version`)
 
 ## Next (hosted edition / NeNe Cloud Free — ADR 0015 draft)
 
-- [ ] 組織まるごと export → 自己ホスト import（移行可 headline の launch 前提; 現状 CSV のみ。NeNe Invoice ADR 0017 を起こす）
-- [ ] Suite 多org化: `operators` → `organizations` + `memberships` + role；`superadmin` platform console
-- [ ] セッション JWT に `org_external_id` + role を載せる（現状 `sub` + `suite_id` のみ）
-- [ ] アプリの org 解決（`subdomain` / `custom_domain`）を Suite から driving
-- [ ] entitlement / house-ads 配線（ADR 0013）
-- [ ] ADR 0015 の open questions 解消（signup/不正対策、org解決方式、terminology 登録）→ ADR を accepted へ
-- [ ] **launch 前にまとめて** 法務再レビュー（西村法律事務所 — データ受託化）
+Done (Phase A + B1 — `main`):
+
+- [x] Suite 多org化: `operators` → `organizations` + `memberships` + role；`superadmin` platform console + active-org switcher — Phase A (PR #142–#168, #172, #174)
+- [x] セッション JWT に `org_external_id` + role を載せる（pre-A6 token は fallback で失効させない）— A6, PR #158
+- [x] Federation IdP key plane — ES256 assertion issuer/verifier・signing-key store/gen・JWKS endpoint・fail-closed preflight・key rotation/revoke（edition-gated）— B1, PR #178–#194
+- [x] OSS auth hardening — `NENE_SUITE_EDITION` flag + OSS firewall・login rate-limit・apex logout 失効 — B1, PR #178–#184
+- [x] Origin 消費契約 — 署名済 static GET + detached JWS 検証・update/announcements/house-ads のワイヤ契約を ADR 0017 として確定（NeNe Invoice の export/import ADR 0017 とは別物）— PR #208
+
+Remaining (B2–B6 — see milestone §3):
+
+- [ ] アプリの org 解決（`subdomain` / `custom_domain`）+ authorization-code assertion flow を Suite から driving（B2 — cross-repo）
+- [ ] Suite Origin **client** 実装 — per-product fetch（ETag）+ `.jws` 検証 + version-compare/forced-update + dependency-ordered "update all"（ADR 0017 consumer 側）
+- [ ] catalog schema 拡張（`icon` / `description` / `category` / `min_suite_version`）+ フロント IA 配線（updates badge / announcements rail / ad slot）
+- [ ] entitlement / quota + house-ads 配線（B4 — ADR 0013; suite mode の `tier` は federation IdP claim 由来）
+- [ ] 組織まるごと export → 自己ホスト import（B5 — 移行可 headline の launch 前提; 現状 CSV のみ）
+- [ ] ADR 0015 の open questions 解消（signup/不正対策、org解決方式、terminology 登録）→ ADR を accepted へ（B6 terminal gate）
+- [ ] **launch 前にまとめて** 法務再レビュー（西村法律事務所 — データ受託化）（B6）
 
 ## Blockers
 
@@ -119,4 +144,32 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - phpMyAdmin runs as a VPS-local, out-of-repo compose project (SSH-tunnel only).
 - Detailed daily report: `docs/daily-reports/2026-06-21.md`.
 
-Last updated: 2026-06-21
+### 2026-06-22
+
+- **Multi-tenant Phase A complete (A0–A8b)** — `operators` → organizations /
+  memberships / roles, superadmin org + membership consoles, active-org switcher,
+  session JWT carries `org_external_id` + role (PR #142–#168 + polish #172/#174).
+  OSS single-org behavior preserved (ADR 0015 §8); lockout firewall (A4/A4.5/A5)
+  landed before the first runtime change (A6). Record: `docs/handover/2026-06-22-multi-tenant-phase-a.md`.
+- **Phase B / B1 complete** — federation IdP key plane + OSS auth hardening
+  (PR #178–#194): `NENE_SUITE_EDITION` flag, OSS-flags-off firewall, persistent
+  login rate-limit, apex logout-revocation, ES256 assertion issuer/verifier,
+  `federation_signing_keys` store + key-gen command, `/.well-known/jwks.json`,
+  hosted fail-closed preflight, time-driven rotation + emergency revoke. Apex
+  session stays HS256; everything asymmetric is edition-gated (clean OSS build
+  holds no key material). Runbook: `docs/ops/federation-key-management.md`.
+
+### 2026-06-23 / 24
+
+- **PostgreSQL support** for the control DB + provisioning (ADR 0016, PR #201–#202).
+- **Schema doc generation** — `docs/reference/schema.md` is generated from
+  `database/schema` (`composer schema:docs`), with lint, ER diagram, and
+  domain grouping; CI freshness check (PR #203–#206).
+- **ADR 0017 — Origin consumption contract accepted** (PR #207–#208): signed static
+  GETs + RFC 7797 detached-JWS verification for update / announcements / house-ads;
+  roster stays a Suite concern (`catalog/apps.json`), Origin owns per-product signals.
+- **Frontend IA / UI element brief** (PR #209–#210) — apex shell surfaces + readiness
+  (`docs/design/frontend-information-architecture.md`).
+- Gate state verified green: PHPUnit **345** / vitest **38**.
+
+Last updated: 2026-06-24

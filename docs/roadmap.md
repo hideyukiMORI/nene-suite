@@ -18,8 +18,13 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   ad-supported, continued use OK; the acquisition funnel for install support and
   bespoke work. Headline is **anti-lock-in / data portability** ("無料で始める。
   必要になったら、いつでも自社サーバーへ。"), not price. The sibling apps are already
-  multi-tenant; the remaining work is the Suite identity/registry layer. Phases 2–4
-  below are read in light of this direction.
+  multi-tenant; the Suite identity/registry layer is now built — organizations /
+  memberships / roles / superadmin console (multi-tenant **Phase A**) and the
+  federation IdP key plane (ES256 + JWKS, **B1**, edition-gated). The remaining
+  hosted work is sibling-side org resolution + the assertion flow (B2), portability
+  round-trip (B5), signup/abuse, and ADR 0015 acceptance (B6). Phases 2–4 below are
+  read in light of this direction; the detailed build-out lives in
+  [`docs/milestones/2026-06-multi-tenant-suite.md`](./milestones/2026-06-multi-tenant-suite.md).
 
 ## Phase 0: Governance and Foundation ✅
 
@@ -27,20 +32,31 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Orchestration compliance (士業 review pattern) ✅ Issue #8
 - 税理士 / 公認会計士 + 弁護士 sign-off on binding docs ✅ (2026-05-31)
 
-## Phase 1: Tier B Installer MVP ✅ (mostly)
+## Phase 1: Tier B Installer MVP ✅
 
 - Docker Compose orchestrator ✅ (multi-stage image incl. SPA; entrypoint
   auto-migrates — ADR 0014)
 - Select Invoice + Clear; provision DBs + env + service token ✅
 - Apex shell (login + app links + install wizard + audit viewer) ✅
 - Staging on ConoHa VPS with automatic deploy from `main` ✅
-- Document add-app workflow
+- Control DB + provisioning are PostgreSQL-capable as well as MySQL ✅ (ADR 0016)
+- Document add-app workflow (remaining minor doc task)
 
-## Phase 2: Federation Contract
+## Phase 2: Federation Contract — in progress
 
-- Shared JWT issuer / org UUID propagation
-- Sibling app changes tracked via cross-repo Issues
-- Catalog dependency resolver + validation tool
+- ✅ Suite identity/registry layer — organizations, memberships, roles, superadmin
+  console + active-org switcher; session JWT carries `org_external_id` + role
+  (multi-tenant Phase A; ADR 0015 §8).
+- ✅ Federation IdP key plane — ES256 assertion issuer/verifier, `/.well-known/jwks.json`,
+  signing-key store + rotation/revoke, edition-gated (B1; ADR 0012).
+- ✅ Catalog dependency resolver + validation tool (`AppDependencyResolver`,
+  `tools/validate-catalog.sh`).
+- ✅ Origin consumption contract fixed — signed static GETs + detached-JWS
+  verification for update / announcements / house-ads (ADR 0017).
+- ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
+  authorization-code assertion flow, tracked via cross-repo Issues (B2).
+- ⏳ Suite Origin **client** — per-product fetch (ETag) + `.jws` verification +
+  version-compare/forced-update + dependency-ordered "update all" (ADR 0017 consumer).
 
 ## Phase 3: Tier A Web Installer
 
@@ -61,4 +77,4 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Shared application database **across products** (each app keeps its own DB;
   hosted multi-tenancy is per-app `organization_id` scoping, not a shared app DB)
 
-Last updated: 2026-06-21
+Last updated: 2026-06-24
