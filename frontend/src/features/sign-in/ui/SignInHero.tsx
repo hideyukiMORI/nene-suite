@@ -1,5 +1,6 @@
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { Icon } from '@/shared/ui'
+import { useConsoleStream } from '../hooks/use-console-stream'
 import styles from './sign-in.module.css'
 
 const TRUST: readonly { icon: string; key: MessageKey }[] = [
@@ -21,6 +22,7 @@ const APPS: readonly { initial: string; name: string }[] = [
 /** Left brand panel — always dark (apex shell rail signature), tagline leads. */
 export function SignInHero() {
   const { t } = useTranslation()
+  const consoleRef = useConsoleStream()
 
   return (
     <section className={styles['hero']}>
@@ -97,6 +99,13 @@ export function SignInHero() {
               </span>
             ))}
           </div>
+        </div>
+
+        <div className={styles['console']} aria-hidden>
+          <span className={styles['consoleDot']} />
+          <span className={styles['consolePrompt']}>›</span>
+          <span className={styles['consoleStream']} ref={consoleRef} />
+          <span className={styles['consoleCaret']} />
         </div>
       </div>
     </section>

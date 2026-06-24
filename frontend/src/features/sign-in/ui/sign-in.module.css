@@ -20,6 +20,52 @@
   }
 }
 
+/* Hero teal glow breathing (loop). */
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-46px, 34px) scale(1.14);
+    opacity: 0.5;
+  }
+}
+
+/* Portfolio tiles light up one at a time (loop, staggered per tile). */
+@keyframes tileGlow {
+  0%,
+  16%,
+  100% {
+    background: var(--side-active);
+    border-color: var(--side-line);
+    box-shadow: none;
+    color: var(--side-brand);
+  }
+  5%,
+  11% {
+    background: color-mix(in srgb, var(--side-brand) 28%, var(--side-active));
+    border-color: color-mix(in srgb, var(--side-brand) 55%, transparent);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--side-brand) 15%, transparent),
+      0 7px 20px color-mix(in srgb, var(--side-brand) 24%, transparent);
+    color: var(--side-fg);
+  }
+}
+
+/* Blinking console caret. */
+@keyframes caret {
+  0%,
+  48% {
+    opacity: 0.9;
+  }
+  48.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .screen {
   display: flex;
   flex-direction: row;
@@ -125,6 +171,7 @@
     color-mix(in srgb, var(--side-brand) 22%, transparent),
     transparent 66%
   );
+  animation: aurora 16s ease-in-out infinite;
 }
 
 .heroVignette {
@@ -255,6 +302,68 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--side-brand);
+  animation: tileGlow 6s ease-in-out infinite;
+}
+
+.tile:nth-child(1) {
+  animation-delay: 0s;
+}
+.tile:nth-child(2) {
+  animation-delay: 1s;
+}
+.tile:nth-child(3) {
+  animation-delay: 2s;
+}
+.tile:nth-child(4) {
+  animation-delay: 3s;
+}
+.tile:nth-child(5) {
+  animation-delay: 4s;
+}
+.tile:nth-child(6) {
+  animation-delay: 5s;
+}
+
+/* ── live console (decorative system-log typewriter) ────────────────────── */
+.console {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: clamp(20px, 3vh, 28px);
+  font-family: var(--font-num), monospace;
+  font-size: 11.5px;
+  line-height: 1;
+  color: var(--side-fg-mut);
+  min-height: 14px;
+  overflow: hidden;
+  animation: lpUp 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.32s both;
+}
+
+.consoleDot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--side-brand);
+  flex: none;
+  animation: pulse 1.7s ease-in-out infinite;
+}
+
+.consolePrompt {
+  color: var(--side-brand);
+  flex: none;
+}
+
+.consoleStream {
+  white-space: nowrap;
+  flex: none;
+}
+
+.consoleCaret {
+  width: 6px;
+  height: 13px;
+  background: var(--side-brand);
+  flex: none;
+  animation: caret 1.05s steps(1) infinite;
 }
 
 /* ── form panel (right, theme-following) ────────────────────────────────── */
