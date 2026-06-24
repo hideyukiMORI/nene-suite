@@ -1,0 +1,20 @@
+{
+    "id": "valid-entitlement",
+    "title": "Valid entitlement audience policy",
+    "description": "entitlement current → audience policy (no per-user data; min_valid_generation watermark).",
+    "tree": "entitlement",
+    "entry": "v1/entitlement/nene-invoice/paid/current",
+    "delegation_key": "nene-invoice/paid",
+    "reduce": true,
+    "client": {
+        "persisted_gen": 4,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": true,
+        "reason": "ok",
+        "stage": "complete"
+    }
+}

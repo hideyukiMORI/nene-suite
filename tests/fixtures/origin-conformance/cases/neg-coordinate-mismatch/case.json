@@ -1,0 +1,20 @@
+{
+    "id": "neg-coordinate-mismatch",
+    "title": "A validly-signed manifest served at the wrong channel path",
+    "description": "Cross-coordinate mix-and-match: the stable manifest (channel \"stable\") is served where the client asked for \"beta\"; the signed leaf must not bind to the requested coordinate.",
+    "tree": "update",
+    "entry": "v1/nene-invoice/beta/current",
+    "delegation_key": "nene-invoice/beta",
+    "reduce": true,
+    "client": {
+        "persisted_gen": 41,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": false,
+        "reason": "coordinate_mismatch",
+        "stage": "targets"
+    }
+}

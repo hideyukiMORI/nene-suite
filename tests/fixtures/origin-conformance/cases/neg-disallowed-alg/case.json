@@ -1,0 +1,20 @@
+{
+    "id": "neg-disallowed-alg",
+    "title": "current.jws uses a disallowed algorithm (\"none\")",
+    "description": "Algorithm-allowlist downgrade: the protected header declares alg \"none\" with an empty signature.",
+    "tree": "update",
+    "entry": "v1/nene-invoice/stable/current",
+    "delegation_key": "nene-invoice/stable",
+    "reduce": false,
+    "client": {
+        "persisted_gen": 41,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": false,
+        "reason": "alg_not_allowed",
+        "stage": "current"
+    }
+}

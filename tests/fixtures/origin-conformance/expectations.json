@@ -1,0 +1,158 @@
+{
+    "spec_version": 1,
+    "signed_at": "2026-06-20T00:00:00Z",
+    "note": "Signed golden conformance corpus (ADR 0006). Dev/test Ed25519 keys only — never production. The reference verifier (src/Conformance/ReferenceVerifier.php) must reproduce every expected outcome below; consumers mirror it.",
+    "verification_order": "../verification-order.md",
+    "cases": [
+        {
+            "id": "valid-update",
+            "title": "Valid update tree (full snapshot path)",
+            "tree": "update",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
+            "id": "valid-update-reduced",
+            "title": "Valid update tree (consumer reduction, snapshot skipped)",
+            "tree": "update",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
+            "id": "valid-warn-freshness",
+            "title": "Valid but stale within grace (warn) — still accepts",
+            "tree": "update",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
+            "id": "valid-feed",
+            "title": "Valid content-tree feed (announcement)",
+            "tree": "feed",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
+            "id": "valid-entitlement",
+            "title": "Valid entitlement audience policy",
+            "tree": "entitlement",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
+            "id": "neg-current-rollback",
+            "title": "current.gen below the client persisted generation",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "rollback",
+                "stage": "current"
+            }
+        },
+        {
+            "id": "neg-expired",
+            "title": "Frozen (stale) metadata beyond the refuse-new bound",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "freshness_refuse_new",
+                "stage": "current"
+            }
+        },
+        {
+            "id": "neg-revoked-kid",
+            "title": "targets signed by a retired kid (kid not valid at iat)",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "kid_not_valid_at_iat",
+                "stage": "targets"
+            }
+        },
+        {
+            "id": "neg-missing-artifact-hash",
+            "title": "Artifact bytes do not match the signed artifact_sha256",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "artifact_hash_mismatch",
+                "stage": "artifact"
+            }
+        },
+        {
+            "id": "neg-snapshot-mismatch",
+            "title": "snapshot body does not match current.snapshot_sha256",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "snapshot_hash_mismatch",
+                "stage": "snapshot"
+            }
+        },
+        {
+            "id": "neg-poisoned",
+            "title": "Pointed generation is below the yank watermark",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "yanked",
+                "stage": "current"
+            }
+        },
+        {
+            "id": "neg-root-version-floor",
+            "title": "root.json version below the client root-version floor",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "root_version_below_floor",
+                "stage": "root"
+            }
+        },
+        {
+            "id": "neg-disallowed-alg",
+            "title": "current.jws uses a disallowed algorithm (\"none\")",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "alg_not_allowed",
+                "stage": "current"
+            }
+        },
+        {
+            "id": "neg-coordinate-mismatch",
+            "title": "A validly-signed manifest served at the wrong channel path",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "coordinate_mismatch",
+                "stage": "targets"
+            }
+        },
+        {
+            "id": "neg-unsupported-schema-version",
+            "title": "current with an unknown schema_version major",
+            "tree": "update",
+            "expect": {
+                "accepted": false,
+                "reason": "unsupported_schema_version",
+                "stage": "current"
+            }
+        }
+    ]
+}

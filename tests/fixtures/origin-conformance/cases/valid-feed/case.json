@@ -1,0 +1,20 @@
+{
+    "id": "valid-feed",
+    "title": "Valid content-tree feed (announcement)",
+    "description": "feed current → feed-targets → feed body, body verified by content_sha256.",
+    "tree": "feed",
+    "entry": "v1/feeds/nene-invoice/free/ja/current",
+    "delegation_key": "nene-invoice/free/ja/announcement",
+    "reduce": true,
+    "client": {
+        "persisted_gen": 6,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": true,
+        "reason": "ok",
+        "stage": "complete"
+    }
+}

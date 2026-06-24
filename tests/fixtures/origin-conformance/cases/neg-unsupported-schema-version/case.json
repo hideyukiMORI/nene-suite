@@ -1,0 +1,20 @@
+{
+    "id": "neg-unsupported-schema-version",
+    "title": "current with an unknown schema_version major",
+    "description": "current.schema_version 2 exceeds the supported object major and is refused.",
+    "tree": "update",
+    "entry": "v1/nene-invoice/stable/current",
+    "delegation_key": "nene-invoice/stable",
+    "reduce": false,
+    "client": {
+        "persisted_gen": 41,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": false,
+        "reason": "unsupported_schema_version",
+        "stage": "current"
+    }
+}
