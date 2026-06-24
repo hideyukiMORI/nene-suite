@@ -173,6 +173,18 @@ export const en = {
   'suite.auth.signIn': 'Sign in',
   'suite.auth.signingIn': 'Signing in…',
   'suite.auth.invalidCredentials': 'Invalid email or password',
+  'suite.auth.emptyFields': 'Enter your email and password',
+  'suite.auth.help.contact': "Can't sign in? Contact your install administrator.",
+  'suite.auth.hero.headline': 'Your data is yours.',
+  'suite.auth.hero.support': 'Start free. Move to your own server whenever you need to.',
+  'suite.auth.hero.eyebrow': 'Operator sign-in',
+  'suite.auth.hero.portfolioLabel': 'Your NeNe portfolio',
+  'suite.auth.hero.trust.export': 'Export anytime',
+  'suite.auth.hero.trust.selfhost': 'Move to your own server',
+  'suite.auth.hero.trust.nolockin': 'No lock-in',
+  'suite.auth.footer.poweredBy': 'Powered by NENE2 · © {{year}} AYANE',
+  'suite.auth.footer.site': 'Website',
+  'suite.auth.footer.help': 'Help',
 
   // ── App launcher (apex home) ─────────────────────────────────────────────
   'suite.launcher.title': 'Installed applications',

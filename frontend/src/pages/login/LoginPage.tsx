@@ -1,14 +1,6 @@
-import { SignInForm } from '@/features/sign-in'
-import { useTranslation } from '@/shared/i18n'
-import { LocaleSwitcher, PageHeader } from '@/shared/ui'
+import { SignInScreen } from '@/features/sign-in'
 
+/** Public /login route — full split-hero sign-in screen (owns its own chrome). */
 export function LoginPage() {
-  const { t } = useTranslation()
-
-  return (
-    <main>
-      <PageHeader title={t('suite.nav.appTitle')} actions={<LocaleSwitcher />} />
-      <SignInForm />
-    </main>
-  )
+  return <SignInScreen />
 }
