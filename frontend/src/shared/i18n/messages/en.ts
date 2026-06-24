@@ -76,6 +76,11 @@ export const en = {
   'suite.catalog.title': 'App catalog',
   'suite.catalog.placeholder':
     'The catalog store lands in a later phase. For now, install apps through the wizard.',
+  'suite.catalog.subtitle': 'Browse NeNe apps and add them to your installation.',
+  'suite.catalog.filter.all': 'All',
+  'suite.catalog.get': 'Get',
+  'suite.catalog.requires': 'Requires {{names}}',
+  'suite.catalog.empty': 'No apps match this filter.',
   'suite.settings.title': 'Settings',
   'suite.settings.placeholder':
     'Disclaimer, Origin polling, edition, and update channel settings land in a later phase.',
