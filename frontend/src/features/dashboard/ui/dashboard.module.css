@@ -1,0 +1,412 @@
+.root {
+  max-width: 1180px;
+  margin: 0 auto;
+  animation: fade 0.3s ease;
+}
+
+/* ── Masthead ───────────────────────────────────────────────────────────── */
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hero-accent);
+  margin-bottom: 9px;
+}
+
+.greeting {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.32;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--fg-2);
+  max-width: 460px;
+}
+
+.getApps {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--on-brand);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  flex: none;
+  text-decoration: none;
+}
+
+.getApps:hover {
+  background: var(--brand-strong);
+}
+
+/* ── Greet color picker ─────────────────────────────────────────────────── */
+.pickerWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.pickerBtn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--fg-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pickerBtn:hover {
+  background: var(--surface-2);
+  color: var(--fg);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.pickerPop {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  z-index: 50;
+  width: 202px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-lg);
+  padding: 13px;
+  animation: popIn 0.14s ease;
+}
+
+.pickerTitle {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: 10px;
+}
+
+.swatchGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--r-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatch[data-active='true'] {
+  border-color: var(--fg);
+}
+
+.customRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-2);
+  cursor: pointer;
+}
+
+.customInput {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  padding: 2px;
+  cursor: pointer;
+}
+
+/* ── KPI strip ──────────────────────────────────────────────────────────── */
+.kpiStrip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 36px;
+  box-shadow: var(--shadow);
+}
+
+.kpiCell {
+  background: var(--surface);
+  padding: 17px 22px;
+}
+
+.kpiNum {
+  font-family: var(--font-num), monospace;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.kpiNumMuted {
+  font-family: var(--font-num), monospace;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fg-3);
+}
+
+.kpiLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-3);
+  margin-top: 9px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Section divider ────────────────────────────────────────────────────── */
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  margin-bottom: 16px;
+}
+
+.sectionTitle h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+}
+
+.sectionLine {
+  height: 1px;
+  flex: 1;
+  background: var(--border);
+}
+
+/* ── Pillars ────────────────────────────────────────────────────────────── */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 34px;
+  box-shadow: var(--shadow);
+}
+
+.pillar {
+  position: relative;
+  background: var(--surface);
+  padding: 24px 22px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pillarHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pillarFallback {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-sm);
+  background: var(--brand-deep);
+  color: var(--side-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  flex: none;
+}
+
+.pillarBadge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ok);
+  border: 1px solid color-mix(in oklch, var(--ok) 32%, var(--border));
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+.pillarName {
+  margin: 16px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.pillarMeta {
+  font-size: 12px;
+  color: var(--fg-3);
+  margin-top: 4px;
+  flex: 1;
+}
+
+.pillarActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.openBtn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: var(--r);
+  background: var(--brand);
+  color: var(--on-brand);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.openBtn:hover {
+  background: var(--brand-strong);
+}
+
+/* ── Feeds ──────────────────────────────────────────────────────────────── */
+.feeds {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.feedPanel {
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.feedHead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.feedHead h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.originTag {
+  font-family: var(--font-num), monospace;
+  font-size: 10px;
+  color: var(--origin);
+  background: color-mix(in srgb, var(--origin) 14%, transparent);
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+}
+
+.feedPlaceholder {
+  margin: 0;
+  padding: 18px 2px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-3);
+}
+
+/* ── Loading / error ────────────────────────────────────────────────────── */
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.skeletonCard {
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  height: 150px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.errorPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 20px;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--border));
+  border-radius: var(--r);
+  background: color-mix(in srgb, var(--danger) 5%, var(--surface));
+  gap: 14px;
+  text-align: center;
+}
+
+.retryBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 17px;
+  border: none;
+  border-radius: var(--r);
+  background: var(--brand);
+  color: var(--on-brand);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+}
