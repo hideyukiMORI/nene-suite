@@ -191,6 +191,23 @@ It is **portfolio-neutral**: standalone siblings and the suite consume it identi
 it deliberately does **not** carry the `NENE_SUITE_` prefix. Suite is one client of Origin,
 not its authority.
 
+**Origin read-model vocabulary (profiled TUF — [ADR 0017](../adr/0017-origin-client-consumption-contract.md)).**
+Canonical object / field names the Suite client consumes; do not rename or invent variants in code.
+
+| Concept | Canonical | Never |
+| --- | --- | --- |
+| Root metadata (keys + role delegations) | `root.json` | `keyset`, `key_set`, JWKS wrapper (the flat shape is superseded) |
+| Mutable per-tree pointer (timestamp role) | `current` | `latest.json`, `timestamp.json` |
+| Consistency anchor | `snapshot` | — |
+| Manifest object (targets role) | `targets` | `manifest` (now an alias of `targets`) |
+| Monotonic version counter | `gen` | `generation`; `version` is reserved for the product semver |
+| Yank / rollback watermark | `min_valid_generation` | `min_gen`, `revoked_generation` |
+| Schema / contract version | `spec_version` | `contract_version` |
+
+> The profiled-TUF read model (Topic 2 re-agreement, 2026-06-24) **supersedes the flat
+> `manifest` + JWKS `key_set` shape**. The signing/transport primitive (detached JWS, RFC 7515 +
+> 7797 `b64:false`) is unchanged. Origin owns the authoritative spec.
+
 ---
 
 ## 5. JWT claims (suite mode)
