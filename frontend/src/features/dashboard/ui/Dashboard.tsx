@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AppDetailDrawer } from '@/features/app-detail'
 import { useTranslation } from '@/shared/i18n'
 import { Icon, PlaceholderState } from '@/shared/ui'
 import { useDashboard } from '../hooks/use-dashboard'
@@ -14,6 +16,7 @@ const SKELETON_KEYS = ['s1', 's2', 's3']
 export function Dashboard() {
   const { t } = useTranslation()
   const { apps, isLoading, isError, refetch } = useDashboard()
+  const [detailId, setDetailId] = useState<string | null>(null)
 
   if (isLoading) {
     return (
@@ -66,8 +69,16 @@ export function Dashboard() {
         <h2>{t('suite.home.appsTitle')}</h2>
         <span className={styles['sectionLine']} />
       </div>
-      <Pillars apps={apps} />
+      <Pillars apps={apps} onOpenDetail={setDetailId} />
       <Feeds />
+      {detailId !== null ? (
+        <AppDetailDrawer
+          appId={detailId}
+          onClose={() => {
+            setDetailId(null)
+          }}
+        />
+      ) : null}
     </div>
   )
 }

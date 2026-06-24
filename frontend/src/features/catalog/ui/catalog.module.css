@@ -124,7 +124,8 @@
 }
 
 .getBtn,
-.openBtn {
+.openBtn,
+.detailBtn {
   padding: 8px 16px;
   border-radius: var(--r);
   cursor: pointer;
@@ -132,6 +133,18 @@
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
+}
+
+.detailBtn {
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--fg-2);
+  margin-right: auto;
+}
+
+.detailBtn:hover {
+  background: var(--surface-2);
+  color: var(--fg);
 }
 
 .getBtn {

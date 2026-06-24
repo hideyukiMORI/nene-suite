@@ -68,6 +68,12 @@ export const ja: Partial<MessageCatalog> = {
   'suite.catalog.get': '入手',
   'suite.catalog.requires': '{{names}} が必要',
   'suite.catalog.empty': 'この条件に合うアプリがありません。',
+
+  'suite.appDetail.view': '詳細',
+  'suite.appDetail.role': 'ロール',
+  'suite.appDetail.provides': '{{names}} を提供',
+  'suite.appDetail.changelog': '変更履歴',
+  'suite.appDetail.changelogPlaceholder': '変更履歴は Origin 連携（Phase B）で表示されます。',
   'suite.settings.title': '設定',
   'suite.settings.placeholder':
     '免責・Origin ポーリング・エディション・更新チャンネルの設定は後続フェーズで実装します。',
