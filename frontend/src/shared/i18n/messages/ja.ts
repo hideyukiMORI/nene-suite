@@ -70,6 +70,27 @@ export const ja: Partial<MessageCatalog> = {
   'suite.account.placeholder':
     'プロフィール・パスワード / MFA・セッションは後続フェーズで実装します。',
 
+  'suite.home.eyebrow': '運用コンソール',
+  'suite.home.greeting': 'おかえりなさい、',
+  'suite.home.subtitle': 'インストール済みアプリの起動、更新・組織・アクセスの管理。',
+  'suite.home.greetColor': '名前の色',
+  'suite.home.greetColor.custom': 'カスタム',
+  'suite.home.appsTitle': '導入済みアプリ',
+  'suite.home.open': '開く',
+  'suite.home.status.active': '利用中',
+  'suite.home.kpi.installed': '利用中アプリ',
+  'suite.home.kpi.updates': '更新あり',
+  'suite.home.kpi.members': '組織メンバー',
+  'suite.home.kpi.audit': '監査(24h)',
+  'suite.home.kpi.unavailable': 'Origin 連携（Phase B）で表示',
+  'suite.home.firstRun.title': 'NeNe Suite へようこそ',
+  'suite.home.firstRun.subtitle':
+    '必要な業務アプリを選んでインストールし、ここから起動・管理します。',
+  'suite.home.updates.title': '利用可能なアップデート',
+  'suite.home.announcements.title': 'お知らせ',
+  'suite.home.feeds.placeholder':
+    '更新・お知らせ・ハウスアドは Origin 連携（Phase B）で表示されます。',
+
   'suite.auth.subtitle': 'NeNe インストールを管理するにはサインインしてください',
   'suite.auth.emailLabel': 'メールアドレス',
   'suite.auth.emailPlaceholder': 'operator@example.com',

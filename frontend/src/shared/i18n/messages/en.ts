@@ -83,6 +83,28 @@ export const en = {
   'suite.account.placeholder':
     'Profile, password / MFA, and active sessions land in a later phase.',
 
+  // ── Home / dashboard ─────────────────────────────────────────────────────
+  'suite.home.eyebrow': 'Operations console',
+  'suite.home.greeting': 'Welcome back,',
+  'suite.home.subtitle': 'Launch installed apps, and manage updates, organizations, and access.',
+  'suite.home.greetColor': 'Name color',
+  'suite.home.greetColor.custom': 'Custom',
+  'suite.home.appsTitle': 'Your apps',
+  'suite.home.open': 'Open',
+  'suite.home.status.active': 'Active',
+  'suite.home.kpi.installed': 'Active apps',
+  'suite.home.kpi.updates': 'Updates',
+  'suite.home.kpi.members': 'Members',
+  'suite.home.kpi.audit': 'Audit (24h)',
+  'suite.home.kpi.unavailable': 'Available with Origin (Phase B)',
+  'suite.home.firstRun.title': 'Welcome to NeNe Suite',
+  'suite.home.firstRun.subtitle':
+    'Install the apps your back office needs — then launch and manage them from here.',
+  'suite.home.updates.title': 'Available updates',
+  'suite.home.announcements.title': 'Announcements',
+  'suite.home.feeds.placeholder':
+    'Update, announcement, and house-ad feeds arrive with Origin (Phase B).',
+
   // ── Auth (apex login) ────────────────────────────────────────────────────
   'suite.auth.subtitle': 'Sign in to manage your NeNe installation',
   'suite.auth.emailLabel': 'Email',
