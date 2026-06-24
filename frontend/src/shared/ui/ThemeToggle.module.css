@@ -1,0 +1,18 @@
+/* Header icon button — DESIGN-SYSTEM.md §5.1 (38×38, --surface-2 ground). */
+.button {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button:hover {
+  color: var(--fg);
+  border-color: var(--border-2);
+}

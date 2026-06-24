@@ -39,6 +39,11 @@ export const en = {
   'suite.locale.label': 'Language',
   'suite.locale.select': 'Select language',
 
+  // ── Theme ────────────────────────────────────────────────────────────────
+  'suite.theme.toggle': 'Toggle light / dark theme',
+  'suite.theme.light': 'Light',
+  'suite.theme.dark': 'Dark',
+
   // ── Apex navigation ──────────────────────────────────────────────────────
   'suite.nav.home': 'Home',
   'suite.nav.install': 'Install apps',
