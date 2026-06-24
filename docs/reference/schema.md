@@ -34,6 +34,10 @@ product database, not here.
 
 - [`federation_signing_keys`](#federation_signing_keys) — Federation IdP signing keys: public JWK only (private key never stored). Exactly one row is active; status drives JWKS publication.
 
+### Origin
+
+- [`origin_gen_watermarks`](#origin_gen_watermarks) — Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per product slug, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
+
 ## Relationships
 
 Logical references only — the control DB declares no physical foreign keys
@@ -192,6 +196,18 @@ Suite tenancy registry (SSOT). external_id is the federation UUID propagated to 
 
 - `idx_organizations_external_id` (UNIQUE) on `external_id`
 - `idx_organizations_slug` (UNIQUE) on `slug`
+
+## `origin_gen_watermarks`
+
+_Group: Origin_
+
+Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per product slug, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
+
+| Column | Type | Null | Key | Description |
+| --- | --- | --- | --- | --- |
+| `product` | `VARCHAR(100)` | NO | PK | Catalog product slug. Product-scoped, cross-channel (one watermark per product). |
+| `gen` | `BIGINT` | NO |  | Highest accepted profiled-TUF generation; advanced monotonically (never regresses). |
+| `updated_at` | `VARCHAR(32)` | NO |  | Last advance time, ISO-8601 UTC string. |
 
 ## `revoked_tokens`
 
