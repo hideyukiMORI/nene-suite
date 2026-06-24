@@ -74,6 +74,23 @@ export const ja: Partial<MessageCatalog> = {
   'suite.appDetail.provides': '{{names}} を提供',
   'suite.appDetail.changelog': '変更履歴',
   'suite.appDetail.changelogPlaceholder': '変更履歴は Origin 連携（Phase B）で表示されます。',
+
+  'suite.admin.title': '管理',
+  'suite.admin.subtitle': '組織・メンバー・オペレーター・連携キーを管理します。',
+  'suite.admin.tab.organizations': '組織',
+  'suite.admin.tab.members': 'メンバー',
+  'suite.admin.tab.operators': 'オペレーター',
+  'suite.admin.tab.keys': '連携キー',
+  'suite.admin.members.selectOrg': 'メンバーを管理するには、組織タブから組織を選択してください。',
+  'suite.admin.operators.email': 'メール',
+  'suite.admin.operators.name': '名前',
+  'suite.admin.operators.scope': 'スコープ',
+  'suite.admin.operators.mfa': 'MFA',
+  'suite.admin.operators.lastAccess': '最終アクセス',
+  'suite.admin.operators.empty': 'オペレーターがいません。',
+  'suite.admin.operators.phaseB': 'オペレーター詳細 API（Phase B）で表示',
+  'suite.admin.keys.placeholder':
+    '連携署名鍵は現在オペレーターコマンドで管理します。一覧 API とコンソールは後続フェーズで実装します。',
   'suite.settings.title': '設定',
   'suite.settings.placeholder':
     '免責・Origin ポーリング・エディション・更新チャンネルの設定は後続フェーズで実装します。',

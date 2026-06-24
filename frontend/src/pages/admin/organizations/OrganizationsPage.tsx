@@ -1,16 +1,6 @@
-import { OrganizationConsole } from '@/features/organization-console'
-import { useTranslation } from '@/shared/i18n'
-import { PageHeader } from '@/shared/ui'
+import { AdminHub } from '@/features/admin-hub'
 
-/** Content-only — the global chrome (header/nav/org switcher) is owned by AppShell. */
+/** Content-only — the global chrome is owned by AppShell; AdminHub owns its header + tabs. */
 export function OrganizationsPage() {
-  const { t } = useTranslation()
-
-  return (
-    <>
-      <PageHeader title={t('suite.org.title')} />
-      <p>{t('suite.org.description')}</p>
-      <OrganizationConsole />
-    </>
-  )
+  return <AdminHub />
 }
