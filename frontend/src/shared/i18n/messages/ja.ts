@@ -35,14 +35,40 @@ export const ja: Partial<MessageCatalog> = {
   'suite.theme.dark': 'ダーク',
 
   'suite.nav.home': 'ホーム',
+  'suite.nav.catalog': 'カタログ',
   'suite.nav.install': 'アプリをインストール',
   'suite.nav.audit': '監査ログ',
+  'suite.nav.admin': '管理',
   'suite.nav.settings': '設定',
   'suite.nav.logout': 'ログアウト',
+  'suite.nav.getApps': 'アプリを入手',
   'suite.nav.openMenu': 'ナビゲーションメニューを開く',
   'suite.nav.closeMenu': 'ナビゲーションメニューを閉じる',
   'suite.nav.appTitle': 'NeNe Suite',
   'suite.nav.organizations': '組織',
+
+  'suite.shell.navLabel': 'ナビゲーション',
+  'suite.shell.search': '検索・移動…',
+  'suite.shell.commandPalette': 'コマンドパレット',
+  'suite.shell.commandPalette.empty': '一致する項目がありません。',
+  'suite.shell.commandPalette.navGroup': '移動',
+  'suite.shell.commandPalette.actionGroup': 'アクション',
+  'suite.shell.notifications': '通知',
+  'suite.shell.notifications.placeholder':
+    '更新・お知らせ・キー期限の通知は Origin 連携（Phase B）で表示されます。',
+  'suite.shell.account.menu': 'アカウントメニュー',
+  'suite.shell.account.profile': 'プロフィール',
+  'suite.shell.account.security': 'セキュリティ',
+
+  'suite.catalog.title': 'アプリカタログ',
+  'suite.catalog.placeholder':
+    'カタログ（ストア）は後続フェーズで実装します。当面はウィザードからインストールしてください。',
+  'suite.settings.title': '設定',
+  'suite.settings.placeholder':
+    '免責・Origin ポーリング・エディション・更新チャンネルの設定は後続フェーズで実装します。',
+  'suite.account.title': 'アカウント & セキュリティ',
+  'suite.account.placeholder':
+    'プロフィール・パスワード / MFA・セッションは後続フェーズで実装します。',
 
   'suite.auth.subtitle': 'NeNe インストールを管理するにはサインインしてください',
   'suite.auth.emailLabel': 'メールアドレス',

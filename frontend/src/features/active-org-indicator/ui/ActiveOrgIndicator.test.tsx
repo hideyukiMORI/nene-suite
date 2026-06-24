@@ -22,14 +22,16 @@ function seedSession(): void {
 }
 
 describe('ActiveOrgIndicator', () => {
-  it('renders the operator organizations with the active one selected', async () => {
+  it('shows the active organization and lists memberships in the popover', async () => {
+    const user = userEvent.setup()
     seedSession()
     renderWithProviders(<ActiveOrgIndicator />)
 
-    const select = await screen.findByRole('combobox')
-    expect(await screen.findByRole('option', { name: 'Acme KK' })).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: 'Beta LLC' })).toBeInTheDocument()
-    expect(select).toHaveValue(SESSION_ORG_ACME.organizationId)
+    const trigger = await screen.findByRole('button', { name: /Acme KK/ })
+    await user.click(trigger)
+
+    expect(await screen.findByRole('menuitem', { name: /Acme KK/ })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Beta LLC/ })).toBeInTheDocument()
   })
 
   it('switches the active organization and persists the re-issued session', async () => {
@@ -37,8 +39,8 @@ describe('ActiveOrgIndicator', () => {
     seedSession()
     renderWithProviders(<ActiveOrgIndicator />)
 
-    const select = await screen.findByRole('combobox')
-    await user.selectOptions(select, SESSION_ORG_BETA.organizationId)
+    await user.click(await screen.findByRole('button', { name: /Acme KK/ }))
+    await user.click(await screen.findByRole('menuitem', { name: /Beta LLC/ }))
 
     await waitFor(() => {
       expect(authStore.getOrgExternalId()).toBe(SESSION_ORG_BETA.externalId)

@@ -46,14 +46,42 @@ export const en = {
 
   // ── Apex navigation ──────────────────────────────────────────────────────
   'suite.nav.home': 'Home',
+  'suite.nav.catalog': 'Catalog',
   'suite.nav.install': 'Install apps',
   'suite.nav.audit': 'Audit log',
+  'suite.nav.admin': 'Admin',
   'suite.nav.settings': 'Settings',
   'suite.nav.logout': 'Log out',
+  'suite.nav.getApps': 'Get apps',
   'suite.nav.openMenu': 'Open navigation menu',
   'suite.nav.closeMenu': 'Close navigation menu',
   'suite.nav.appTitle': 'NeNe Suite',
   'suite.nav.organizations': 'Organizations',
+
+  // ── App shell (header chrome) ────────────────────────────────────────────
+  'suite.shell.navLabel': 'Navigation',
+  'suite.shell.search': 'Search or jump to…',
+  'suite.shell.commandPalette': 'Command palette',
+  'suite.shell.commandPalette.empty': 'No matches.',
+  'suite.shell.commandPalette.navGroup': 'Go to',
+  'suite.shell.commandPalette.actionGroup': 'Actions',
+  'suite.shell.notifications': 'Notifications',
+  'suite.shell.notifications.placeholder':
+    'Update, announcement, and key-expiry signals arrive with Origin (Phase B).',
+  'suite.shell.account.menu': 'Account menu',
+  'suite.shell.account.profile': 'Profile',
+  'suite.shell.account.security': 'Security',
+
+  // ── Placeholder surfaces (built in a later phase) ────────────────────────
+  'suite.catalog.title': 'App catalog',
+  'suite.catalog.placeholder':
+    'The catalog store lands in a later phase. For now, install apps through the wizard.',
+  'suite.settings.title': 'Settings',
+  'suite.settings.placeholder':
+    'Disclaimer, Origin polling, edition, and update channel settings land in a later phase.',
+  'suite.account.title': 'Account & security',
+  'suite.account.placeholder':
+    'Profile, password / MFA, and active sessions land in a later phase.',
 
   // ── Auth (apex login) ────────────────────────────────────────────────────
   'suite.auth.subtitle': 'Sign in to manage your NeNe installation',
