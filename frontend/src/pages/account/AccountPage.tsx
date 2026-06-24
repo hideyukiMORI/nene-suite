@@ -1,14 +1,6 @@
-import { useTranslation } from '@/shared/i18n'
-import { PlaceholderState } from '@/shared/ui'
+import { AccountView } from '@/features/account'
 
-/** Account & security — built in a later phase. Honest placeholder, no fabricated data. */
+/** Account & security. Content-only — global chrome is in AppShell. */
 export function AccountPage() {
-  const { t } = useTranslation()
-  return (
-    <PlaceholderState
-      icon="manage_accounts"
-      title={t('suite.account.title')}
-      description={t('suite.account.placeholder')}
-    />
-  )
+  return <AccountView />
 }

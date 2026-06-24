@@ -113,6 +113,22 @@ export const en = {
   'suite.account.title': 'Account & security',
   'suite.account.placeholder':
     'Profile, password / MFA, and active sessions land in a later phase.',
+  'suite.account.subtitle': 'Your profile, security, and signed-in sessions.',
+  'suite.account.tab.profile': 'Profile',
+  'suite.account.tab.security': 'Security',
+  'suite.account.tab.sessions': 'Sessions',
+  'suite.account.field.email': 'Email',
+  'suite.account.field.role': 'Role',
+  'suite.account.profile.phaseB': 'Editing your display name and email lands in a later phase.',
+  'suite.account.security.title': 'Password & MFA',
+  'suite.account.security.phaseB':
+    'Password change and multi-factor authentication land in a later phase.',
+  'suite.account.sessions.current': 'Current session',
+  'suite.account.sessions.expires': 'Expires',
+  'suite.account.sessions.activeOrg': 'Active organization',
+  'suite.account.sessions.none': 'No active organization',
+  'suite.account.sessions.phaseB':
+    'Per-device sessions and “log out everywhere” land in a later phase.',
 
   // ── Home / dashboard ─────────────────────────────────────────────────────
   'suite.home.eyebrow': 'Operations console',
