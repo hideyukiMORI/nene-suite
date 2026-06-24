@@ -32,6 +32,7 @@ use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotReadyExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
+use NeNeSuite\Origin\OriginServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use NeNeSuite\SuiteEnv\SuiteEnvServiceProvider;
@@ -72,7 +73,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new DatabaseProvisionServiceProvider())
             ->addProvider(new InstalledAppsServiceProvider())
             ->addProvider(new InstallerServiceProvider())
-            ->addProvider(new TenancyServiceProvider());
+            ->addProvider(new TenancyServiceProvider())
+            ->addProvider(new OriginServiceProvider());
 
         $builder
             ->set(
