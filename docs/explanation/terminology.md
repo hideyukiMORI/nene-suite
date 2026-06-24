@@ -203,6 +203,10 @@ Canonical object / field names the Suite client consumes; do not rename or inven
 | Monotonic version counter | `gen` | `generation`; `version` is reserved for the product semver |
 | Yank / rollback watermark | `min_valid_generation` | `min_gen`, `revoked_generation` |
 | Schema / contract version | `spec_version` | `contract_version` |
+| Feed metadata (content tree, targets role) | `feed-targets` (= the `feed` object) | `announcements`/`ads` feed (bare array — superseded) |
+| Feed body (item array) | `feed-body` | inline feed array |
+| Feed body integrity hash | `content_sha256` | `body_sha256`, `feed_sha256` |
+| Cohort bucket | `audience` (`free` \| `paid`) | `tier` (reserved for the IdP claim), `segment` |
 
 > The profiled-TUF read model (Topic 2 re-agreement, 2026-06-24) **supersedes the flat
 > `manifest` + JWKS `key_set` shape**. The signing/transport primitive (detached JWS, RFC 7515 +
