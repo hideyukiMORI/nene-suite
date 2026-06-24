@@ -5,7 +5,7 @@ merge gate for the profiled-TUF read contract (Origin ADR 0006 §8; consumed by 
 [ADR 0017](../../../docs/adr/0017-origin-client-consumption-contract.md)).
 
 - **Source**: `nene-origin` `docs/spec/conformance/` (`trust-anchor.json`, `expectations.json`, `cases/`).
-- **Pinned at**: `nene-origin@9812c2b` ("feat(spec): signed conformance corpus + reference verifier (PR-4)").
+- **Pinned at**: `nene-origin@d5882cf` (PR #114, "feat(spec): signed conformance corpus + reference verifier" — the official merge-gate commit; Origin huddle `origin-0009`).
 - **Keys**: dev/test Ed25519 only, derived from public labels. **No production key material.**
 
 `tests/Origin/OriginConformanceCorpusTest.php` runs every case through Suite's
