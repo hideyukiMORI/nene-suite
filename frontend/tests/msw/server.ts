@@ -6,6 +6,7 @@ import { installedAppHandlers } from './handlers/installed-app'
 import { membershipHandlers } from './handlers/membership'
 import { operatorHandlers } from './handlers/operator'
 import { organizationHandlers } from './handlers/organization'
+import { originHandlers } from './handlers/origin'
 import { suiteAuditEventHandlers } from './handlers/suite-audit-event'
 
 export const mswServer = setupServer(
@@ -17,4 +18,5 @@ export const mswServer = setupServer(
   ...organizationHandlers,
   ...membershipHandlers,
   ...operatorHandlers,
+  ...originHandlers,
 )

@@ -36,4 +36,48 @@ describe('Dashboard', () => {
 
     expect(await screen.findByText('Welcome to NeNe Suite')).toBeInTheDocument()
   })
+
+  it('wires the updates panel to verified Origin signals', async () => {
+    seedSession()
+    mswServer.use(
+      http.get('/api/v1/origin/updates', () =>
+        HttpResponse.json({
+          available: true,
+          updates: [
+            {
+              product: 'nene-invoice',
+              channel: 'stable',
+              installedVersion: null,
+              status: 'unknown',
+              latestVersion: '1.4.0',
+              minSupportedVersion: '1.2.0',
+              changelogUrl: null,
+              releasedAt: null,
+              freshness: 'fresh',
+              reason: null,
+              warnings: [],
+            },
+            {
+              product: 'nene-clear',
+              channel: 'stable',
+              installedVersion: '1.0.0',
+              status: 'update_available',
+              latestVersion: '1.1.0',
+              minSupportedVersion: null,
+              changelogUrl: null,
+              releasedAt: null,
+              freshness: 'fresh',
+              reason: null,
+              warnings: [],
+            },
+          ],
+        }),
+      ),
+    )
+    renderWithProviders(<Dashboard />)
+
+    expect(await screen.findByText('Latest 1.4.0')).toBeInTheDocument()
+    expect(screen.getByText('Update available')).toBeInTheDocument()
+    expect(screen.getByText('Latest available')).toBeInTheDocument()
+  })
 })

@@ -70,7 +70,7 @@ export function Dashboard() {
         <span className={styles['sectionLine']} />
       </div>
       <Pillars apps={apps} onOpenDetail={setDetailId} />
-      <Feeds />
+      <Feeds apps={apps} />
       {detailId !== null ? (
         <AppDetailDrawer
           appId={detailId}

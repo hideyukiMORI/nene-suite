@@ -160,6 +160,14 @@ export const en = {
   'suite.home.firstRun.subtitle':
     'Install the apps your back office needs — then launch and manage them from here.',
   'suite.home.updates.title': 'Available updates',
+  'suite.home.updates.checking': 'Checking for updates…',
+  'suite.home.updates.empty': 'No update information.',
+  'suite.home.updates.latest': 'Latest {{version}}',
+  'suite.home.updates.status.up_to_date': 'Up to date',
+  'suite.home.updates.status.update_available': 'Update available',
+  'suite.home.updates.status.forced': 'Security update',
+  'suite.home.updates.status.unknown': 'Latest available',
+  'suite.home.updates.status.unavailable': 'Unavailable',
   'suite.home.announcements.title': 'Announcements',
   'suite.home.feeds.placeholder':
     'Update, announcement, and house-ad feeds arrive with Origin (Phase B).',

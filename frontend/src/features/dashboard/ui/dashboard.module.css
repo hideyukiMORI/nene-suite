@@ -383,6 +383,64 @@
   color: var(--fg-3);
 }
 
+.feedList {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.feedRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 2px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.feedRow:first-child {
+  border-top: 0;
+}
+
+.feedRowName {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.feedRowVersion {
+  color: var(--fg-3);
+  font-family: var(--font-num), monospace;
+  font-size: 12px;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  color: var(--fg-3);
+  background: color-mix(in srgb, var(--fg-3) 12%, transparent);
+}
+
+.statusBadge[data-status='update_available'] {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 14%, transparent);
+}
+
+.statusBadge[data-status='forced'] {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+}
+
+.statusBadge[data-status='up_to_date'] {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 14%, transparent);
+}
+
 /* ── Loading / error ────────────────────────────────────────────────────── */
 .skeletonGrid {
   display: grid;
