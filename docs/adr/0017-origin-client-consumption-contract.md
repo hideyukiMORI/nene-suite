@@ -4,20 +4,31 @@
 
 accepted
 
+**Revised 2026-06-24 (Topic 2).** The read model is now a **profiled TUF** model
+(Origin [ADR 0006](https://github.com/hideyukiMORI/nene-origin)); this revision **supersedes the
+flat shape** recorded in the original 2026-06-23 version (a single `manifest` object + a JWKS
+`key_set`). The signing/transport primitive and the §1 SSOT split are unchanged.
+
 ## Context
 
 NeNe Suite's dashboard surfaces three Origin-fed signals per installed app — **available
-updates**, **announcements**, and **house-ads** — mirroring the Adobe Creative Cloud
-launcher. [ADR 0013](0013-update-aggregation-and-upgrade-orchestration.md) established Suite
-as the optional **aggregator/upgrade orchestrator** but deferred the concrete wire contract
-to "a Suite-side ADR when implementation lands". This ADR records that contract, as agreed
-with the NeNe Origin authority.
+updates**, **announcements**, and **house-ads** — mirroring the Adobe Creative Cloud launcher.
+[ADR 0013](0013-update-aggregation-and-upgrade-orchestration.md) established Suite as the optional
+**aggregator/upgrade orchestrator** but deferred the concrete wire contract to "a Suite-side ADR
+when implementation lands". This ADR is the **consumer** record (owner: nene-suite); Origin owns
+the authoritative spec (`nene-origin/docs/spec/`).
 
-The agreement was reached 2026-06-23 in a cross-repo working session (notes archived at
-`/home/xi/docker/huddle-suite-and-origin/`). Origin's authoritative spec lives in the
-`nene-origin` repo (`nene-origin/docs/spec/openapi.yaml` + `*.schema.json`); Origin owns the
-contract and is filing the amendments noted under **Origin-side follow-up**. This ADR is the
-**consumer** record (owner: nene-suite) so Suite can implement against a stable target.
+**Two rounds of cross-repo agreement** (notes archived at
+`/home/xi/docker/huddle-suite-and-origin/`):
+
+- **Topic 1 (2026-06-23)** agreed a flat read model: `.jws` detached sidecar (RFC 7515 + RFC 7797
+  `b64:false`), `?channel=`, locale fallback, per-product fan-out.
+- **Topic 2 (2026-06-24)** re-agreed the **read model itself**. After a 20-persona adversarial
+  design review, Origin recorded **ADR 0006 "signed static read model = profiled TUF"**, which
+  **keeps the Topic 1 transport/signing primitive** but **changes the object structure** to a
+  vetted hierarchy with defenses against rollback / freeze / mix-and-match. Both sides are
+  **pre-launch** (no client or signing CLI implemented, nothing published), so the model is
+  switched **cleanly in `/v1`** — no `/v1`→`/v2` migration, no compatibility window.
 
 Layering recap (ADR 0013): Origin is the private signing authority; each product ships a thin
 client; Suite optionally aggregates. Suite must never become required for a standalone product
@@ -25,91 +36,145 @@ client; Suite optionally aggregates. Suite must never become required for a stan
 
 ## Decision
 
-### 1. Source of truth (SSOT)
+### 1. Source of truth (SSOT) — unchanged
 
 - **Suite `catalog/apps.json` owns the app roster** and the display metadata
   (`icon` / `description` / `category` / `min_suite_version` / `deprecation`).
-- **Origin owns per-product signals only** — version/update, announcements, house-ads.
-  There is **no global "all apps" endpoint**; Suite fans out per product slug from its own
-  roster. (This keeps the roster a Suite concern and avoids Origin enumerating the portfolio.)
+- **Origin owns per-product signals only** — version/update, announcements, house-ads. There is
+  **no global "all apps" endpoint**; Suite fans out per product slug from its own roster.
 
-### 2. Read API (consumed by Suite)
+### 2. Read model — profiled TUF (static, signed, no read server)
 
 Base = `NENE_ORIGIN_URL`, all under `/v1`, signed **static** objects (GET, unauthenticated,
-CDN-cacheable). Suite consumes:
+CDN-cacheable). The model is a hierarchy of signed objects, **per tree** = per
+`(product, channel)`; the **content tree** (announcements / house-ads) is **axis-separated** from
+the update tree so content updates never touch code metadata.
 
-| Object | Request | Shape (consumed fields) |
+```
+embedded root key(s) (current + next)          ← shipped in each client build
+  └ root.json                                  ← role delegations + public keys, signed M-of-N
+     ├ update tree  (product/channel): current → [snapshot] → targets(=manifest) → artifacts/{sha256}
+     └ content tree (product/audience): feed current → [feed-snapshot] → feed-targets (cohort only)
+```
+
+`current` (the timestamp role) is the **only mutable object per tree**; everything else is
+immutable and content-addressed (`{sha256}`).
+
+### 3. Objects consumed
+
+| Object | Role | Consumed fields (Suite) |
 | --- | --- | --- |
-| version manifest | `GET /v1/manifest/{product}?channel=` | `latest{version, released_at, artifact_url, artifact_sha256, changelog_url?, requires}`, `min_supported_version`, `channels`. `channel` ∈ {stable,beta,dev}, default `stable`, subset of declared `channels`. |
-| announcements | `GET /v1/announcements/{product}?locale=&since=` | signed JSON **array**; `id, severity(info\|important\|security), locale, title, body_md, publish_from, publish_until, target{version_range}, link_url`. |
-| house-ads | `GET /v1/ads/{product}?locale=` | signed JSON **array**; `id, locale, title, body_md?, creative_url, link_url, weight, impression_cap, target{version_range?, tier:"free"}`. |
-| keys | `GET /v1/keys` | JWKS (public members only); `kid` + rotation `active\|next\|retiring\|retired` + `overlap_until`. |
+| `root.json` (+ `root/{n}.json`) | root | public keys + role delegations + thresholds (**public material only**); `spec_version` |
+| `current` (per tree) | timestamp | `gen`, `targets_sha256`, `snapshot_sha256`, `expires`, `min_client_version`, `poll_after`, `priority`, `history[]`, `successor?` |
+| `snapshot/{sha}` | snapshot | consistency anchor (anti mix-and-match); **may be skipped by an aggregating client — see §4** |
+| `targets/{sha}` (= manifest) | targets | `latest{version, released_at, artifact_url, artifact_sha256, changelog_url?, requires}`, `min_supported_version`, `channels`, `provenance`; exhaustive over every artifact `sha256` |
+| `artifacts/{sha256}` | target body | the binary (verified by hash before apply) |
+| feed `current` + `feed-targets` | timestamp/targets | announcements / house-ads, **per-locale**, cohort fields only |
 
-Per-product fan-out over the roster; cost bounded by `ETag` / `If-None-Match` → `304`.
+Every object carries `{schema_version, spec_version}`; **no raw keys, no PII, no per-user
+identifiers** are ever published. Channel selection stays `?channel={stable|beta|dev}` (default
+`stable`, subset of the declared `channels`). Per-product fan-out; cost bounded by `ETag` /
+`If-None-Match` → `304`.
 
-### 3. Signature verification
+### 4. Trust, keys & verification order
 
-Every body has a sibling **`.jws` sidecar** (e.g. `…/manifest/{product}.jws`): a **detached
-JWS** (RFC 7515) using **RFC 7797 unencoded payload** (`b64:false`, `crit:["b64"]`), protected
-header `{alg, kid}` (`EdDSA`/Ed25519 preferred; `ES256`/`RS256` allowed). The signature covers
-the **exact served bytes** (Origin invariant: signed canonical bytes == served bytes; CDN does
-not transform bodies).
+- **Embedded root, no TOFU.** Suite ships root public keys (**current + next**, for overlap
+  rotation) at build time and verifies `root.json` against them with the **root M-of-N threshold**,
+  enforcing a **root-version floor** (a withheld rotation fails closed).
+- **Primitive unchanged.** Each object's `.jws` sidecar is a **detached JWS** (RFC 7515 + RFC 7797
+  unencoded payload, `b64:false`, `crit:["b64"]`), protected header `{alg, kid}` (`EdDSA`/Ed25519
+  preferred; `ES256`/`RS256` allowed), covering the **exact served bytes**. Suite verifies **without
+  a generic JWS / TUF parser** — it reconstructs the signing input
+  `ASCII(BASE64URL(protected) + ".") ‖ <raw body bytes>` and verifies with **libsodium**
+  (`sodium_crypto_sign_verify_detached`) or **openssl** (EC/RSA).
+- **Per-`.jws` rules:** verify with the **role's** delegated key; `kid`-valid-at-`iat`
+  (`kid.not_after ≥ signature iat`); per-major **algorithm allowlist**, asymmetric-only, `"none"`
+  forbidden.
+- **Verification order (client MUST):**
+  1. verify `root.json` (embedded root, M-of-N, version floor) → resolve `role → {keyids, threshold}`;
+  2. fetch + verify `current` (timestamp role) → check **`gen` monotonic** (§5) and **`expires`
+     freshness** (§5);
+  3. `[snapshot]` — the authority always emits it; **an aggregating client may skip it** by pinning
+     `current.targets_sha256` (a single-`targets` tree needs no separate snapshot consistency check);
+  4. fetch + verify `targets` at `current.targets_sha256` (targets role; exhaustive artifact hashes);
+  5. only then **trust fields**; verify **`artifact_sha256`** before applying any downloaded artifact.
 
-Suite verifies **without a generic JWS parser** — it reconstructs the RFC 7797 signing input
-`ASCII(BASE64URL(protected) + ".") ‖ <raw body bytes>` and verifies directly with **libsodium**
-(`sodium_crypto_sign_verify_detached`, Ed25519) or **openssl** (EC/RSA). `firebase/php-jwt`
-(used for federation JWTs) is **not** used here — it does not support unencoded/detached payloads.
+### 5. Anti-attack obligations (consumer side)
 
-Client verification order (MUST): fetch `/v1/keys` (pin a root key at build; refresh only on an
-unknown `kid` that chains to pinned material) → verify the `.jws` over the raw body → only then
-trust fields → verify `artifact_sha256` **before** applying any downloaded update.
+- **Rollback** — persist a **per-product `gen` watermark** (**product-scoped, cross-channel**, so a
+  channel switch cannot downgrade); reject a `current` whose `gen` is below the watermark or the
+  **build-time `gen`/date floor**; honor a `min_valid_generation` watermark / `poisoned` marker
+  (refused even if cached).
+- **Freeze** — `current.expires` (**default 30 d**, per-tree) with **fail-degraded** behaviour
+  (`fresh → warn → refuse-new → hard`) mapped to **per-card** dashboard state — one product's stale
+  `current` must **not** refuse the whole dashboard. `poll_after` (default 6 h) is honored with
+  **client-side jitter**; the aggregator staggers polls per product.
+- **Mix-and-match** — the authority always emits a **per-tree** `snapshot`; Suite uses the
+  constrained-client **reduction** of §4 step 3. There is **no global snapshot** across products, so
+  aggregation stays O(N) per-tree.
 
-### 4. Locale fallback
+### 6. Locale fallback (content tree) — unchanged
 
-`announcements`/`ads` are per-locale signed objects. Suite maintains **ja + en** only (other
-locales fall back to en — see frontend i18n posture).
+`announcements` / `ads` are per-locale signed objects. Suite maintains **ja + en** only.
 
 - Requested locale unpublished → **404** → Suite refetches **en** (ja/en are always published).
 - Published but empty → **200** with a signed `[]` → show "none" (do **not** fall back).
-- `manifest` is locale-independent; its 404 means product/channel absent.
+- `targets`/`manifest` are locale-independent; a 404 there means product/channel absent.
 
-### 5. Entitlement
+### 7. Entitlement — unchanged
 
 In **suite mode**, `tier` / `ads_off` come from the **federation IdP claim**
 ([ADR 0012](0012-federation-participation-contract.md)), **not** an Origin read endpoint. Paid
-suppresses house-ads client-side; house-ads carry `target.tier="free"`. Suite does not call any
-`/v1/entitlement` endpoint.
+suppresses house-ads client-side; house-ads carry `target.tier="free"`. Suite does not read the
+Origin entitlement audience-policy / `min_valid_generation` object in suite mode.
 
-### 6. Update determination (Suite-side)
+### 8. Update determination (Suite-side)
 
-- **Update available** = installed version `<` `manifest.latest.version` (semver compare).
-- **Forced update** = installed `<` `min_supported_version` (security floor) → surfaced distinctly.
-- **"Update all"** ordering uses `latest.requires` (dependency min-compatible ranges) + the
-  catalog DAG (`tools/validate-catalog.sh`), per ADR 0013.
+- **Update available** = installed version `<` `targets.latest.version` (semver compare), and the
+  candidate's `gen` is **not below** the persisted watermark (§5).
+- **Forced update** = installed `<` `targets.min_supported_version` (security floor) → surfaced distinctly.
+- **"Update all"** ordering uses `targets.latest.requires` (dependency min-compatible ranges) + the
+  catalog DAG (`tools/validate-catalog.sh`), per ADR 0013. `requires` stays in `targets`.
 - No PII / customer data ever sent to Origin (signed static GETs only).
 
 ## Consequences
 
-**Benefits.** A stable, signed, CDN-friendly contract Suite can implement against now; no live
-Origin server or auth needed; verification is library-independent (raw sodium/openssl); roster
-stays a Suite concern.
+**Benefits.** Vetted resistance to rollback / freeze / mix-and-match / key-compromise without
+hand-rolled crypto; offline-verifiable; mirror-resistant; cheapest architecture (no read server).
+Fixing the model pre-launch avoids a `/v1`→`/v2` migration of an immortal, embedded-client-readable
+contract. The transport primitive and SSOT split from Topic 1 are preserved, so prior agreement is
+not lost.
 
-**Costs / follow-up.**
-- **Origin-side (owned by nene-origin):** ADR 0001 §4 amendment (`.jws` sidecar + RFC 7797);
-  `openapi.yaml` adds `?channel=`, the `.jws` sidecars, and the locale-fallback semantics.
-- **Suite-side (this repo):** build the Origin client — per-product fetch (ETag) + `.jws`
-  verification + version-compare/forced-update + dependency-ordered "update all"; plus the
-  catalog-schema extension for `icon/description/category/min_suite_version` (separate issue).
-  UI wiring (updates badge, announcements rail, ad slot) follows the frontend IA work.
-- Suite depends on Origin shipping the amendment before end-to-end verification against a real
-  feed; unit tests use a local test keypair + signed fixtures in the interim.
+**Conformance is the linchpin (consumer cost is bounded by it).** The added work is **client state
+and chain logic, not new crypto** (the §4 primitive is unchanged). To keep that cost acceptable,
+Suite implements against Origin's **single canonical verifier + signed conformance corpus**
+(positive + negative vectors: `gen` rollback, expired, revoked `kid`, missing artifact hash,
+snapshot mismatch, poisoned, root-version-floor violation, disallowed alg). The corpus is a **merge
+gate for every consumer**; Suite (PHP, sodium/openssl) ships its own verifier and proves parity by
+running the corpus in CI.
+
+**Sequencing (D6, agreed, clean pre-launch switch).**
+1. **Origin first (blocks Suite client):** publish read schemas/paths (`root.json` / `current`
+   incl. `targets_sha256` / `snapshot` / `targets` / feeds) + the **verification-order spec** + the
+   **canonical verifier** + the **conformance corpus / signed vectors**.
+2. **Suite next:** implement the Origin client against that corpus (CI green); this ADR is the
+   target. **The client is intentionally not started before step 1** — building against an undefined
+   verifier/vectors would defeat the conformance guarantee.
+3. **Origin then:** ratify ADR 0006 `proposed → accepted` and amend ADR 0001 / 0002.
+   Production key ceremony and publishing stay **human-gated** (outside this agreement).
+
+**Other Suite follow-up.** The `catalog/apps.json` schema extension for
+`icon/description/category/min_suite_version` is a **separate issue** (unrelated to this read-model
+change). The dashboard's Origin feeds remain a Phase-B placeholder until the client lands.
 
 ## Related
 
-- ADR 0013 (update aggregation & dependency-ordered upgrade orchestration — this concretizes its consumption contract)
+- Origin authority: `nene-origin/docs/adr/0006-signed-static-read-model-profiled-tuf.md` (proposed →
+  to be accepted), `…/0001`, `…/0002`, `…/0005`
+- ADR 0013 (update aggregation & dependency-ordered upgrade orchestration)
 - ADR 0012 (federation participation — entitlement claim source)
-- `docs/explanation/suite-environment-contract.md` (`NENE_ORIGIN_URL`), `docs/explanation/terminology.md` §4
-- Origin authority spec: `nene-origin/docs/spec/openapi.yaml`, `nene-origin/docs/adr/0001`, `…/0002`, `…/0005`
-- Cross-repo agreement notes: `/home/xi/docker/huddle-suite-and-origin/`
-- Issue: `#207`
-- Supersedes: none / Superseded by: none
+- Terminology: `docs/explanation/terminology.md` §4.3 (Origin read-model vocabulary)
+- Cross-repo agreement notes: `/home/xi/docker/huddle-suite-and-origin/` (Topic 1: `suite-0001…0003`;
+  Topic 2: `suite-0004`/`suite-0005`, `origin-0004…0006`, `HUDDLE END (ack)`)
+- Issue: `#207` (original), `#226` (Topic 2 revision)
+- Supersedes: the flat read-model shape in this ADR's 2026-06-23 version / Superseded by: none
