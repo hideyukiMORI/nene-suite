@@ -14,7 +14,8 @@ export function KpiStrip({ installedCount }: { installedCount: number }) {
   const updates = useOriginUpdates()
   const updateCount =
     updates.data?.available === true
-      ? updates.data.updates.filter((update) => ACTIONABLE_UPDATE_STATUSES.includes(update.status)).length
+      ? updates.data.updates.filter((update) => ACTIONABLE_UPDATE_STATUSES.includes(update.status))
+          .length
       : null
 
   return (

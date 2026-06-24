@@ -28,4 +28,7 @@ export interface OriginUpdates {
 }
 
 /** Statuses that count as an actionable update in the KPI (a confirmed diff). */
-export const ACTIONABLE_UPDATE_STATUSES: readonly OriginUpdateStatus[] = ['update_available', 'forced']
+export const ACTIONABLE_UPDATE_STATUSES: readonly OriginUpdateStatus[] = [
+  'update_available',
+  'forced',
+]

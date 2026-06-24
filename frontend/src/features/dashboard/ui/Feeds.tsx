@@ -29,7 +29,9 @@ export function Feeds({ apps }: { apps: InstalledApp[] }) {
       <ul className={styles['feedList']}>
         {updates.data.updates.map((update) => (
           <li key={update.product} className={styles['feedRow']}>
-            <span className={styles['feedRowName']}>{nameById.get(update.product) ?? update.product}</span>
+            <span className={styles['feedRowName']}>
+              {nameById.get(update.product) ?? update.product}
+            </span>
             {update.latestVersion !== null ? (
               <span className={styles['feedRowVersion']}>
                 {t('suite.home.updates.latest', { version: update.latestVersion })}
