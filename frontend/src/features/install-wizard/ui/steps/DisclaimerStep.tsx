@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from '@/shared/i18n'
+import styles from '../install-wizard.module.css'
 
 interface DisclaimerStepProps {
   isPending: boolean
@@ -11,11 +12,11 @@ export function DisclaimerStep({ isPending, onAccept }: DisclaimerStepProps) {
   const [agreed, setAgreed] = useState(false)
 
   return (
-    <section>
-      <h3>{t('suite.disclaimer.title')}</h3>
-      <p>{t('suite.disclaimer.shortNotice')}</p>
+    <div>
+      <h3 className={styles['stepTitle']}>{t('suite.disclaimer.title')}</h3>
+      <div className={styles['noticeBox']}>{t('suite.disclaimer.shortNotice')}</div>
 
-      <label>
+      <label className={styles['checkLabel']}>
         <input
           type="checkbox"
           checked={agreed}
@@ -26,11 +27,18 @@ export function DisclaimerStep({ isPending, onAccept }: DisclaimerStepProps) {
         {t('suite.disclaimer.checkbox')}
       </label>
 
-      {!agreed ? <p>{t('suite.disclaimer.mustAccept')}</p> : null}
+      {!agreed ? <p className={styles['mustAccept']}>{t('suite.disclaimer.mustAccept')}</p> : null}
 
-      <button type="button" disabled={isPending || !agreed} onClick={onAccept}>
-        {t('common.actions.confirm')}
-      </button>
-    </section>
+      <div className={styles['actions']}>
+        <button
+          type="button"
+          className={styles['primaryBtn']}
+          disabled={isPending || !agreed}
+          onClick={onAccept}
+        >
+          {t('common.actions.confirm')}
+        </button>
+      </div>
+    </div>
   )
 }

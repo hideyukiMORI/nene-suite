@@ -1,5 +1,6 @@
 import type { InstallSession } from '@/entities/install-session'
 import { useTranslation } from '@/shared/i18n'
+import styles from '../install-wizard.module.css'
 
 interface ReviewStepProps {
   session: InstallSession | undefined
@@ -12,22 +13,30 @@ export function ReviewStep({ session, isPending, onComplete }: ReviewStepProps) 
   const selectedApps = session?.selectedApps ?? []
 
   return (
-    <section>
-      <h3>{t('suite.install.review.title')}</h3>
-      <p>{t('suite.install.review.description')}</p>
+    <div>
+      <h3 className={styles['stepTitle']}>{t('suite.install.review.title')}</h3>
+      <p className={styles['stepDesc']}>{t('suite.install.review.description')}</p>
 
-      <h4>{t('suite.install.review.selectedApps')}</h4>
-      <ul>
+      <ul className={styles['reviewList']}>
         {selectedApps.map((id) => (
-          <li key={id}>{id}</li>
+          <li key={id} className={styles['reviewChip']}>
+            {id}
+          </li>
         ))}
       </ul>
 
-      <p>{t('suite.install.review.preCompleteSummary')}</p>
+      <div className={styles['summaryBox']}>{t('suite.install.review.preCompleteSummary')}</div>
 
-      <button type="button" disabled={isPending || session === undefined} onClick={onComplete}>
-        {t('common.actions.finish')}
-      </button>
-    </section>
+      <div className={styles['actions']}>
+        <button
+          type="button"
+          className={styles['primaryBtn']}
+          disabled={isPending || session === undefined}
+          onClick={onComplete}
+        >
+          {t('common.actions.finish')}
+        </button>
+      </div>
+    </div>
   )
 }

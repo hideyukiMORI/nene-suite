@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CatalogApp } from '@/entities/catalog-app'
 import { useTranslation } from '@/shared/i18n'
+import styles from '../install-wizard.module.css'
 
 interface AppSelectionStepProps {
   apps: CatalogApp[]
@@ -20,46 +21,49 @@ export function AppSelectionStep({ apps, isPending, onSubmit }: AppSelectionStep
   }
 
   return (
-    <section>
-      <h3>{t('suite.install.apps.title')}</h3>
-      <p>{t('suite.install.apps.description')}</p>
+    <div>
+      <h3 className={styles['stepTitle']}>{t('suite.install.apps.title')}</h3>
+      <p className={styles['stepDesc']}>{t('suite.install.apps.description')}</p>
 
       {installable.length === 0 ? (
-        <p>{t('suite.install.apps.empty')}</p>
+        <p className={styles['stepDesc']}>{t('suite.install.apps.empty')}</p>
       ) : (
-        <ul>
+        <div className={styles['appList']}>
           {installable.map((app) => (
-            <li key={app.id}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={selected.includes(app.id)}
-                  onChange={() => {
-                    toggle(app.id)
-                  }}
-                />
-                {app.name}
-              </label>
+            <label key={app.id} className={styles['appRow']}>
+              <input
+                type="checkbox"
+                checked={selected.includes(app.id)}
+                onChange={() => {
+                  toggle(app.id)
+                }}
+              />
+              <span className={styles['appName']}>{app.name}</span>
               {app.requires.length > 0 ? (
-                <small>
+                <span className={styles['requiresHint']}>
                   {t('suite.install.apps.requiredBy', { appName: app.requires.join(', ') })}
-                </small>
+                </span>
               ) : null}
-            </li>
+            </label>
           ))}
-        </ul>
+        </div>
       )}
 
-      <p>{t('suite.install.apps.selectedCount', { count: selected.length })}</p>
-      <button
-        type="button"
-        disabled={isPending || selected.length === 0}
-        onClick={() => {
-          onSubmit(selected)
-        }}
-      >
-        {t('common.actions.next')}
-      </button>
-    </section>
+      <p className={styles['count']}>
+        {t('suite.install.apps.selectedCount', { count: selected.length })}
+      </p>
+      <div className={styles['actions']}>
+        <button
+          type="button"
+          className={styles['primaryBtn']}
+          disabled={isPending || selected.length === 0}
+          onClick={() => {
+            onSubmit(selected)
+          }}
+        >
+          {t('common.actions.next')}
+        </button>
+      </div>
+    </div>
   )
 }
