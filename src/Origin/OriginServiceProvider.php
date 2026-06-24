@@ -96,6 +96,18 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
 
                     return new OriginUpdateAggregator($verifier);
                 },
+            )
+            ->set(
+                OriginFeedReader::class,
+                static function (ContainerInterface $container): OriginFeedReader {
+                    $verifier = $container->get(OriginReadModelVerifier::class);
+
+                    if (!$verifier instanceof OriginReadModelVerifier) {
+                        throw new LogicException('Origin read model verifier service is invalid.');
+                    }
+
+                    return new OriginFeedReader($verifier);
+                },
             );
     }
 }
