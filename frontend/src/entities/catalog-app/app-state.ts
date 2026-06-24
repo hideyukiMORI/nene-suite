@@ -1,9 +1,11 @@
-import type { CatalogApp } from '@/entities/catalog-app'
 import type { MessageKey } from '@/shared/i18n'
+import type { CatalogApp } from './model'
 
 /**
- * Display state of a catalog card. Derived from the real catalog status plus an
- * installed cross-reference — no Origin "update-available" state yet (Phase B).
+ * Display state of a catalog app. Derived from the catalog status plus an
+ * installed cross-reference (a Set of installed catalog ids) — no Origin
+ * "update-available" state yet (Phase B). Lives in the entity so both the
+ * catalog and app-detail features share one source of truth.
  */
 export type CatalogCardState = 'installed' | 'installable' | 'planned' | 'deprecated'
 

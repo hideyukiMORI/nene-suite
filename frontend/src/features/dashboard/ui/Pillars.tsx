@@ -12,7 +12,13 @@ const SSOT_LABEL_KEYS: Record<SsotRole, MessageKey | null> = {
 }
 
 /** Installed-app pillar cards (the launcher grid). Real data only. */
-export function Pillars({ apps }: { apps: InstalledApp[] }) {
+export function Pillars({
+  apps,
+  onOpenDetail,
+}: {
+  apps: InstalledApp[]
+  onOpenDetail: (catalogId: string) => void
+}) {
   const { t } = useTranslation()
 
   return (
@@ -43,6 +49,15 @@ export function Pillars({ apps }: { apps: InstalledApp[] }) {
               >
                 {t('suite.home.open')}
               </a>
+              <button
+                type="button"
+                className={styles['detailBtn']}
+                onClick={() => {
+                  onOpenDetail(app.catalogId)
+                }}
+              >
+                {t('suite.appDetail.view')}
+              </button>
             </div>
           </div>
         )
