@@ -90,6 +90,34 @@
   color: var(--fg-3);
 }
 
+.changelog {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.changelogVersion {
+  font-family: var(--font-num), monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.changelogLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.changelogLink:hover {
+  text-decoration: underline;
+}
+
 .footer {
   display: flex;
   gap: 8px;

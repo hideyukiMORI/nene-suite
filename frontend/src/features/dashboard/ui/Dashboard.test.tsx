@@ -80,4 +80,70 @@ describe('Dashboard', () => {
     expect(screen.getByText('Update available')).toBeInTheDocument()
     expect(screen.getByText('Latest available')).toBeInTheDocument()
   })
+
+  it('wires the announcements panel and the house-ad slot to verified Origin feeds', async () => {
+    seedSession()
+    mswServer.use(
+      http.get('/api/v1/origin/announcements', () =>
+        HttpResponse.json({
+          available: true,
+          feeds: [
+            {
+              product: 'nene-invoice',
+              audience: 'free',
+              kind: 'announcement',
+              requestedLocale: 'en',
+              servedLocale: 'en',
+              available: true,
+              count: 1,
+              items: [
+                {
+                  id: 'a1',
+                  severity: 'important',
+                  title: 'Scheduled maintenance',
+                  body_md: 'Tonight.',
+                  link_url: null,
+                },
+              ],
+              freshness: 'fresh',
+              reason: null,
+              warnings: [],
+            },
+          ],
+        }),
+      ),
+      http.get('/api/v1/origin/house-ads', () =>
+        HttpResponse.json({
+          available: true,
+          feeds: [
+            {
+              product: 'nene-invoice',
+              audience: 'free',
+              kind: 'ad',
+              requestedLocale: 'en',
+              servedLocale: 'en',
+              available: true,
+              count: 1,
+              items: [
+                {
+                  id: 'ad1',
+                  title: 'Upgrade to paid',
+                  body_md: 'Remove ads.',
+                  link_url: 'https://example.com/upgrade',
+                  creative_url: null,
+                },
+              ],
+              freshness: 'fresh',
+              reason: null,
+              warnings: [],
+            },
+          ],
+        }),
+      ),
+    )
+    renderWithProviders(<Dashboard />)
+
+    expect(await screen.findByText('Scheduled maintenance')).toBeInTheDocument()
+    expect(screen.getByText('Upgrade to paid')).toBeInTheDocument()
+  })
 })
