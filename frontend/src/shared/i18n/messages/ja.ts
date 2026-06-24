@@ -142,6 +142,14 @@ export const ja: Partial<MessageCatalog> = {
   'suite.home.firstRun.subtitle':
     '必要な業務アプリを選んでインストールし、ここから起動・管理します。',
   'suite.home.updates.title': '利用可能なアップデート',
+  'suite.home.updates.checking': '更新を確認中…',
+  'suite.home.updates.empty': '更新情報はありません。',
+  'suite.home.updates.latest': '最新 {{version}}',
+  'suite.home.updates.status.up_to_date': '最新です',
+  'suite.home.updates.status.update_available': '更新あり',
+  'suite.home.updates.status.forced': 'セキュリティ更新',
+  'suite.home.updates.status.unknown': '最新あり',
+  'suite.home.updates.status.unavailable': '確認できません',
   'suite.home.announcements.title': 'お知らせ',
   'suite.home.feeds.placeholder':
     '更新・お知らせ・ハウスアドは Origin 連携（Phase B）で表示されます。',
