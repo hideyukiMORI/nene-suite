@@ -248,6 +248,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/origin/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verified Origin update signals for the installed roster (ADR 0017).
+         * @description For each suite-installed product, returns the update standing computed from the verified
+         *     Origin update tree (profiled TUF). Read-only; no audit event. Degrades transparently:
+         *     `available` is false (and `updates` empty) when Origin is not configured (no
+         *     `NENE_ORIGIN_URL` or no embedded trust anchor), and a per-product verification failure or
+         *     unreachable Origin yields `status: unavailable` with a `reason` rather than aborting.
+         *     Installed versions are not tracked yet, so `installedVersion` is null and `status` is
+         *     `unknown` while the verified `latestVersion` is still surfaced.
+         */
+        get: operations["getOriginUpdates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/suite-audit-events": {
         parameters: {
             query?: never;
@@ -804,6 +830,35 @@ export interface components {
         };
         InstalledAppList: {
             apps: components["schemas"]["InstalledApp"][];
+        };
+        OriginUpdate: {
+            product: string;
+            channel: string;
+            /** @description Currently installed version, or null when Suite does not track it yet. */
+            installedVersion: string | null;
+            /** @enum {string} */
+            status: "up_to_date" | "update_available" | "forced" | "unknown" | "unavailable";
+            /** @description Verified latest version from the Origin manifest. */
+            latestVersion: string | null;
+            /** @description Security floor; an installed version below this is a forced update. */
+            minSupportedVersion: string | null;
+            /** Format: uri */
+            changelogUrl: string | null;
+            /** Format: date-time */
+            releasedAt: string | null;
+            /**
+             * @description Per-tree freshness state of the verified current pointer.
+             * @enum {string|null}
+             */
+            freshness: "fresh" | "warn" | "refuse_new" | "hard" | null;
+            /** @description Stable verification reason when status is unavailable (or origin_unreachable). */
+            reason: string | null;
+            warnings: string[];
+        };
+        OriginUpdateList: {
+            /** @description False when Origin is not configured (no URL or trust anchor); updates is then empty. */
+            available: boolean;
+            updates: components["schemas"]["OriginUpdate"][];
         };
         /**
          * @description Affected orchestration entity (audit-trail §4; matches `schema/suite-audit-event.schema.json`).
@@ -1612,6 +1667,48 @@ export interface operations {
                      *     }
                      */
                     "application/json": components["schemas"]["InstalledAppList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getOriginUpdates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Update signals (or a disabled placeholder). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "available": true,
+                     *       "updates": [
+                     *         {
+                     *           "product": "nene-invoice",
+                     *           "channel": "stable",
+                     *           "installedVersion": null,
+                     *           "status": "unknown",
+                     *           "latestVersion": "1.4.0",
+                     *           "minSupportedVersion": "1.2.0",
+                     *           "changelogUrl": "https://cdn.nene-origin.dev/nene-invoice/changelog/1.4.0",
+                     *           "releasedAt": "2026-06-19T00:00:00Z",
+                     *           "freshness": "fresh",
+                     *           "reason": null,
+                     *           "warnings": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["OriginUpdateList"];
                 };
             };
             401: components["responses"]["Unauthorized"];
