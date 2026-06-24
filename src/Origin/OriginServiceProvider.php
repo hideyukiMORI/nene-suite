@@ -20,6 +20,10 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
     {
         $builder
             ->set(
+                OriginSignatureVerifier::class,
+                static fn (ContainerInterface $container): OriginSignatureVerifier => new OriginSignatureVerifier(),
+            )
+            ->set(
                 OriginClientConfigResolver::class,
                 static fn (ContainerInterface $container): OriginClientConfigResolver => new OriginClientConfigResolver(),
             )
