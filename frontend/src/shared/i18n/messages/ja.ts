@@ -63,6 +63,11 @@ export const ja: Partial<MessageCatalog> = {
   'suite.catalog.title': 'アプリカタログ',
   'suite.catalog.placeholder':
     'カタログ（ストア）は後続フェーズで実装します。当面はウィザードからインストールしてください。',
+  'suite.catalog.subtitle': 'NeNe アプリを見て、インストールに追加します。',
+  'suite.catalog.filter.all': 'すべて',
+  'suite.catalog.get': '入手',
+  'suite.catalog.requires': '{{names}} が必要',
+  'suite.catalog.empty': 'この条件に合うアプリがありません。',
   'suite.settings.title': '設定',
   'suite.settings.placeholder':
     '免責・Origin ポーリング・エディション・更新チャンネルの設定は後続フェーズで実装します。',

@@ -1,7 +1,6 @@
 import type { InstalledApp, SsotRole } from '@/entities/installed-app'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { AppLogo, Icon } from '@/shared/ui'
-import { catalogIdToLogoSlug } from '../app-logo'
+import { AppLogo, catalogIdToLogoSlug, Icon } from '@/shared/ui'
 import styles from './dashboard.module.css'
 
 const SSOT_LABEL_KEYS: Record<SsotRole, MessageKey | null> = {

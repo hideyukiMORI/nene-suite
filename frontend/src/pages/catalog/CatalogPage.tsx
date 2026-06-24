@@ -1,16 +1,6 @@
-import { Link } from 'react-router-dom'
-import { useTranslation } from '@/shared/i18n'
-import { PlaceholderState } from '@/shared/ui'
+import { Catalog } from '@/features/catalog'
 
-/** Catalog store — built in a later phase. Honest placeholder, no fabricated data. */
+/** Catalog store. Content-only — global chrome is in AppShell. */
 export function CatalogPage() {
-  const { t } = useTranslation()
-  return (
-    <PlaceholderState
-      icon="apps"
-      title={t('suite.catalog.title')}
-      description={t('suite.catalog.placeholder')}
-      action={<Link to="/install">{t('suite.nav.getApps')}</Link>}
-    />
-  )
+  return <Catalog />
 }
