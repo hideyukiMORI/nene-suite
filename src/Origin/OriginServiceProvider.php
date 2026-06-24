@@ -184,15 +184,79 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                GetOriginFeedsUseCase::class,
+                static function (ContainerInterface $container): GetOriginFeedsUseCase {
+                    $config = $container->get(OriginClientConfig::class);
+                    $anchors = $container->get(OriginTrustAnchorProvider::class);
+                    $installed = $container->get(ListInstalledAppsUseCaseInterface::class);
+                    $store = $container->get(HttpOriginObjectStore::class);
+                    $reader = $container->get(OriginFeedReader::class);
+                    $watermarks = $container->get(OriginGenWatermarkRepositoryInterface::class);
+
+                    if (!$config instanceof OriginClientConfig) {
+                        throw new LogicException('Origin client config service is invalid.');
+                    }
+
+                    if (!$anchors instanceof OriginTrustAnchorProvider) {
+                        throw new LogicException('Origin trust anchor provider service is invalid.');
+                    }
+
+                    if (!$installed instanceof ListInstalledAppsUseCaseInterface) {
+                        throw new LogicException('Installed apps use case service is invalid.');
+                    }
+
+                    if (!$store instanceof HttpOriginObjectStore) {
+                        throw new LogicException('Origin HTTP object store service is invalid.');
+                    }
+
+                    if (!$reader instanceof OriginFeedReader) {
+                        throw new LogicException('Origin feed reader service is invalid.');
+                    }
+
+                    if (!$watermarks instanceof OriginGenWatermarkRepositoryInterface) {
+                        throw new LogicException('Origin gen watermark repository service is invalid.');
+                    }
+
+                    return new GetOriginFeedsUseCase($config, $anchors, $installed, $store, $reader, $watermarks);
+                },
+            )
+            ->set(
+                GetOriginFeedsHandler::class,
+                static function (ContainerInterface $container): GetOriginFeedsHandler {
+                    $authenticator = $container->get(BearerTokenAuthenticator::class);
+                    $useCase = $container->get(GetOriginFeedsUseCase::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$authenticator instanceof BearerTokenAuthenticator) {
+                        throw new LogicException('Bearer token authenticator service is invalid.');
+                    }
+
+                    if (!$useCase instanceof GetOriginFeedsUseCase) {
+                        throw new LogicException('Get Origin feeds use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new GetOriginFeedsHandler($authenticator, $useCase, $response);
+                },
+            )
+            ->set(
                 'nene-suite.route_registrar.origin',
                 static function (ContainerInterface $container): OriginRouteRegistrar {
                     $updatesHandler = $container->get(GetOriginUpdatesHandler::class);
+                    $feedsHandler = $container->get(GetOriginFeedsHandler::class);
 
                     if (!$updatesHandler instanceof GetOriginUpdatesHandler) {
                         throw new LogicException('Get Origin updates handler service is invalid.');
                     }
 
-                    return new OriginRouteRegistrar($updatesHandler);
+                    if (!$feedsHandler instanceof GetOriginFeedsHandler) {
+                        throw new LogicException('Get Origin feeds handler service is invalid.');
+                    }
+
+                    return new OriginRouteRegistrar($updatesHandler, $feedsHandler);
                 },
             );
     }
