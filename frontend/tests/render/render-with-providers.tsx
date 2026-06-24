@@ -10,6 +10,7 @@ import {
 import type { ReactElement, ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { I18nProvider } from '@/shared/i18n'
+import { ThemeProvider } from '@/shared/ui'
 
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
@@ -24,11 +25,13 @@ function Providers({ children }: { children: ReactNode }) {
   const queryClient = createTestQueryClient()
 
   return (
-    <MemoryRouter>
-      <I18nProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </I18nProvider>
-    </MemoryRouter>
+    <ThemeProvider>
+      <MemoryRouter>
+        <I18nProvider>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </I18nProvider>
+      </MemoryRouter>
+    </ThemeProvider>
   )
 }
 

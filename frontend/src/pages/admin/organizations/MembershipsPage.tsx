@@ -1,24 +1,18 @@
 import { Link, useParams } from 'react-router-dom'
-import { ActiveOrgIndicator } from '@/features/active-org-indicator'
 import { MembershipConsole } from '@/features/membership-console'
 import { useTranslation } from '@/shared/i18n'
-import { LocaleSwitcher, PageHeader } from '@/shared/ui'
+import { PageHeader } from '@/shared/ui'
 
+/** Content-only — the global chrome (header/nav) is owned by AppShell. */
 export function MembershipsPage() {
   const { t } = useTranslation()
   const { id } = useParams()
 
   return (
-    <main>
+    <>
       <PageHeader
         title={t('suite.member.title')}
-        actions={
-          <>
-            <Link to="/admin/organizations">{t('suite.nav.organizations')}</Link>
-            <ActiveOrgIndicator />
-            <LocaleSwitcher />
-          </>
-        }
+        actions={<Link to="/admin/organizations">{t('suite.nav.organizations')}</Link>}
       />
       <p>{t('suite.member.description')}</p>
       {id !== undefined ? (
@@ -26,6 +20,6 @@ export function MembershipsPage() {
       ) : (
         <p>{t('common.error.notFound')}</p>
       )}
-    </main>
+    </>
   )
 }
