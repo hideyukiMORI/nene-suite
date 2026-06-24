@@ -8,12 +8,15 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\JsonResponseFactory;
+use NeNeSuite\Auth\BearerTokenAuthenticator;
+use NeNeSuite\InstalledApps\ListInstalledAppsUseCaseInterface;
 use Psr\Container\ContainerInterface;
 
 /**
  * Origin client services: config resolution + the outbound HTTP seam (O0), the JWS signature
- * primitive (O1a), and the per-product gen watermark store (O2). No routes or domain exceptions
- * yet (the read API lands in O4), so this provider contributes no registrar/handler.
+ * primitive (O1a), the gen watermark store (O2), the verifier + fetch/aggregate engines (O1b/O3),
+ * and the read API (O4 — the updates endpoint, operator-authenticated).
  */
 final readonly class OriginServiceProvider implements ServiceProviderInterface
 {
@@ -107,6 +110,89 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                     }
 
                     return new OriginFeedReader($verifier);
+                },
+            )
+            ->set(
+                OriginTrustAnchorProvider::class,
+                static function (ContainerInterface $container): OriginTrustAnchorProvider {
+                    $config = $container->get(OriginClientConfig::class);
+
+                    if (!$config instanceof OriginClientConfig) {
+                        throw new LogicException('Origin client config service is invalid.');
+                    }
+
+                    return new OriginTrustAnchorProvider($config->trustAnchorPath);
+                },
+            )
+            ->set(
+                GetOriginUpdatesUseCase::class,
+                static function (ContainerInterface $container): GetOriginUpdatesUseCase {
+                    $config = $container->get(OriginClientConfig::class);
+                    $anchors = $container->get(OriginTrustAnchorProvider::class);
+                    $installed = $container->get(ListInstalledAppsUseCaseInterface::class);
+                    $store = $container->get(HttpOriginObjectStore::class);
+                    $aggregator = $container->get(OriginUpdateAggregator::class);
+                    $watermarks = $container->get(OriginGenWatermarkRepositoryInterface::class);
+
+                    if (!$config instanceof OriginClientConfig) {
+                        throw new LogicException('Origin client config service is invalid.');
+                    }
+
+                    if (!$anchors instanceof OriginTrustAnchorProvider) {
+                        throw new LogicException('Origin trust anchor provider service is invalid.');
+                    }
+
+                    if (!$installed instanceof ListInstalledAppsUseCaseInterface) {
+                        throw new LogicException('Installed apps use case service is invalid.');
+                    }
+
+                    if (!$store instanceof HttpOriginObjectStore) {
+                        throw new LogicException('Origin HTTP object store service is invalid.');
+                    }
+
+                    if (!$aggregator instanceof OriginUpdateAggregator) {
+                        throw new LogicException('Origin update aggregator service is invalid.');
+                    }
+
+                    if (!$watermarks instanceof OriginGenWatermarkRepositoryInterface) {
+                        throw new LogicException('Origin gen watermark repository service is invalid.');
+                    }
+
+                    return new GetOriginUpdatesUseCase($config, $anchors, $installed, $store, $aggregator, $watermarks);
+                },
+            )
+            ->set(
+                GetOriginUpdatesHandler::class,
+                static function (ContainerInterface $container): GetOriginUpdatesHandler {
+                    $authenticator = $container->get(BearerTokenAuthenticator::class);
+                    $useCase = $container->get(GetOriginUpdatesUseCase::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$authenticator instanceof BearerTokenAuthenticator) {
+                        throw new LogicException('Bearer token authenticator service is invalid.');
+                    }
+
+                    if (!$useCase instanceof GetOriginUpdatesUseCase) {
+                        throw new LogicException('Get Origin updates use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new GetOriginUpdatesHandler($authenticator, $useCase, $response);
+                },
+            )
+            ->set(
+                'nene-suite.route_registrar.origin',
+                static function (ContainerInterface $container): OriginRouteRegistrar {
+                    $updatesHandler = $container->get(GetOriginUpdatesHandler::class);
+
+                    if (!$updatesHandler instanceof GetOriginUpdatesHandler) {
+                        throw new LogicException('Get Origin updates handler service is invalid.');
+                    }
+
+                    return new OriginRouteRegistrar($updatesHandler);
                 },
             );
     }

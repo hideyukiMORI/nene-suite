@@ -92,8 +92,14 @@ final readonly class OriginUpdateAggregator
         );
     }
 
-    private function status(string $installed, ?string $latest, ?string $minSupported): OriginUpdateStatus
+    private function status(?string $installed, ?string $latest, ?string $minSupported): OriginUpdateStatus
     {
+        // No installed-version tracking yet (O4 decision): the manifest is verified but no diff can
+        // be claimed — surface the latest, status unknown.
+        if ($installed === null) {
+            return OriginUpdateStatus::Unknown;
+        }
+
         if ($minSupported !== null && version_compare($installed, $minSupported, '<')) {
             return OriginUpdateStatus::Forced;
         }

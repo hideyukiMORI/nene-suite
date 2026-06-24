@@ -532,6 +532,44 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/origin/updates:
+    get:
+      operationId: getOriginUpdates
+      summary: Verified Origin update signals for the installed roster (ADR 0017).
+      description: |
+        For each suite-installed product, returns the update standing computed from the verified
+        Origin update tree (profiled TUF). Read-only; no audit event. Degrades transparently:
+        `available` is false (and `updates` empty) when Origin is not configured (no
+        `NENE_ORIGIN_URL` or no embedded trust anchor), and a per-product verification failure or
+        unreachable Origin yields `status: unavailable` with a `reason` rather than aborting.
+        Installed versions are not tracked yet, so `installedVersion` is null and `status` is
+        `unknown` while the verified `latestVersion` is still surfaced.
+      responses:
+        '200':
+          description: Update signals (or a disabled placeholder).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginUpdateList'
+              example:
+                available: true
+                updates:
+                  - product: nene-invoice
+                    channel: stable
+                    installedVersion: null
+                    status: unknown
+                    latestVersion: 1.4.0
+                    minSupportedVersion: 1.2.0
+                    changelogUrl: https://cdn.nene-origin.dev/nene-invoice/changelog/1.4.0
+                    releasedAt: '2026-06-19T00:00:00Z'
+                    freshness: fresh
+                    reason: null
+                    warnings: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/suite-audit-events:
     get:
       tags: [Audit]
@@ -1927,6 +1965,58 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InstalledApp'
+
+    OriginUpdate:
+      type: object
+      additionalProperties: false
+      required: [product, channel, installedVersion, status, latestVersion, minSupportedVersion, changelogUrl, releasedAt, freshness, reason, warnings]
+      properties:
+        product:
+          type: string
+        channel:
+          type: string
+        installedVersion:
+          type: [string, 'null']
+          description: Currently installed version, or null when Suite does not track it yet.
+        status:
+          type: string
+          enum: [up_to_date, update_available, forced, unknown, unavailable]
+        latestVersion:
+          type: [string, 'null']
+          description: Verified latest version from the Origin manifest.
+        minSupportedVersion:
+          type: [string, 'null']
+          description: Security floor; an installed version below this is a forced update.
+        changelogUrl:
+          type: [string, 'null']
+          format: uri
+        releasedAt:
+          type: [string, 'null']
+          format: date-time
+        freshness:
+          type: [string, 'null']
+          enum: [fresh, warn, refuse_new, hard, null]
+          description: Per-tree freshness state of the verified current pointer.
+        reason:
+          type: [string, 'null']
+          description: Stable verification reason when status is unavailable (or origin_unreachable).
+        warnings:
+          type: array
+          items:
+            type: string
+
+    OriginUpdateList:
+      type: object
+      additionalProperties: false
+      required: [available, updates]
+      properties:
+        available:
+          type: boolean
+          description: False when Origin is not configured (no URL or trust anchor); updates is then empty.
+        updates:
+          type: array
+          items:
+            $ref: '#/components/schemas/OriginUpdate'
 
     AuditEntityType:
       type: string
