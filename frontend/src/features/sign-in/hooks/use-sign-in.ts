@@ -10,6 +10,7 @@ export interface UseSignInResult {
   submit: (credentials: SignInCredentials) => void
   isPending: boolean
   isInvalidCredentials: boolean
+  isRateLimited: boolean
   hasError: boolean
 }
 
@@ -34,6 +35,7 @@ export function useSignIn(redirectTo = '/'): UseSignInResult {
     submit,
     isPending: mutation.isPending,
     isInvalidCredentials: mutation.error?.status === 401,
+    isRateLimited: mutation.error?.status === 429,
     hasError: mutation.error !== null,
   }
 }
