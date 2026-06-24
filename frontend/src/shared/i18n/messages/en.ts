@@ -88,6 +88,8 @@ export const en = {
   'suite.appDetail.provides': 'Provides {{names}}',
   'suite.appDetail.changelog': 'Change history',
   'suite.appDetail.changelogPlaceholder': 'The change history is Origin-fed (Phase B).',
+  'suite.appDetail.latest': 'Latest {{version}}',
+  'suite.appDetail.viewChangelog': 'View change history',
 
   // ── Admin hub ────────────────────────────────────────────────────────────
   'suite.admin.title': 'Admin',
@@ -169,6 +171,8 @@ export const en = {
   'suite.home.updates.status.unknown': 'Latest available',
   'suite.home.updates.status.unavailable': 'Unavailable',
   'suite.home.announcements.title': 'Announcements',
+  'suite.home.announcements.empty': 'No announcements.',
+  'suite.home.houseAds.title': 'Sponsored',
   'suite.home.feeds.placeholder':
     'Update, announcement, and house-ad feeds arrive with Origin (Phase B).',
 

@@ -74,6 +74,8 @@ export const ja: Partial<MessageCatalog> = {
   'suite.appDetail.provides': '{{names}} を提供',
   'suite.appDetail.changelog': '変更履歴',
   'suite.appDetail.changelogPlaceholder': '変更履歴は Origin 連携（Phase B）で表示されます。',
+  'suite.appDetail.latest': '最新 {{version}}',
+  'suite.appDetail.viewChangelog': '変更履歴を見る',
 
   'suite.admin.title': '管理',
   'suite.admin.subtitle': '組織・メンバー・オペレーター・連携キーを管理します。',
@@ -151,6 +153,8 @@ export const ja: Partial<MessageCatalog> = {
   'suite.home.updates.status.unknown': '最新あり',
   'suite.home.updates.status.unavailable': '確認できません',
   'suite.home.announcements.title': 'お知らせ',
+  'suite.home.announcements.empty': 'お知らせはありません。',
+  'suite.home.houseAds.title': '広告',
   'suite.home.feeds.placeholder':
     '更新・お知らせ・ハウスアドは Origin 連携（Phase B）で表示されます。',
 

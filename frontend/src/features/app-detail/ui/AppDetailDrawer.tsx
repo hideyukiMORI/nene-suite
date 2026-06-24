@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CARD_STATE_META } from '@/entities/catalog-app'
 import type { SsotRole } from '@/entities/installed-app'
+import { useOriginUpdates } from '@/entities/origin-update'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { AppLogo, catalogIdToLogoSlug, Drawer, Icon } from '@/shared/ui'
 import { useAppDetail } from '../hooks/use-app-detail'
@@ -18,6 +19,7 @@ const SSOT_LABEL_KEYS: Record<SsotRole, MessageKey | null> = {
 export function AppDetailDrawer({ appId, onClose }: { appId: string; onClose: () => void }) {
   const { t } = useTranslation()
   const detail = useAppDetail(appId)
+  const updates = useOriginUpdates()
   const ariaLabel = detail?.app.name ?? t('suite.appDetail.view')
 
   return (
@@ -30,6 +32,10 @@ export function AppDetailDrawer({ appId, onClose }: { appId: string; onClose: ()
           const meta = CARD_STATE_META[detail.state]
           const ssotKey =
             detail.installed !== null ? SSOT_LABEL_KEYS[detail.installed.ssotRole] : null
+          const update =
+            updates.data?.available === true
+              ? updates.data.updates.find((signal) => signal.product === detail.app.id)
+              : undefined
           return (
             <>
               <div className={styles['head']}>
@@ -70,7 +76,28 @@ export function AppDetailDrawer({ appId, onClose }: { appId: string; onClose: ()
                   {t('suite.appDetail.changelog')}
                   <span className={styles['originTag']}>Origin</span>
                 </h3>
-                <p className={styles['placeholder']}>{t('suite.appDetail.changelogPlaceholder')}</p>
+                {update !== undefined && update.latestVersion !== null ? (
+                  <div className={styles['changelog']}>
+                    <span className={styles['changelogVersion']}>
+                      {t('suite.appDetail.latest', { version: update.latestVersion })}
+                    </span>
+                    {update.changelogUrl !== null ? (
+                      <a
+                        className={styles['changelogLink']}
+                        href={update.changelogUrl}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        {t('suite.appDetail.viewChangelog')}
+                        <Icon name="open_in_new" size={15} />
+                      </a>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className={styles['placeholder']}>
+                    {t('suite.appDetail.changelogPlaceholder')}
+                  </p>
+                )}
               </div>
 
               <div className={styles['footer']}>
