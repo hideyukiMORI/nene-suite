@@ -97,6 +97,21 @@ export const ja: Partial<MessageCatalog> = {
   'suite.account.title': 'アカウント & セキュリティ',
   'suite.account.placeholder':
     'プロフィール・パスワード / MFA・セッションは後続フェーズで実装します。',
+  'suite.account.subtitle': 'プロフィール・セキュリティ・サインイン中のセッション。',
+  'suite.account.tab.profile': 'プロフィール',
+  'suite.account.tab.security': 'セキュリティ',
+  'suite.account.tab.sessions': 'セッション',
+  'suite.account.field.email': 'メール',
+  'suite.account.field.role': 'ロール',
+  'suite.account.profile.phaseB': '表示名・メールの編集は後続フェーズで実装します。',
+  'suite.account.security.title': 'パスワード & MFA',
+  'suite.account.security.phaseB': 'パスワード変更と多要素認証は後続フェーズで実装します。',
+  'suite.account.sessions.current': '現在のセッション',
+  'suite.account.sessions.expires': '有効期限',
+  'suite.account.sessions.activeOrg': 'アクティブな組織',
+  'suite.account.sessions.none': 'アクティブな組織なし',
+  'suite.account.sessions.phaseB':
+    'デバイス別セッションと「すべてからログアウト」は後続フェーズで実装します。',
 
   'suite.home.eyebrow': '運用コンソール',
   'suite.home.greeting': 'おかえりなさい、',
