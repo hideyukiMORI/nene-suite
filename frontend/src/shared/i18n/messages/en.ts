@@ -110,6 +110,18 @@ export const en = {
   'suite.settings.title': 'Settings',
   'suite.settings.placeholder':
     'Disclaimer, Origin polling, edition, and update channel settings land in a later phase.',
+  'suite.settings.subtitle': 'Suite configuration, integrations, and legal.',
+  'suite.settings.section.general': 'General',
+  'suite.settings.section.about': 'Help / About',
+  'suite.settings.edition': 'Edition',
+  'suite.settings.federationKeys': 'Federation keys',
+  'suite.settings.federationKeys.manage': 'Manage',
+  'suite.settings.originPolling': 'Origin polling interval',
+  'suite.settings.updateChannel': 'Update channel',
+  'suite.settings.phaseB': 'Configurable in a later phase',
+  'suite.settings.disclaimer': 'Disclaimer',
+  'suite.settings.disclaimer.view': 'View disclaimer',
+  'suite.settings.disclaimer.binding': 'Binding — please read before operating (ADR 0003).',
   'suite.account.title': 'Account & security',
   'suite.account.placeholder':
     'Profile, password / MFA, and active sessions land in a later phase.',

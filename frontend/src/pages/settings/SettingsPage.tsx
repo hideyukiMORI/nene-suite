@@ -1,14 +1,6 @@
-import { useTranslation } from '@/shared/i18n'
-import { PlaceholderState } from '@/shared/ui'
+import { SettingsView } from '@/features/settings'
 
-/** Settings — built in a later phase. Honest placeholder, no fabricated data. */
+/** Settings. Content-only — global chrome is in AppShell. */
 export function SettingsPage() {
-  const { t } = useTranslation()
-  return (
-    <PlaceholderState
-      icon="settings"
-      title={t('suite.settings.title')}
-      description={t('suite.settings.placeholder')}
-    />
-  )
+  return <SettingsView />
 }
