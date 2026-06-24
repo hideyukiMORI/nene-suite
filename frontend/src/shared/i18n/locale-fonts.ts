@@ -2,13 +2,16 @@ import type { SupportedLocale } from './locales'
 
 export const LOCALE_FONT_FAMILY_VAR = '--font-sans'
 
+// Design typography (DESIGN-SYSTEM.md §2): Noto Sans JP leads the body/UI stack
+// for every locale so the apex shell is visually consistent ja↔en; each locale
+// keeps its native system fallbacks for offline / font-load failure.
 export const LOCALE_FONT_STACKS: Record<SupportedLocale, string> = {
-  en: 'ui-sans-serif, system-ui, sans-serif',
-  ja: '"Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", sans-serif',
-  fr: 'ui-sans-serif, system-ui, sans-serif',
-  'zh-Hans': '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
-  'pt-BR': 'ui-sans-serif, system-ui, sans-serif',
-  de: 'ui-sans-serif, system-ui, sans-serif',
+  en: '"Noto Sans JP", ui-sans-serif, system-ui, sans-serif',
+  ja: '"Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif',
+  fr: '"Noto Sans JP", ui-sans-serif, system-ui, sans-serif',
+  'zh-Hans': '"Noto Sans JP", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  'pt-BR': '"Noto Sans JP", ui-sans-serif, system-ui, sans-serif',
+  de: '"Noto Sans JP", ui-sans-serif, system-ui, sans-serif',
 }
 
 export function getLocaleFontStack(locale: SupportedLocale): string {

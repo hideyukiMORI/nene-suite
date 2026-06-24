@@ -30,6 +30,10 @@ export const ja: Partial<MessageCatalog> = {
   'suite.locale.label': '言語',
   'suite.locale.select': '言語を選択',
 
+  'suite.theme.toggle': 'ライト / ダークを切り替え',
+  'suite.theme.light': 'ライト',
+  'suite.theme.dark': 'ダーク',
+
   'suite.nav.home': 'ホーム',
   'suite.nav.install': 'アプリをインストール',
   'suite.nav.audit': '監査ログ',

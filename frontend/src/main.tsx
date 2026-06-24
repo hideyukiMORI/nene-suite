@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppProviders } from '@/app/providers'
 import { AppRouter } from '@/app/router'
+import '@/shared/ui/theme/tokens.css'
+import '@/shared/ui/theme/global.css'
 
 const rootElement = document.getElementById('root')
 if (rootElement === null) {
