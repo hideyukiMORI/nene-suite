@@ -88,6 +88,25 @@ export const en = {
   'suite.appDetail.provides': 'Provides {{names}}',
   'suite.appDetail.changelog': 'Change history',
   'suite.appDetail.changelogPlaceholder': 'The change history is Origin-fed (Phase B).',
+
+  // ── Admin hub ────────────────────────────────────────────────────────────
+  'suite.admin.title': 'Admin',
+  'suite.admin.subtitle': 'Manage organizations, members, operators, and federation keys.',
+  'suite.admin.tab.organizations': 'Organizations',
+  'suite.admin.tab.members': 'Members',
+  'suite.admin.tab.operators': 'Operators',
+  'suite.admin.tab.keys': 'Federation keys',
+  'suite.admin.members.selectOrg':
+    'Select an organization from the Organizations tab to manage its members.',
+  'suite.admin.operators.email': 'Email',
+  'suite.admin.operators.name': 'Name',
+  'suite.admin.operators.scope': 'Scope',
+  'suite.admin.operators.mfa': 'MFA',
+  'suite.admin.operators.lastAccess': 'Last access',
+  'suite.admin.operators.empty': 'No operators.',
+  'suite.admin.operators.phaseB': 'Shown with the operator detail API (Phase B)',
+  'suite.admin.keys.placeholder':
+    'Federation signing keys are managed via operator commands today; a read API and console land in a later phase.',
   'suite.settings.title': 'Settings',
   'suite.settings.placeholder':
     'Disclaimer, Origin polling, edition, and update channel settings land in a later phase.',
