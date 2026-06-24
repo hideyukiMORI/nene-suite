@@ -54,7 +54,7 @@ the update tree so content updates never touch code metadata.
 embedded root key(s) (current + next)          ← shipped in each client build
   └ root.json                                  ← role delegations + public keys, signed M-of-N
      ├ update tree  (product/channel): current → [snapshot] → targets(=manifest) → artifacts/{sha256}
-     └ content tree (product/audience): feed current → [feed-snapshot] → feed-targets (cohort only)
+     └ content tree (product/audience): feed current → [feed-snapshot] → feed-targets(=feed) → feed-body/{sha256} (cohort only)
 ```
 
 `current` (the timestamp role) is the **only mutable object per tree**; everything else is
@@ -69,12 +69,17 @@ immutable and content-addressed (`{sha256}`).
 | `snapshot/{sha}` | snapshot | consistency anchor (anti mix-and-match); **may be skipped by an aggregating client — see §4** |
 | `targets/{sha}` (= manifest) | targets | `latest{version, released_at, artifact_url, artifact_sha256, changelog_url?, requires}`, `min_supported_version`, `channels`, `provenance`; exhaustive over every artifact `sha256` |
 | `artifacts/{sha256}` | target body | the binary (verified by hash before apply) |
-| feed `current` + `feed-targets` | timestamp/targets | announcements / house-ads, **per-locale**, cohort fields only |
+| feed `current` (per `product/audience/locale`) | timestamp | `gen`, `targets_sha256` → the `feed-targets` object |
+| `feed-targets/{sha}` (= the `feed` object) | targets | `kind` (`announcement`\|`ad`), `gen`, `content_sha256`, `count`, `audience`, `locale`; cohort-only |
+| `feed-body/{sha256}` | (body) | JSON **array** of `announcement` / `ad` items, verified against `feed-targets.content_sha256` **before** trusting items |
 
 Every object carries `{schema_version, spec_version}`; **no raw keys, no PII, no per-user
 identifiers** are ever published. Channel selection stays `?channel={stable|beta|dev}` (default
 `stable`, subset of the declared `channels`). Per-product fan-out; cost bounded by `ETag` /
-`If-None-Match` → `304`.
+`If-None-Match` → `304`. The bare-array `getAnnouncementsFeed` / `getAdsFeed` of the Topic 1 shape
+are **removed**; feeds now follow the content-tree chain (Origin operationIds: `getRoot` /
+`getCurrent` / `getSnapshot` / `getTargets` / `getFeedCurrent` / `getFeedTargets` / `getFeedBody`;
+`getEntitlementCurrent` / `getEntitlementPolicy` are unused in suite mode — §7).
 
 ### 4. Trust, keys & verification order
 
@@ -113,13 +118,26 @@ identifiers** are ever published. Channel selection stays `?channel={stable|beta
   constrained-client **reduction** of §4 step 3. There is **no global snapshot** across products, so
   aggregation stays O(N) per-tree.
 
-### 6. Locale fallback (content tree) — unchanged
+### 6. Content tree — feeds & locale fallback
 
-`announcements` / `ads` are per-locale signed objects. Suite maintains **ja + en** only.
+`announcements` / `ads` are reached per `(product, audience, locale)` through the content-tree chain
+(fallback **semantics unchanged** from Topic 1; only the object shape moved to the content tree):
 
-- Requested locale unpublished → **404** → Suite refetches **en** (ja/en are always published).
-- Published but empty → **200** with a signed `[]` → show "none" (do **not** fall back).
-- `targets`/`manifest` are locale-independent; a 404 there means product/channel absent.
+1. `feed current` (`/v1/feeds/{product}/{audience}/{locale}/current`) → verify (timestamp role) → read
+   `targets_sha256`;
+2. `feed-targets/{sha}` (the signed `feed` object) → verify (targets role) → read `kind`,
+   `content_sha256`, `count`;
+3. `feed-body/{sha256}` → verify the **served bytes against `content_sha256`** → only then trust the
+   item array (`announcement` / `ad` items validate against their schemas).
+
+Locale & audience rules (Suite maintains **ja + en** only):
+
+- Requested locale variant unpublished → **404** → Suite refetches the **en** variant (ja/en are
+  always published).
+- `count = 0` → published-but-empty → show "none" (do **not** fall back).
+- `audience` is the cohort `{free, paid}` from the federation IdP claim (§7); house-ad feeds are
+  **`free` only** (paid suppresses house-ads client-side).
+- The update tree (`targets`) is locale-independent; its 404 means product/channel absent.
 
 ### 7. Entitlement — unchanged
 
