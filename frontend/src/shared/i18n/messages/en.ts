@@ -200,9 +200,15 @@ export const en = {
   'suite.audit.description':
     'History of suite configuration changes (before/after snapshots). Domain audit remains in each app.',
   'suite.audit.export': 'Export',
+  'suite.audit.exportCsv': 'Export CSV',
   'suite.audit.empty': 'No audit events yet.',
+  'suite.audit.noMatch': 'No events match the filters.',
+  'suite.audit.loadMore': 'Load more',
+  'suite.audit.filter.allActors': 'All actors',
+  'suite.audit.clearFilters': 'Clear',
   'suite.audit.column.action': 'Action',
   'suite.audit.column.actor': 'Actor',
+  'suite.audit.column.entity': 'Entity',
   'suite.audit.column.time': 'Time',
 
   // ── Organizations (superadmin console) ───────────────────────────────────

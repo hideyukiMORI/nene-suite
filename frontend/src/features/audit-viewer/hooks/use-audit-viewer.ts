@@ -7,6 +7,7 @@ export interface UseAuditViewerResult {
   hasMore: boolean
   isLoadingMore: boolean
   loadMore: () => void
+  refetch: () => void
 }
 
 /** Flattens the paginated audit query into a single list for the table. */
@@ -22,6 +23,9 @@ export function useAuditViewer(): UseAuditViewerResult {
     isLoadingMore: query.isFetchingNextPage,
     loadMore: () => {
       void query.fetchNextPage()
+    },
+    refetch: () => {
+      void query.refetch()
     },
   }
 }

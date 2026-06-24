@@ -176,9 +176,15 @@ export const ja: Partial<MessageCatalog> = {
   'suite.audit.description':
     'Suite 設定変更の履歴（変更前後のスナップショット）。ドメイン監査は各アプリに残ります。',
   'suite.audit.export': 'エクスポート',
+  'suite.audit.exportCsv': 'CSV エクスポート',
   'suite.audit.empty': '監査イベントはまだありません。',
+  'suite.audit.noMatch': 'フィルタに一致するイベントがありません。',
+  'suite.audit.loadMore': 'さらに読み込む',
+  'suite.audit.filter.allActors': 'すべての実行者',
+  'suite.audit.clearFilters': 'クリア',
   'suite.audit.column.action': '操作',
   'suite.audit.column.actor': '実行者',
+  'suite.audit.column.entity': 'エンティティ',
   'suite.audit.column.time': '日時',
 
   // ── 組織（スーパー管理者コンソール） ──────────────────────────────────────

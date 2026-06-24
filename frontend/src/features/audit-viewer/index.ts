@@ -1,2 +1,2 @@
-export { AuditEventsTable } from './ui/AuditEventsTable'
+export { AuditViewer } from './ui/AuditViewer'
 export { useAuditViewer } from './hooks/use-audit-viewer'
