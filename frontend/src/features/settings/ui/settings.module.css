@@ -1,0 +1,127 @@
+.root {
+  max-width: 760px;
+  margin: 0 auto;
+  animation: fade 0.3s ease;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 7px 0 24px;
+  font-size: 14.5px;
+  color: var(--fg-2);
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionTitle {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.list {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.row:first-child {
+  border-top: none;
+}
+
+.rowLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.bindingHint {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--warn);
+}
+
+.rowValue {
+  font-size: 13.5px;
+  color: var(--fg-2);
+}
+
+.mono {
+  font-family: var(--font-num), monospace;
+  font-size: 12px;
+  border: 1px solid var(--border-2);
+  padding: 3px 9px;
+  border-radius: var(--r-sm);
+  color: var(--fg-2);
+}
+
+.rowMuted {
+  font-size: 12.5px;
+  color: var(--fg-3);
+}
+
+.rowLink,
+.rowBtn {
+  padding: 8px 14px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rowLink:hover,
+.rowBtn:hover {
+  background: var(--surface-2);
+}
+
+.modalTitle {
+  margin: 0 40px 14px 0;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.modalBody {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--fg-2);
+}
+
+.modalFooter {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--fg-3);
+}
