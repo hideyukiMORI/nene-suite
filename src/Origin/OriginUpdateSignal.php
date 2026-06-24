@@ -18,7 +18,7 @@ final readonly class OriginUpdateSignal
     public function __construct(
         public string $product,
         public string $channel,
-        public string $installedVersion,
+        public ?string $installedVersion,
         public OriginUpdateStatus $status,
         public ?string $latestVersion = null,
         public ?string $minSupportedVersion = null,

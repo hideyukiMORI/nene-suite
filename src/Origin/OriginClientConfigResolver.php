@@ -5,22 +5,48 @@ declare(strict_types=1);
 namespace NeNeSuite\Origin;
 
 /**
- * Resolves {@see OriginClientConfig} from the environment. `NENE_ORIGIN_URL` is
- * portfolio-neutral (no `NENE_SUITE_` prefix — terminology §4.3); unset means the
- * Origin client is disabled. Read from `$_SERVER` / `$_ENV` to match the other
- * suite env resolvers (e.g. ControlDatabaseConfigResolver).
+ * Resolves {@see OriginClientConfig} from the environment. `NENE_ORIGIN_URL` is portfolio-neutral
+ * (no `NENE_SUITE_` prefix — terminology §4.3); unset means the Origin client is disabled. The
+ * anti-rollback floors and the embedded trust-anchor path are build-time pins. Read from `$_SERVER`
+ * / `$_ENV` to match the other suite env resolvers (e.g. ControlDatabaseConfigResolver).
  */
 final readonly class OriginClientConfigResolver
 {
-    private const ENV_VAR = 'NENE_ORIGIN_URL';
+    private const ENV_BASE_URL = 'NENE_ORIGIN_URL';
+
+    private const ENV_ROOT_VERSION_FLOOR = 'NENE_ORIGIN_ROOT_VERSION_FLOOR';
+
+    private const ENV_GEN_FLOOR = 'NENE_ORIGIN_GEN_FLOOR';
+
+    private const ENV_TRUST_ANCHOR_PATH = 'NENE_ORIGIN_TRUST_ANCHOR_PATH';
 
     private const DEFAULT_TIMEOUT_SECONDS = 10;
 
     public function resolve(): OriginClientConfig
     {
-        $url = $_SERVER[self::ENV_VAR] ?? $_ENV[self::ENV_VAR] ?? null;
-        $baseUrl = is_string($url) ? rtrim($url, '/') : '';
+        $url = self::env(self::ENV_BASE_URL);
+        $trustAnchorPath = self::env(self::ENV_TRUST_ANCHOR_PATH);
 
-        return new OriginClientConfig($baseUrl, self::DEFAULT_TIMEOUT_SECONDS);
+        return new OriginClientConfig(
+            baseUrl: $url !== null ? rtrim($url, '/') : '',
+            timeoutSeconds: self::DEFAULT_TIMEOUT_SECONDS,
+            rootVersionFloor: self::intEnv(self::ENV_ROOT_VERSION_FLOOR, 1),
+            genFloor: self::intEnv(self::ENV_GEN_FLOOR, 1),
+            trustAnchorPath: $trustAnchorPath !== null && $trustAnchorPath !== '' ? $trustAnchorPath : null,
+        );
+    }
+
+    private static function env(string $name): ?string
+    {
+        $value = $_SERVER[$name] ?? $_ENV[$name] ?? null;
+
+        return is_string($value) ? $value : null;
+    }
+
+    private static function intEnv(string $name, int $default): int
+    {
+        $value = self::env($name);
+
+        return $value !== null && ctype_digit($value) ? (int) $value : $default;
     }
 }

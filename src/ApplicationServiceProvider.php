@@ -32,6 +32,7 @@ use NeNeSuite\InstallSession\InstallSessionNotFoundExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionNotReadyExceptionHandler;
 use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
+use NeNeSuite\Origin\OriginRouteRegistrar;
 use NeNeSuite\Origin\OriginServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
@@ -88,6 +89,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $installedApps = $container->get('nene-suite.route_registrar.installed_apps');
                     $tenancy = $container->get('nene-suite.route_registrar.tenancy');
                     $memberships = $container->get('nene-suite.route_registrar.memberships');
+                    $origin = $container->get('nene-suite.route_registrar.origin');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -121,6 +123,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Membership route registrar service is invalid.');
                     }
 
+                    if (!$origin instanceof OriginRouteRegistrar) {
+                        throw new LogicException('Origin route registrar service is invalid.');
+                    }
+
                     $registrars = [
                         $appCatalog,
                         $installSession,
@@ -130,6 +136,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $installedApps,
                         $tenancy,
                         $memberships,
+                        $origin,
                     ];
 
                     // Edition-gated: the federation surface (JWKS) is registered only in the hosted

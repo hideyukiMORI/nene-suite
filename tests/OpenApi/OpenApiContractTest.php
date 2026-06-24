@@ -39,6 +39,7 @@ final class OpenApiContractTest extends TestCase
         'switchActiveOrganization',
         'listSuiteAuditEvents',
         'listInstalledApps',
+        'getOriginUpdates',
         'createOperator',
         'listOperators',
         'createOrganization',
