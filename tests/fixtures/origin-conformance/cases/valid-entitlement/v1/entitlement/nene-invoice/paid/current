@@ -1,0 +1,10 @@
+{
+    "spec_version": 1,
+    "schema_version": 1,
+    "gen": 5,
+    "snapshot_sha256": "771d5fe204c365b55c81e669f75ea6d1ff90fb3e29ae5badf5f5730b48c88499",
+    "targets_sha256": "b327e0e49fb02007f3474b03719e72dbca98234ccef072ef44eeb0032eead1e9",
+    "expires": "2026-07-19T00:00:00Z",
+    "poll_after": 21600,
+    "urgency": "normal"
+}

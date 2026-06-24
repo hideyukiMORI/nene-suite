@@ -1,0 +1,129 @@
+{
+    "spec_version": 1,
+    "version": 1,
+    "expires": "2027-06-19T00:00:00Z",
+    "root_keyids": [
+        "root-2026a",
+        "root-2026b",
+        "root-2026c"
+    ],
+    "root_threshold": 2,
+    "keys": [
+        {
+            "kid": "root-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "yATEfnanPfElvwpH-GuYa4YQEn5aHs4rhCTOzjWsSI4",
+            "status": "active"
+        },
+        {
+            "kid": "root-2026b",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "UDktzjgNilbq-AsZdwJQAwiYhTp4icRRjsfpp98soRk",
+            "status": "active"
+        },
+        {
+            "kid": "root-2026c",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "7grRcaJfB1yKru_cfAHt7Cu1PrByt7ur_neMdQIGhQE",
+            "status": "next"
+        },
+        {
+            "kid": "ts-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "UKs5TeBywH2cwGYnFydUuk_Jc22hBHartJ8OyzRSv-M",
+            "status": "active"
+        },
+        {
+            "kid": "snap-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "T8r0mmg5irLwcMQ-5KafJZBbSKxRvaB3aOCjUOkvZ6w",
+            "status": "active"
+        },
+        {
+            "kid": "tgt-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "oKxoMdxFrPZf57BABznb5pFI-0rekgeOXWUcUd-Rm9w",
+            "status": "active",
+            "not_after": "2027-01-01T00:00:00Z"
+        },
+        {
+            "kid": "tgt-2025x",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "oqqF3KbEZH2Ly1Qj__nOERQDu_tN_bEmf5OKFaKvV8c",
+            "status": "retired",
+            "not_after": "2026-01-01T00:00:00Z"
+        },
+        {
+            "kid": "feed-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "ZLjsaf7K3a6GGinZ-Ci1eGsIw6WBr7mzqMR1Tf_3HhE",
+            "status": "active"
+        },
+        {
+            "kid": "ent-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "LOW0IhAwtbPdq4hW0I0yzlXPQqRWx12xauJZvYDHRlE",
+            "status": "active"
+        }
+    ],
+    "roles": {
+        "timestamp": {
+            "keyids": [
+                "ts-2026a"
+            ],
+            "threshold": 1
+        },
+        "snapshot": {
+            "keyids": [
+                "snap-2026a"
+            ],
+            "threshold": 1
+        },
+        "targets": {
+            "keyids": [
+                "tgt-2026a",
+                "tgt-2025x"
+            ],
+            "threshold": 1
+        },
+        "feed": {
+            "keyids": [
+                "feed-2026a"
+            ],
+            "threshold": 1
+        },
+        "entitlement": {
+            "keyids": [
+                "ent-2026a"
+            ],
+            "threshold": 1
+        }
+    }
+}

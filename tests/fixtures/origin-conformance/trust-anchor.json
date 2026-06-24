@@ -1,0 +1,38 @@
+{
+    "note": "Embedded root trust a conforming client ships at build time (verification-order.md §2.1). Public keys only; root.json is verified against this, never against runtime-discovered keys.",
+    "root_keyids": [
+        "root-2026a",
+        "root-2026b",
+        "root-2026c"
+    ],
+    "root_threshold": 2,
+    "keys": [
+        {
+            "kid": "root-2026a",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "yATEfnanPfElvwpH-GuYa4YQEn5aHs4rhCTOzjWsSI4",
+            "status": "active"
+        },
+        {
+            "kid": "root-2026b",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "UDktzjgNilbq-AsZdwJQAwiYhTp4icRRjsfpp98soRk",
+            "status": "active"
+        },
+        {
+            "kid": "root-2026c",
+            "kty": "OKP",
+            "use": "sig",
+            "alg": "EdDSA",
+            "crv": "Ed25519",
+            "x": "7grRcaJfB1yKru_cfAHt7Cu1PrByt7ur_neMdQIGhQE",
+            "status": "next"
+        }
+    ]
+}

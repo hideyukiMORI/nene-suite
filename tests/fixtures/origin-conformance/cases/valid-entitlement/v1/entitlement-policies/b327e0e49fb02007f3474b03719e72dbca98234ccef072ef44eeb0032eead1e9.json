@@ -1,0 +1,8 @@
+{
+    "spec_version": 1,
+    "schema_version": 1,
+    "product": "nene-invoice",
+    "audience": "paid",
+    "min_valid_generation": 12,
+    "ads_off": true
+}
