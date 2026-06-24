@@ -1,5 +1,6 @@
 export { LoadingState, ErrorState, EmptyState } from './components/AsyncStates'
 export { PlaceholderState } from './components/PlaceholderState'
+export { Drawer } from './components/Drawer'
 export { PageHeader } from './components/PageHeader'
 export { LocaleSwitcher } from './locale/LocaleSwitcher'
 export { Icon } from './Icon'

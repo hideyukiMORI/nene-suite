@@ -81,6 +81,13 @@ export const en = {
   'suite.catalog.get': 'Get',
   'suite.catalog.requires': 'Requires {{names}}',
   'suite.catalog.empty': 'No apps match this filter.',
+
+  // ── App detail drawer ────────────────────────────────────────────────────
+  'suite.appDetail.view': 'Details',
+  'suite.appDetail.role': 'Role',
+  'suite.appDetail.provides': 'Provides {{names}}',
+  'suite.appDetail.changelog': 'Change history',
+  'suite.appDetail.changelogPlaceholder': 'The change history is Origin-fed (Phase B).',
   'suite.settings.title': 'Settings',
   'suite.settings.placeholder':
     'Disclaimer, Origin polling, edition, and update channel settings land in a later phase.',

@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from '@/shared/i18n'
-import { AppLogo, catalogIdToLogoSlug, Icon } from '@/shared/ui'
 import {
   CARD_STATE_META,
   CARD_STATE_ORDER,
   deriveCardState,
   type CatalogCardState,
-} from '../app-state'
+} from '@/entities/catalog-app'
+import { AppDetailDrawer } from '@/features/app-detail'
+import { useTranslation } from '@/shared/i18n'
+import { AppLogo, catalogIdToLogoSlug, Icon } from '@/shared/ui'
 import { useCatalog } from '../hooks/use-catalog'
 import styles from './catalog.module.css'
 
@@ -18,6 +19,7 @@ export function Catalog() {
   const { t } = useTranslation()
   const { apps, installedIds, installedUrlById, isLoading, isError, refetch } = useCatalog()
   const [filter, setFilter] = useState<Filter>('all')
+  const [detailId, setDetailId] = useState<string | null>(null)
 
   if (isLoading) {
     return (
@@ -111,6 +113,15 @@ export function Catalog() {
                     : null}
                 </p>
                 <div className={styles['actions']}>
+                  <button
+                    type="button"
+                    className={styles['detailBtn']}
+                    onClick={() => {
+                      setDetailId(app.id)
+                    }}
+                  >
+                    {t('suite.appDetail.view')}
+                  </button>
                   {state === 'installed' && url !== undefined ? (
                     <a
                       className={styles['openBtn']}
@@ -132,6 +143,15 @@ export function Catalog() {
           })}
         </div>
       )}
+
+      {detailId !== null ? (
+        <AppDetailDrawer
+          appId={detailId}
+          onClose={() => {
+            setDetailId(null)
+          }}
+        />
+      ) : null}
     </div>
   )
 }

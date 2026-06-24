@@ -320,6 +320,23 @@
   background: var(--brand-strong);
 }
 
+.detailBtn {
+  padding: 10px 16px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg-2);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detailBtn:hover {
+  background: var(--surface-2);
+  color: var(--fg);
+}
+
 /* ── Feeds ──────────────────────────────────────────────────────────────── */
 .feeds {
   display: grid;

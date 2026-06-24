@@ -1,3 +1,5 @@
 export type { CatalogApp, CatalogAppStatus } from './model'
 export { useCatalogApps } from './queries'
 export { catalogAppKeys } from './query-keys'
+export { deriveCardState, CARD_STATE_META, CARD_STATE_ORDER } from './app-state'
+export type { CatalogCardState } from './app-state'
