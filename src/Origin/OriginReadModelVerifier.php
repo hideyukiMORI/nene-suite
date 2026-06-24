@@ -232,7 +232,7 @@ final class OriginReadModelVerifier
             return OriginVerificationOutcome::reject(OriginVerificationReason::ArtifactHashMismatch, 'artifact');
         }
 
-        return OriginVerificationOutcome::accept('complete', $freshness, $warnings);
+        return OriginVerificationOutcome::accept('complete', $freshness, $warnings, $targets);
     }
 
     /**
@@ -249,7 +249,7 @@ final class OriginReadModelVerifier
             return OriginVerificationOutcome::reject(OriginVerificationReason::ContentHashMismatch, 'feed-body');
         }
 
-        return OriginVerificationOutcome::accept('complete', $freshness, $warnings);
+        return OriginVerificationOutcome::accept('complete', $freshness, $warnings, $feed);
     }
 
     /**
@@ -267,7 +267,7 @@ final class OriginReadModelVerifier
             return OriginVerificationOutcome::reject(OriginVerificationReason::MalformedObject, 'entitlement', 'entitlement policy is missing a valid min_valid_generation watermark');
         }
 
-        return OriginVerificationOutcome::accept('complete', $freshness, $warnings);
+        return OriginVerificationOutcome::accept('complete', $freshness, $warnings, $policy);
     }
 
     /**

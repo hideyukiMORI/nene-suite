@@ -63,6 +63,39 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
 
                     return new PdoOriginGenWatermarkRepository($query);
                 },
+            )
+            ->set(
+                OriginReadModelVerifier::class,
+                static fn (ContainerInterface $container): OriginReadModelVerifier => new OriginReadModelVerifier(),
+            )
+            ->set(
+                HttpOriginObjectStore::class,
+                static function (ContainerInterface $container): HttpOriginObjectStore {
+                    $client = $container->get(OriginHttpClientInterface::class);
+                    $config = $container->get(OriginClientConfig::class);
+
+                    if (!$client instanceof OriginHttpClientInterface) {
+                        throw new LogicException('Origin HTTP client service is invalid.');
+                    }
+
+                    if (!$config instanceof OriginClientConfig) {
+                        throw new LogicException('Origin client config service is invalid.');
+                    }
+
+                    return new HttpOriginObjectStore($client, $config->baseUrl);
+                },
+            )
+            ->set(
+                OriginUpdateAggregator::class,
+                static function (ContainerInterface $container): OriginUpdateAggregator {
+                    $verifier = $container->get(OriginReadModelVerifier::class);
+
+                    if (!$verifier instanceof OriginReadModelVerifier) {
+                        throw new LogicException('Origin read model verifier service is invalid.');
+                    }
+
+                    return new OriginUpdateAggregator($verifier);
+                },
             );
     }
 }
