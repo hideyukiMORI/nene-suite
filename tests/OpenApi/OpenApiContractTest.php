@@ -40,6 +40,8 @@ final class OpenApiContractTest extends TestCase
         'listSuiteAuditEvents',
         'listInstalledApps',
         'getOriginUpdates',
+        'getOriginAnnouncements',
+        'getOriginHouseAds',
         'createOperator',
         'listOperators',
         'createOrganization',

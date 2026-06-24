@@ -570,6 +570,51 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/origin/announcements:
+    get:
+      operationId: getOriginAnnouncements
+      summary: Verified Origin announcements for the installed roster (content tree).
+      description: |
+        Per installed product, returns the verified announcement feed (profiled-TUF content tree).
+        Read-only; no audit event. `available:false` (empty `feeds`) when Origin is not configured;
+        a per-product failure / missing feed yields `available:false` on that feed with a `reason`.
+        `audience` is `free` until org-tier tracking lands. A `count:0` feed is published-empty.
+      parameters:
+        - $ref: '#/components/parameters/OriginFeedLocale'
+      responses:
+        '200':
+          description: Announcement feeds (or a disabled placeholder).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginFeedList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/origin/house-ads:
+    get:
+      operationId: getOriginHouseAds
+      summary: Verified Origin house-ads for the installed roster (content tree).
+      description: |
+        Per installed product, returns the verified house-ad feed (`free`-only cohort). Read-only;
+        no audit event. Same disabled / degrade / `count:0` semantics as announcements. Paid-tier
+        suppression lands with org-tier tracking.
+      parameters:
+        - $ref: '#/components/parameters/OriginFeedLocale'
+      responses:
+        '200':
+          description: House-ad feeds (or a disabled placeholder).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginFeedList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/suite-audit-events:
     get:
       tags: [Audit]
@@ -1260,6 +1305,15 @@ components:
       schema:
         $ref: '#/components/schemas/Ulid'
       example: 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+    OriginFeedLocale:
+      name: locale
+      in: query
+      required: false
+      description: Render locale. Suite renders en | ja (default en); other values degrade to en, and a missing locale variant falls back to en.
+      schema:
+        type: string
+        enum: [en, ja]
+      example: ja
 
   responses:
     Unauthorized:
@@ -2017,6 +2071,59 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OriginUpdate'
+
+    OriginFeed:
+      type: object
+      additionalProperties: false
+      required: [product, audience, kind, requestedLocale, servedLocale, available, count, items, freshness, reason, warnings]
+      properties:
+        product:
+          type: string
+        audience:
+          type: string
+          description: Cohort the feed was fetched for (free until org-tier tracking lands).
+        kind:
+          type: string
+          enum: [announcement, ad]
+        requestedLocale:
+          type: string
+        servedLocale:
+          type: string
+          description: Locale actually returned (may differ from requested after the en fallback).
+        available:
+          type: boolean
+        count:
+          type: integer
+          description: Signed item count; 0 is a published-empty feed (available, no items).
+        items:
+          type: array
+          description: Verified feed body — announcement / ad objects passed through as-is.
+          items:
+            type: object
+            additionalProperties: true
+        freshness:
+          type: [string, 'null']
+          enum: [fresh, warn, refuse_new, hard, null]
+        reason:
+          type: [string, 'null']
+          description: Stable verification reason when the feed is unavailable (or origin_unreachable).
+        warnings:
+          type: array
+          items:
+            type: string
+
+    OriginFeedList:
+      type: object
+      additionalProperties: false
+      required: [available, feeds]
+      properties:
+        available:
+          type: boolean
+          description: False when Origin is not configured (no URL or trust anchor); feeds is then empty.
+        feeds:
+          type: array
+          items:
+            $ref: '#/components/schemas/OriginFeed'
 
     AuditEntityType:
       type: string

@@ -274,6 +274,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/origin/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verified Origin announcements for the installed roster (content tree).
+         * @description Per installed product, returns the verified announcement feed (profiled-TUF content tree).
+         *     Read-only; no audit event. `available:false` (empty `feeds`) when Origin is not configured;
+         *     a per-product failure / missing feed yields `available:false` on that feed with a `reason`.
+         *     `audience` is `free` until org-tier tracking lands. A `count:0` feed is published-empty.
+         */
+        get: operations["getOriginAnnouncements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/origin/house-ads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Verified Origin house-ads for the installed roster (content tree).
+         * @description Per installed product, returns the verified house-ad feed (`free`-only cohort). Read-only;
+         *     no audit event. Same disabled / degrade / `count:0` semantics as announcements. Paid-tier
+         *     suppression lands with org-tier tracking.
+         */
+        get: operations["getOriginHouseAds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/suite-audit-events": {
         parameters: {
             query?: never;
@@ -860,6 +905,33 @@ export interface components {
             available: boolean;
             updates: components["schemas"]["OriginUpdate"][];
         };
+        OriginFeed: {
+            product: string;
+            /** @description Cohort the feed was fetched for (free until org-tier tracking lands). */
+            audience: string;
+            /** @enum {string} */
+            kind: "announcement" | "ad";
+            requestedLocale: string;
+            /** @description Locale actually returned (may differ from requested after the en fallback). */
+            servedLocale: string;
+            available: boolean;
+            /** @description Signed item count; 0 is a published-empty feed (available, no items). */
+            count: number;
+            /** @description Verified feed body — announcement / ad objects passed through as-is. */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** @enum {string|null} */
+            freshness: "fresh" | "warn" | "refuse_new" | "hard" | null;
+            /** @description Stable verification reason when the feed is unavailable (or origin_unreachable). */
+            reason: string | null;
+            warnings: string[];
+        };
+        OriginFeedList: {
+            /** @description False when Origin is not configured (no URL or trust anchor); feeds is then empty. */
+            available: boolean;
+            feeds: components["schemas"]["OriginFeed"][];
+        };
         /**
          * @description Affected orchestration entity (audit-trail §4; matches `schema/suite-audit-event.schema.json`).
          * @enum {string}
@@ -1163,6 +1235,11 @@ export interface components {
          * @example 01J8XR4ZS6Q9V2H7K3N5M0B8TC
          */
         InstallSessionId: components["schemas"]["Ulid"];
+        /**
+         * @description Render locale. Suite renders en | ja (default en); other values degrade to en, and a missing locale variant falls back to en.
+         * @example ja
+         */
+        OriginFeedLocale: "en" | "ja";
     };
     requestBodies: never;
     headers: never;
@@ -1709,6 +1786,62 @@ export interface operations {
                      *     }
                      */
                     "application/json": components["schemas"]["OriginUpdateList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getOriginAnnouncements: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Render locale. Suite renders en | ja (default en); other values degrade to en, and a missing locale variant falls back to en.
+                 * @example ja
+                 */
+                locale?: components["parameters"]["OriginFeedLocale"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Announcement feeds (or a disabled placeholder). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OriginFeedList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getOriginHouseAds: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Render locale. Suite renders en | ja (default en); other values degrade to en, and a missing locale variant falls back to en.
+                 * @example ja
+                 */
+                locale?: components["parameters"]["OriginFeedLocale"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description House-ad feeds (or a disabled placeholder). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OriginFeedList"];
                 };
             };
             401: components["responses"]["Unauthorized"];
