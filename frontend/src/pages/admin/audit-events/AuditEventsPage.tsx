@@ -1,16 +1,6 @@
-import { AuditEventsTable } from '@/features/audit-viewer'
-import { useTranslation } from '@/shared/i18n'
-import { PageHeader } from '@/shared/ui'
+import { AuditViewer } from '@/features/audit-viewer'
 
-/** Content-only — the global chrome (header/nav) is owned by AppShell. */
+/** Content-only — the global chrome is owned by AppShell; AuditViewer owns its header. */
 export function AuditEventsPage() {
-  const { t } = useTranslation()
-
-  return (
-    <>
-      <PageHeader title={t('suite.audit.title')} />
-      <p>{t('suite.audit.description')}</p>
-      <AuditEventsTable />
-    </>
-  )
+  return <AuditViewer />
 }
