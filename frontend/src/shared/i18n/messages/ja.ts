@@ -94,6 +94,18 @@ export const ja: Partial<MessageCatalog> = {
   'suite.settings.title': '設定',
   'suite.settings.placeholder':
     '免責・Origin ポーリング・エディション・更新チャンネルの設定は後続フェーズで実装します。',
+  'suite.settings.subtitle': 'Suite の構成・連携・法的事項。',
+  'suite.settings.section.general': '一般',
+  'suite.settings.section.about': 'ヘルプ / バージョン情報',
+  'suite.settings.edition': 'エディション',
+  'suite.settings.federationKeys': '連携キー',
+  'suite.settings.federationKeys.manage': '管理',
+  'suite.settings.originPolling': 'Origin ポーリング間隔',
+  'suite.settings.updateChannel': '更新チャンネル',
+  'suite.settings.phaseB': '後続フェーズで設定可能',
+  'suite.settings.disclaimer': '免責事項',
+  'suite.settings.disclaimer.view': '免責事項を表示',
+  'suite.settings.disclaimer.binding': '拘束力あり — 運用前に必ずお読みください（ADR 0003）。',
   'suite.account.title': 'アカウント & セキュリティ',
   'suite.account.placeholder':
     'プロフィール・パスワード / MFA・セッションは後続フェーズで実装します。',
