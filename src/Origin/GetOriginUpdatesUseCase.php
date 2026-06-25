@@ -16,7 +16,7 @@ use NeNeSuite\SiblingHealth\InstalledVersionResolverInterface;
  * the signal's status is a real diff, otherwise it stays `unknown` while surfacing the verified
  * latest. Version resolution runs only on the enabled path (never probed when Origin is off).
  */
-final readonly class GetOriginUpdatesUseCase
+final readonly class GetOriginUpdatesUseCase implements GetOriginUpdatesUseCaseInterface
 {
     private const string DEFAULT_CHANNEL = 'stable';
 

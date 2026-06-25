@@ -105,6 +105,19 @@ Never: `billing_api`, `invoice-api`, `clear-api`.
 | DB config object | `database` | `db` |
 | DB env prefix | `database.env_prefix` | `db_prefix` |
 
+### 2.5 Catalog version fields (read-model mirror)
+
+Per-app version metadata mirrored from Origin (ADR 0013 §4 — "mirror, not originate"). Surfaced on
+the catalog API response (camelCase); **not** stored in `catalog/apps.json` (the values are live).
+
+| Field | Canonical | API (camelCase) | Never |
+| --- | --- | --- | --- |
+| Installed version | `installed_version` | `installedVersion` | `current_version`, `local_version` |
+| Available version | `available_version` | `availableVersion` | `newest_version`, `remote_version` |
+
+`available_version` is a **version string**, distinct from the forbidden catalog `status` value
+`available` (§2.2).
+
 ---
 
 ## 3. Deployment modes

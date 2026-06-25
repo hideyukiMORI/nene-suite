@@ -779,6 +779,16 @@ export interface components {
              * @example NENE_INVOICE_DB_
              */
             databaseEnvPrefix?: string;
+            /**
+             * @description Installed version mirrored from the Origin update signals (ADR 0013 §4 — read-model, not authority). Null when unknown: Origin unconfigured, app not installed, or no version reported by the sibling.
+             * @example 1.3.0
+             */
+            installedVersion?: string | null;
+            /**
+             * @description Latest available version mirrored from the verified Origin manifest (ADR 0013 §4). Null when unknown. A version string — distinct from the catalog `status` value (terminology §2.2).
+             * @example 1.4.0
+             */
+            availableVersion?: string | null;
         };
         CatalogAppList: {
             version: number;
