@@ -6,4 +6,8 @@ export interface CatalogApp {
   status: CatalogAppStatus
   requires: string[]
   provides: string[]
+  /** Installed version mirrored from Origin (ADR 0013 §4); null when unknown. */
+  installedVersion: string | null
+  /** Latest available version mirrored from Origin; null when unknown. */
+  availableVersion: string | null
 }

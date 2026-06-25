@@ -112,6 +112,20 @@ export function Catalog() {
                     ? t('suite.catalog.requires', { names: requiresNames })
                     : null}
                 </p>
+                {app.installedVersion !== null || app.availableVersion !== null ? (
+                  <p className={styles['meta']}>
+                    {[
+                      app.installedVersion !== null
+                        ? t('suite.catalog.version.installed', { version: app.installedVersion })
+                        : null,
+                      app.availableVersion !== null
+                        ? t('suite.catalog.version.available', { version: app.availableVersion })
+                        : null,
+                    ]
+                      .filter((part) => part !== null)
+                      .join(' · ')}
+                  </p>
+                ) : null}
                 <div className={styles['actions']}>
                   <button
                     type="button"

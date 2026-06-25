@@ -168,6 +168,18 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                GetOriginUpdatesUseCaseInterface::class,
+                static function (ContainerInterface $container): GetOriginUpdatesUseCaseInterface {
+                    $useCase = $container->get(GetOriginUpdatesUseCase::class);
+
+                    if (!$useCase instanceof GetOriginUpdatesUseCase) {
+                        throw new LogicException('Get Origin updates use case service is invalid.');
+                    }
+
+                    return $useCase;
+                },
+            )
+            ->set(
                 GetOriginUpdatesHandler::class,
                 static function (ContainerInterface $container): GetOriginUpdatesHandler {
                     $authenticator = $container->get(BearerTokenAuthenticator::class);

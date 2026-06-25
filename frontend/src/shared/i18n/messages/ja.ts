@@ -68,6 +68,8 @@ export const ja: Partial<MessageCatalog> = {
   'suite.catalog.get': '入手',
   'suite.catalog.requires': '{{names}} が必要',
   'suite.catalog.empty': 'この条件に合うアプリがありません。',
+  'suite.catalog.version.installed': 'インストール済 {{version}}',
+  'suite.catalog.version.available': '最新 {{version}}',
 
   'suite.appDetail.view': '詳細',
   'suite.appDetail.role': 'ロール',

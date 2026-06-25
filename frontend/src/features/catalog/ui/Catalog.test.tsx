@@ -30,4 +30,29 @@ describe('Catalog', () => {
     expect(await screen.findByText('NeNe Invoice')).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Get' }).length).toBeGreaterThanOrEqual(2)
   })
+
+  it('shows the installed and available version mirror when present', async () => {
+    mswServer.use(
+      http.get('/api/v1/catalog/apps', () =>
+        HttpResponse.json({
+          version: 1,
+          apps: [
+            {
+              id: 'nene-invoice',
+              name: 'NeNe Invoice',
+              status: 'installable',
+              requires: [],
+              provides: ['billing-api'],
+              installedVersion: '1.3.0',
+              availableVersion: '1.4.0',
+            },
+          ],
+        }),
+      ),
+    )
+    renderWithProviders(<Catalog />)
+
+    expect(await screen.findByText('NeNe Invoice')).toBeInTheDocument()
+    expect(screen.getByText('Installed 1.3.0 · Latest 1.4.0')).toBeInTheDocument()
+  })
 })

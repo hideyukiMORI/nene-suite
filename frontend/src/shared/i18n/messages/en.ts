@@ -81,6 +81,8 @@ export const en = {
   'suite.catalog.get': 'Get',
   'suite.catalog.requires': 'Requires {{names}}',
   'suite.catalog.empty': 'No apps match this filter.',
+  'suite.catalog.version.installed': 'Installed {{version}}',
+  'suite.catalog.version.available': 'Latest {{version}}',
 
   // ── App detail drawer ────────────────────────────────────────────────────
   'suite.appDetail.view': 'Details',

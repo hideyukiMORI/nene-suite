@@ -9,6 +9,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Http\RuntimeServiceProvider;
+use NeNeSuite\Origin\GetOriginUpdatesUseCaseInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class AppCatalogServiceProvider implements ServiceProviderInterface
@@ -30,15 +31,32 @@ final readonly class AppCatalogServiceProvider implements ServiceProviderInterfa
                 },
             )
             ->set(
+                CatalogAppVersionSourceInterface::class,
+                static function (ContainerInterface $container): CatalogAppVersionSourceInterface {
+                    $updates = $container->get(GetOriginUpdatesUseCaseInterface::class);
+
+                    if (!$updates instanceof GetOriginUpdatesUseCaseInterface) {
+                        throw new LogicException('Get Origin updates use case service is invalid.');
+                    }
+
+                    return new OriginCatalogAppVersionSource($updates);
+                },
+            )
+            ->set(
                 ListCatalogAppsUseCaseInterface::class,
                 static function (ContainerInterface $container): ListCatalogAppsUseCaseInterface {
                     $repository = $container->get(CatalogAppRepositoryInterface::class);
+                    $versions = $container->get(CatalogAppVersionSourceInterface::class);
 
                     if (!$repository instanceof CatalogAppRepositoryInterface) {
                         throw new LogicException('Catalog app repository service is invalid.');
                     }
 
-                    return new ListCatalogAppsUseCase($repository);
+                    if (!$versions instanceof CatalogAppVersionSourceInterface) {
+                        throw new LogicException('Catalog app version source service is invalid.');
+                    }
+
+                    return new ListCatalogAppsUseCase($repository, $versions);
                 },
             )
             ->set(
