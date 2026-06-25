@@ -36,6 +36,7 @@ product database, not here.
 
 ### Origin
 
+- [`installed_app_versions`](#installed_app_versions) — Last-known installed version per suite-managed product, learned from the sibling /health probe (#255, epic #251 prerequisite). Supplies the installed version to the Origin update aggregator so a verified latest version can be diffed (unknown -> up_to_date / update_available / forced) instead of surfaced latest-only. Last-write-wins; absence of a row means the version is unknown.
 - [`origin_gen_watermarks`](#origin_gen_watermarks) — Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per product slug, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
 
 ## Relationships
@@ -120,6 +121,18 @@ Installer run state (Tier B). One row per install run: in_progress to completed 
 
 - `idx_install_sessions_suite_id` (index) on `suite_id`
 - `idx_install_sessions_status` (index) on `status`
+
+## `installed_app_versions`
+
+_Group: Origin_
+
+Last-known installed version per suite-managed product, learned from the sibling /health probe (#255, epic #251 prerequisite). Supplies the installed version to the Origin update aggregator so a verified latest version can be diffed (unknown -> up_to_date / update_available / forced) instead of surfaced latest-only. Last-write-wins; absence of a row means the version is unknown.
+
+| Column | Type | Null | Key | Description |
+| --- | --- | --- | --- | --- |
+| `catalog_id` | `VARCHAR(100)` | NO | PK | Catalog product slug (matches catalog/apps.json id). |
+| `version` | `VARCHAR(64)` | NO |  | Installed semver as reported by the sibling /health version field. |
+| `checked_at` | `VARCHAR(32)` | NO |  | Last successful probe time, ISO-8601 UTC string. |
 
 ## `login_attempts`
 
