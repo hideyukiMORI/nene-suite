@@ -2,7 +2,12 @@
 
 ## Status
 
-proposed
+accepted (2026-06-25)
+
+The consumer decisions (§1–§4, §6–§8) are validated by the landed Origin client, installed-version
+tracking, and catalog version mirror (see **Implementation status**). The dependency-ordered upgrade
+orchestrator (§3) and the full Suite↔sibling update relay (§5 beyond its auth surface) remain
+follow-up under epic #251 — built on top of this accepted contract, not blockers to acceptance.
 
 ## Context
 
@@ -61,11 +66,14 @@ Suite already validates a dependency DAG over `catalog/apps.json` (`requires`, v
 
 ### 4. Catalog version mirror (mirror, not originate)
 
-`catalog/apps.json` gains version metadata per app — `installed_version` and
-`available_version` — **mirrored** from the Origin manifest. Suite reflects Origin's
-truth; it never originates version authority (same non-authority pattern as the ADR 0012
-org-roster mirror). The catalog schema change and migration of existing entries are
-follow-up implementation work.
+The catalog gains per-app version metadata — `installed_version` and `available_version` — as a
+**read-model mirror** surfaced on the catalog API (`CatalogApp`; camelCase `installedVersion` /
+`availableVersion`), not static values baked into `catalog/apps.json` (the values are live).
+`available_version` mirrors the **verified Origin manifest** latest; `installed_version` mirrors the
+sibling's own reported version, read from its auth-gated `GET /machine/health` (`version` field,
+NENE2 v1.5.330+). Suite reflects these truths and never originates version authority (same
+non-authority pattern as the ADR 0012 org-roster mirror). Either field is null when unknown (Origin
+unconfigured, app not installed, or version not reported) — no fabricated data.
 
 ### 5. Aggregation contract (Suite ↔ sibling) — the only contract Suite owns
 
@@ -73,7 +81,9 @@ The relay between Suite and its managed siblings is **service-token authenticate
 (existing service-token surface). It covers: how Suite reports "update available /
 required" to a sibling, and how an operator-initiated "update all" triggers each
 sibling's apply in dependency order. The contract is defined here and may be specified as
-a Suite OpenAPI surface in follow-up work.
+a Suite OpenAPI surface in follow-up work. Its authentication surface is already exercised by the
+installed-version probe (Suite presents the per-app machine API key as `X-NENE2-API-Key` to the
+sibling's `/machine/health`); the update-relay and `update all` trigger are follow-up (epic #251).
 
 ### 6. Entitlement propagation
 
@@ -98,8 +108,8 @@ clear 1.1.0→1.2.0".
 
 - **Register `NENE_ORIGIN_URL`** as a portfolio-neutral (non-`NENE_SUITE_`) variable that
   points at the NeNe Origin authority, consumed by Suite and all siblings alike.
-- Catalog version fields (`installed_version`, `available_version`) are registered when
-  the catalog schema change lands (follow-up), not in this ADR.
+- Catalog version fields (`installed_version` / `available_version`) are **registered** in
+  terminology §2.5 (landed with the catalog version mirror, #260).
 
 ## Consequences
 
@@ -117,6 +127,17 @@ catalog DAG.
 **Risks.** Suite must verify Origin signatures with the same rigor as any client; a lax
 aggregator would undermine the supply-chain guarantees of ADR 0001.
 
+## Implementation status (at acceptance, 2026-06-25)
+
+- ✅ **Origin consumption client** — profiled-TUF verification with conformance-corpus parity, the
+  `gen` watermark, and the update / announcements / house-ads read APIs (epic #230; ADR 0017 consumer).
+- ✅ **Installed-version tracking** — sibling `/machine/health` probe with the per-app machine key,
+  feeding the §3 version diff (#255–#258; NENE2 v1.5.330 / NENE2#1414).
+- ✅ **Catalog version mirror (§4)** — read-model on the catalog API (#259 / #260).
+- ⏳ **Dependency-ordered upgrade orchestration (§3)**, the **Suite↔sibling update relay / "update all"
+  (§5 beyond auth)**, and signed-result **caching (§2)** — epic #251. The apply stays in each
+  sibling's own Tier A (§3 / nene-origin ADR 0001 §5).
+
 ## Related
 
 - Issue: `#98`
@@ -127,4 +148,6 @@ aggregator would undermine the supply-chain guarantees of ADR 0001.
   (terminology binding).
 - `docs/roadmap.md` Phase 4 (upgrade path per catalog version pin; health dashboard).
 - `docs/integrations/sibling-products.md` (service tokens).
+- Implementing epic: `#251`; PRs `#256`, `#258`, `#260` (with `#255` / `#257` / `#259`).
+- Cross-repo: NENE2 auth-gated `/machine/health` app version — NENE2#1414 (shipped v1.5.330).
 - Supersedes: none. Superseded by: none.
