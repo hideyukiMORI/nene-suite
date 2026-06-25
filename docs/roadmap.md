@@ -66,9 +66,10 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
 - ⏳ Upgrade **orchestration** — version-compare vs the installed version +
   dependency-ordered "update all". **Suite orders / gates / relays only; the apply
-  stays with each sibling's own Tier A** (Origin ADR 0001 §5 / ADR 0013, accepted). Backlog
-  epic #251; the prerequisites (installed-version tracking, catalog version mirror, ADR 0013
-  acceptance) have landed — the aggregation-contract spec + orchestrator are the remaining work.
+  stays with each sibling's own Tier A** (Origin ADR 0001 §5 / ADR 0013 + ADR 0018, both accepted).
+  Backlog epic #251; the prerequisites (installed-version tracking, catalog version mirror, ADR 0013
+  acceptance, ADR 0018 aggregation contract) have landed — the NENE2 `/machine/update` endpoints and
+  the Suite orchestrator + apex "update all" UI are the remaining work.
 
 ## Phase 3: Tier A Web Installer
 
