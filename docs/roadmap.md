@@ -53,10 +53,17 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   `tools/validate-catalog.sh`).
 - ✅ Origin consumption contract fixed — signed static GETs + detached-JWS
   verification for update / announcements / house-ads (ADR 0017).
+- ✅ Suite Origin **consumption client** — profiled-TUF read model: detached-JWS
+  (EdDSA) verification with conformance-corpus parity, per-product `gen` watermark,
+  and the update / announcements / house-ads read APIs + dashboard wiring
+  (O0–O5b, epic #230; ADR 0017 consumer). Disabled-degrade until the trust anchor
+  is configured.
 - ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
-- ⏳ Suite Origin **client** — per-product fetch (ETag) + `.jws` verification +
-  version-compare/forced-update + dependency-ordered "update all" (ADR 0017 consumer).
+- ⏳ Upgrade **orchestration** — version-compare vs the installed version +
+  dependency-ordered "update all". **Suite orders / gates / relays only; the apply
+  stays with each sibling's own Tier A** (Origin ADR 0001 §5 / ADR 0013). Backlog
+  epic #251; first prerequisite is installed-version tracking.
 
 ## Phase 3: Tier A Web Installer
 
@@ -77,4 +84,4 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Shared application database **across products** (each app keeps its own DB;
   hosted multi-tenancy is per-app `organization_id` scoping, not a shared app DB)
 
-Last updated: 2026-06-24
+Last updated: 2026-06-25

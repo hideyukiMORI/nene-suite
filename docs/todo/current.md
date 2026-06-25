@@ -1,17 +1,21 @@
 # Current TODO
 
-**Status (2026-06-24).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
-(A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅.
-Control DB + provisioning are now PostgreSQL-capable (ADR 0016); the Origin consumption
-contract is fixed (ADR 0017). **Next: B2** — sibling-side org resolution +
-authorization-code assertion flow (cross-repo) — plus the Suite Origin client that
-consumes ADR 0017.
+**Status (2026-06-25).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
+(A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅ ·
+**Origin consumption client** (O0–O5b, epic #230) ✅. Control DB + provisioning are
+PostgreSQL-capable (ADR 0016); the Origin consumption contract (ADR 0017) is now
+implemented end to end — detached-JWS verification with conformance-corpus parity, a
+per-product `gen` watermark, three read APIs, and dashboard wiring. **Next: B2** —
+sibling-side org resolution + authorization-code assertion flow (cross-repo) — and,
+in-repo, the **O6 upgrade-orchestration prerequisite**: installed-version tracking
+(backlog epic #251; the non-destructive first step).
 
 The Phase A / B1 build-out is tracked in
 [`docs/milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md)
-and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); `main`'s git
-log is the authoritative shipped record. Gate state: PHPUnit **345** / vitest **38**, all
-green.
+and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
+client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
+`main`'s git log is the authoritative shipped record. Gate state: PHPUnit **411** /
+vitest **67**, all green.
 
 ---
 
@@ -84,7 +88,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] Operator provisioning HTTP endpoint — `POST /api/v1/operators` + `ProvisionApexOperatorUseCase` (default-org `Admin` membership) — A4.5, PR #154
 - [ ] Shared apex auth middleware — **deferred by design.** Per-handler default-deny via `BearerTokenAuthenticator` / `SuperadminGuard` (first line of `handle()`) is the deliberate pattern while few endpoints need auth (handover §4.3). Revisit only if the authenticated-endpoint count grows.
 - [ ] `IntegrationWiring` — Phase 2 scope
-- [ ] `app_versions` pinning in manifest — Phase 2 scope (Origin consumption now contracted in ADR 0017; update determination is version-compare vs `manifest.latest.version`)
+- [ ] `app_versions` pinning in manifest — now part of the **O6 prerequisite chain** (backlog epic #251): installed-version tracking → catalog version mirror → version-compare vs the Origin `manifest.latest.version`
 
 ## Next (hosted edition / NeNe Cloud Free — ADR 0015 draft)
 
@@ -99,7 +103,8 @@ Done (Phase A + B1 — `main`):
 Remaining (B2–B6 — see milestone §3):
 
 - [ ] アプリの org 解決（`subdomain` / `custom_domain`）+ authorization-code assertion flow を Suite から driving（B2 — cross-repo）
-- [ ] Suite Origin **client** 実装 — per-product fetch（ETag）+ `.jws` 検証 + version-compare/forced-update + dependency-ordered "update all"（ADR 0017 consumer 側）
+- [x] Suite Origin **消費**クライアント実装 — profiled-TUF read model：detached-JWS（EdDSA）検証＋conformance corpus parity（15/15, `nene-origin@d5882cf` pin）・per-product `gen` watermark・update/announcements/house-ads read API＋dashboard 配線（O0–O5b, epic #230 closed; PR #232–#250）。trust anchor 未設定時は disabled-degrade。
+- [ ] アップグレード **orchestration** — version-compare（installed 版）＋ dependency-ordered "update all"。**Suite は順序/gating/relay のみ・apply は各 sibling の Tier A**（Origin ADR 0001 §5 / ADR 0013）。backlog epic #251；前提① = installed-version 追跡（非破壊な最初の一歩）。
 - [ ] catalog schema 拡張（`icon` / `description` / `category` / `min_suite_version`）+ フロント IA 配線（updates badge / announcements rail / ad slot）
 - [ ] entitlement / quota + house-ads 配線（B4 — ADR 0013; suite mode の `tier` は federation IdP claim 由来）
 - [ ] 組織まるごと export → 自己ホスト import（B5 — 移行可 headline の launch 前提; 現状 CSV のみ）
@@ -172,4 +177,27 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   (`docs/design/frontend-information-architecture.md`).
 - Gate state verified green: PHPUnit **345** / vitest **38**.
 
-Last updated: 2026-06-24
+### 2026-06-25
+
+- **Origin consumption client complete (O0–O5b, epic #230 closed)** — profiled-TUF read
+  model end to end: outbound HTTP seam + `ext-sodium` (O0); detached-JWS (EdDSA) verify
+  primitive with an algorithm allowlist, no `none`, kid-valid-at-`iat` (O1a); chain
+  verifier with **conformance-corpus parity (15/15)** ported from Origin's reference
+  verifier and pinned at `nene-origin@d5882cf` (O1b); per-product `gen` watermark in the
+  control DB (monotonic anti-rollback, O2); update aggregation + announcement/house-ad
+  feeds with locale fallback (O3/O3b); `GET /api/v1/origin/{updates,announcements,house-ads}`
+  read APIs (operator-authenticated, read-only, disabled-degrade when Origin is
+  unconfigured, O4); dashboard updates KPI/panel + announcement panel + house-ad slot +
+  app-detail change-history (O5/O5b). Updates are surfaced **latest-only with
+  `status: unknown`** until installed versions are tracked; every surface keeps an honest
+  placeholder when Origin is unconfigured (never fabricated data).
+- **O6 re-framed → backlog #251** — the apply is each sibling's own Tier A (ADR 0013
+  §3/§8 / Origin ADR 0001 §5); Suite orchestrates ordering / gating / relay only. The
+  mis-framing ("Suite downloads + applies") was caught and corrected before any
+  scope-violating code. The prerequisite chain starts at the non-destructive
+  **installed-version tracking** (via sibling `/health`).
+- Production activation stays human-gated (root-key ceremony + `NENE_ORIGIN_URL` /
+  `NENE_ORIGIN_TRUST_ANCHOR_PATH`); once configured, the placeholders become live data.
+- Gate state verified green: PHPUnit **411** / vitest **67**.
+
+Last updated: 2026-06-25
