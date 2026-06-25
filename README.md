@@ -50,11 +50,15 @@ installable standalone via their own git clone or release ZIP.
 
 ## Repository status
 
-**Phase 1 — Tier B installer MVP.** Docker Compose orchestrator, apex shell
-(login + app launcher + install wizard + audit viewer), and all 13 Phase 1
-OpenAPI operations are implemented. CI and automatic staging deployment to
-ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, ADRs
-0001–0013, and professional sign-offs are on record.
+**Phase 1 (Tier B installer MVP) ✅ · multi-tenant Phase A + federation IdP key plane (B1) ✅ ·
+Origin consumption client ✅.** Docker Compose orchestrator and apex shell (login + app launcher +
+install wizard + audit viewer) with the Phase 1 OpenAPI operations; organizations / memberships /
+roles + superadmin console; ES256 federation assertions + JWKS (edition-gated); and a profiled-TUF
+Origin update / announcement / house-ad client. The **O6 upgrade-orchestration prerequisites** have
+landed — installed-version tracking (via the sibling `/machine/health`), catalog version mirror, and
+the upgrade contract (ADR 0013 + ADR 0019, deployment-driven). CI and automatic staging deployment to
+ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0019**, and
+professional sign-offs are on record.
 
 ## License
 
