@@ -2,12 +2,16 @@
 
 ## Status
 
-accepted (2026-06-25)
+superseded by ADR 0019 (2026-06-26)
 
-The contract shape (§1–§6, decisions A / B1 / C1) is accepted and the four open questions are
-resolved below. Implementation is follow-up: NENE2 implements the `/machine/update` endpoints
-(cross-repo, like NENE2#1414), and Suite builds the dependency-ordered orchestrator + apex
-"update all" UI (O6, epic #251).
+Originally accepted 2026-06-25. **Superseded** — §2/§3 specified the apply via a sibling **runtime
+HTTP endpoint** (`POST /machine/update`, the running app applying its own update); review found a
+running web app cannot atomically redeploy/restart itself, and in Tier B the deployment swap is the
+orchestrator's responsibility. **ADR 0019** replaces the apply mechanism with a deployment-driven
+model (Suite recreates the sibling container at the new image; the sibling migrates itself on boot —
+ADR 0014). The decision record below is retained for history (ADR policy: supersede, do not rewrite).
+The orchestration principles (§4 — dependency order, min-version gating, halt-don't-unwind, audit)
+carry over into ADR 0019 §3.
 
 ## Context
 
@@ -158,4 +162,4 @@ mitigated by §4 gating. Both must hold for the contract to be safe.
 - ADR 0007 (audit before/after), ADR 0012 (federation / entitlement), ADR 0017 (Origin consumption).
 - Epic: `#251`. Auth surface: NENE2#1414 (shipped v1.5.330) / Suite `#258`.
 - `docs/integrations/sibling-products.md` (service tokens); `docs/roadmap.md` Phase 4.
-- Supersedes: none. Superseded by: none.
+- Supersedes: none. Superseded by: **ADR 0019** (Tier B upgrade orchestration is deployment-driven).

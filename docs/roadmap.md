@@ -64,12 +64,14 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   adoption is cross-repo (nene-invoice#496 / nene-clear#182 / nene-records#586).
 - ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
-- ⏳ Upgrade **orchestration** — version-compare vs the installed version +
-  dependency-ordered "update all". **Suite orders / gates / relays only; the apply
-  stays with each sibling's own Tier A** (Origin ADR 0001 §5 / ADR 0013 + ADR 0018, both accepted).
-  Backlog epic #251; the prerequisites (installed-version tracking, catalog version mirror, ADR 0013
-  acceptance, ADR 0018 aggregation contract) have landed — the NENE2 `/machine/update` endpoints and
-  the Suite orchestrator + apex "update all" UI are the remaining work.
+- ⏳ Upgrade **orchestration** — dependency-ordered "update all", **deployment-driven** (Tier B:
+  Suite recreates each sibling container at the new image in dependency order with min-version
+  gating; the sibling migrates on boot — its own Tier A). **Suite drives deployment; the apply stays
+  the sibling's** (Origin ADR 0001 §5 / ADR 0013 §3/§8 / ADR 0014 / **ADR 0019**, which supersedes the
+  mis-specified ADR 0018). Backlog epic #251; the prerequisites (installed-version tracking, catalog
+  version mirror, ADR 0013 acceptance, ADR 0019 orchestration contract) have landed — the Suite
+  deployment-driven orchestrator + apex "update all" UI are the remaining work (no sibling runtime
+  endpoint; NENE2#1416 withdrawn).
 
 ## Phase 3: Tier A Web Installer
 
