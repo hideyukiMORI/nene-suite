@@ -7,10 +7,11 @@ PostgreSQL-capable (ADR 0016); the Origin consumption contract (ADR 0017) is now
 implemented end to end — detached-JWS verification with conformance-corpus parity, a
 per-product `gen` watermark, three read APIs, and dashboard wiring. The **O6 upgrade
 orchestration prerequisites are all landed** (installed-version tracking, catalog version mirror,
-ADR 0013 acceptance, and the **ADR 0018 aggregation contract** — see below). **Next: B2** —
-sibling-side org resolution + authorization-code assertion flow (cross-repo) — and, for O6, the
-NENE2 `/machine/update` endpoints (cross-repo) then the Suite orchestrator + apex "update all" UI
-(epic #251).
+ADR 0013 acceptance, and the upgrade-orchestration contract — **ADR 0019**, which supersedes the
+mis-specified ADR 0018; see below). **Next: B2** — sibling-side org resolution +
+authorization-code assertion flow (cross-repo) — and, for O6, the Suite **deployment-driven**
+orchestrator (Tier B compose: dependency-ordered image recreate + min-version gating; the sibling
+migrates on boot) + apex "update all" UI (epic #251).
 
 The Phase A / B1 build-out is tracked in
 [`docs/milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md)
@@ -106,7 +107,7 @@ Remaining (B2–B6 — see milestone §3):
 
 - [ ] アプリの org 解決（`subdomain` / `custom_domain`）+ authorization-code assertion flow を Suite から driving（B2 — cross-repo）
 - [x] Suite Origin **消費**クライアント実装 — profiled-TUF read model：detached-JWS（EdDSA）検証＋conformance corpus parity（15/15, `nene-origin@d5882cf` pin）・per-product `gen` watermark・update/announcements/house-ads read API＋dashboard 配線（O0–O5b, epic #230 closed; PR #232–#250）。trust anchor 未設定時は disabled-degrade。
-- [ ] アップグレード **orchestration** — version-compare（installed 版）＋ dependency-ordered "update all"。**Suite は順序/gating/relay のみ・apply は各 sibling の Tier A**（Origin ADR 0001 §5 / ADR 0013 **accepted** / ADR 0018 **accepted**）。backlog epic #251；**前提①②③④ landed**（installed-version 追跡 #256/#258・catalog version mirror #260・ADR 0013 accepted #262・aggregation contract ADR 0018 accepted #266/#268）→ 次は NENE2 の `POST /machine/update`(+ status) 実装（cross-repo）＋ Suite orchestrator/apex "update all" UI。
+- [ ] アップグレード **orchestration** — dependency-ordered "update all"。**deployment-driven**（Tier B：Suite が依存順に新イメージ recreate＋min-version gating＋audit、各 sibling は起動時 migrate＝Tier A）。**Suite はデプロイ駆動・apply 実体は sibling の boot migrate**（Origin ADR 0001 §5 / ADR 0013 §3/§8 / ADR 0014 / **ADR 0019**）。backlog epic #251；**前提①②③④ landed**（installed-version 追跡 #256/#258・catalog version mirror #260・ADR 0013 accepted #262・upgrade orchestration ADR 0019（ADR 0018 を supersede））→ 次は Suite のデプロイ駆動 orchestrator＋apex "update all" UI（sibling runtime endpoint は不要・NENE2#1416 取り下げ）。
 - [ ] catalog schema 拡張（`icon` / `description` / `category` / `min_suite_version`）+ フロント IA 配線（updates badge / announcements rail / ad slot）
 - [ ] entitlement / quota + house-ads 配線（B4 — ADR 0013; suite mode の `tier` は federation IdP claim 由来）
 - [ ] 組織まるごと export → 自己ホスト import（B5 — 移行可 headline の launch 前提; 現状 CSV のみ）
@@ -202,12 +203,15 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   auth-gated `/machine/health` `version` (NENE2 v1.5.330 / NENE2#1414) — seam + control-DB cache
   (#256), then the `X-NENE2-API-Key` probe + per-app machine-key env (#258); ② **catalog version
   mirror** (ADR 0013 §4 read-model on the catalog API, #260); ③ **ADR 0013 accepted** (#262);
-  ④ **ADR 0018 — Suite↔Sibling Aggregation Contract accepted** (#266 proposed → #268 accepted): the
-  `POST /machine/update` (+ status) shape, async + sibling-atomic apply with target re-verify, and
-  Suite-side dependency-ordered orchestration with min-version gating + halt-don't-unwind.
+  ④ upgrade-orchestration contract — first **ADR 0018** (#266→#268), then **corrected by ADR 0019**
+  (#271): ADR 0018 put the apply on a sibling runtime endpoint (`POST /machine/update`); review found
+  a running app cannot redeploy itself, so ADR 0019 makes it **deployment-driven** (Suite recreates
+  the sibling container at the new image in dependency order with min-version gating + halt-don't-
+  unwind + audit; the sibling migrates on boot — Tier A / ADR 0014). No sibling runtime endpoint —
+  **NENE2#1416 withdrawn**; `/machine/health` version (NENE2#1414) is all NENE2 needs.
   Sibling adoption tracked at nene-invoice#496 / nene-clear#182 / nene-records#586. Until a sibling
-  reports its version the diff stays `unknown` (defensive). Next: NENE2 `/machine/update` impl +
-  the Suite orchestrator / apex UI (O6, #251).
+  reports its version the diff stays `unknown` (defensive). Next: Suite deployment-driven orchestrator
+  + apex UI (O6, #251).
 - Production activation stays human-gated (root-key ceremony + `NENE_ORIGIN_URL` /
   `NENE_ORIGIN_TRUST_ANCHOR_PATH`); once configured, the placeholders become live data.
 - Gate state verified green: PHPUnit **431** / vitest **68**.
