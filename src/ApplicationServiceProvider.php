@@ -34,6 +34,7 @@ use NeNeSuite\InstallSession\InstallSessionRouteRegistrar;
 use NeNeSuite\InstallSession\InstallSessionServiceProvider;
 use NeNeSuite\Origin\OriginRouteRegistrar;
 use NeNeSuite\Origin\OriginServiceProvider;
+use NeNeSuite\SiblingHealth\SiblingHealthServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRouteRegistrar;
 use NeNeSuite\SuiteAudit\SuiteAuditServiceProvider;
 use NeNeSuite\SuiteEnv\SuiteEnvServiceProvider;
@@ -75,6 +76,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new InstalledAppsServiceProvider())
             ->addProvider(new InstallerServiceProvider())
             ->addProvider(new TenancyServiceProvider())
+            ->addProvider(new SiblingHealthServiceProvider())
             ->addProvider(new OriginServiceProvider());
 
         $builder

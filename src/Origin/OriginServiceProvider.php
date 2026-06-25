@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Auth\BearerTokenAuthenticator;
 use NeNeSuite\InstalledApps\ListInstalledAppsUseCaseInterface;
+use NeNeSuite\SiblingHealth\InstalledVersionResolverInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -130,6 +131,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                     $config = $container->get(OriginClientConfig::class);
                     $anchors = $container->get(OriginTrustAnchorProvider::class);
                     $installed = $container->get(ListInstalledAppsUseCaseInterface::class);
+                    $versions = $container->get(InstalledVersionResolverInterface::class);
                     $store = $container->get(HttpOriginObjectStore::class);
                     $aggregator = $container->get(OriginUpdateAggregator::class);
                     $watermarks = $container->get(OriginGenWatermarkRepositoryInterface::class);
@@ -146,6 +148,10 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Installed apps use case service is invalid.');
                     }
 
+                    if (!$versions instanceof InstalledVersionResolverInterface) {
+                        throw new LogicException('Installed version resolver service is invalid.');
+                    }
+
                     if (!$store instanceof HttpOriginObjectStore) {
                         throw new LogicException('Origin HTTP object store service is invalid.');
                     }
@@ -158,7 +164,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Origin gen watermark repository service is invalid.');
                     }
 
-                    return new GetOriginUpdatesUseCase($config, $anchors, $installed, $store, $aggregator, $watermarks);
+                    return new GetOriginUpdatesUseCase($config, $anchors, $installed, $versions, $store, $aggregator, $watermarks);
                 },
             )
             ->set(
