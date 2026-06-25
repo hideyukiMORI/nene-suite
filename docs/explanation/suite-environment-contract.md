@@ -74,6 +74,25 @@ Trailing slash required. HTTP clients concatenate OpenAPI paths relative to this
 
 ---
 
+## Sibling machine credential variables
+
+Pattern: `NENE_SUITE_APP_{CATALOG_SNAKE}_MACHINE_KEY`
+
+| Catalog id | Variable |
+| --- | --- |
+| `nene-invoice` | `NENE_SUITE_APP_NENE_INVOICE_MACHINE_KEY` |
+| `nene-clear` | `NENE_SUITE_APP_NENE_CLEAR_MACHINE_KEY` |
+
+The suite reads each installed sibling's auth-gated `GET /machine/health` (NENE2 v1.5.330+) to
+learn its installed version, sending this value as the `X-NENE2-API-Key` header. Set it to the
+sibling's own `NENE2_MACHINE_API_KEY` — it is the per-product service API key ([ADR 0004](../adr/0004-suite-environment-contract.md)).
+
+Optional and additive: when unset, the suite cannot read that sibling's version and the Origin
+update status stays `unknown` (no fabricated data). This value is a secret and is **never** written
+to the install manifest.
+
+---
+
 ## JWT claims (user sessions, suite mode)
 
 | Claim | Purpose |

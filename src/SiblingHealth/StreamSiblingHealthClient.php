@@ -7,11 +7,12 @@ namespace NeNeSuite\SiblingHealth;
 use JsonException;
 
 /**
- * Native PHP-streams probe of `{publicUrl}/health` (no new dependency — mirrors
- * {@see \NeNeSuite\Origin\StreamOriginHttpClient}). Non-throwing by contract: any transport error,
- * non-200 status, non-JSON body, or missing / blank `version` field degrades to null. The Suite
- * reaches siblings over the internal network; service-token gating of the version is deferred to
- * the ADR 0013 §5 aggregation contract.
+ * Native PHP-streams probe of `{publicUrl}/machine/health` (no new dependency — mirrors
+ * {@see \NeNeSuite\Origin\StreamOriginHttpClient}). The endpoint is auth-gated by NENE2's
+ * `ApiKeyAuthenticationMiddleware`, so the machine API key is sent as `X-NENE2-API-Key`; without a
+ * key the probe short-circuits to null (the endpoint would answer 401). Non-throwing by contract:
+ * any transport error, non-200 status, non-JSON body, or missing / blank `version` field degrades
+ * to null. The suite reaches siblings over the internal network.
  */
 final readonly class StreamSiblingHealthClient implements SiblingHealthClientInterface
 {
@@ -19,14 +20,19 @@ final readonly class StreamSiblingHealthClient implements SiblingHealthClientInt
     {
     }
 
-    public function fetchVersion(string $publicUrl): ?string
+    public function fetchVersion(string $publicUrl, ?string $machineApiKey): ?string
     {
-        $url = rtrim($publicUrl, '/') . '/health';
+        if ($machineApiKey === null || $machineApiKey === '') {
+            return null;
+        }
+
+        $url = rtrim($publicUrl, '/') . '/machine/health';
 
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',
-                'header' => 'Accept: application/json' . "\r\n",
+                'header' => 'Accept: application/json' . "\r\n"
+                    . 'X-NENE2-API-Key: ' . $machineApiKey . "\r\n",
                 'timeout' => $this->timeoutSeconds,
                 'ignore_errors' => true,
                 'follow_location' => 0,
@@ -79,8 +85,8 @@ final readonly class StreamSiblingHealthClient implements SiblingHealthClientInt
     }
 
     /**
-     * Extract a non-blank `version` string from a sibling `/health` JSON body, or null when the
-     * body is not a JSON object or carries no usable `version` field.
+     * Extract a non-blank `version` string from a sibling `/machine/health` JSON body, or null when
+     * the body is not a JSON object or carries no usable `version` field.
      */
     public static function parseVersion(string $body): ?string
     {

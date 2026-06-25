@@ -18,6 +18,7 @@ use NeNeSuite\Origin\OriginUpdateSignal;
 use NeNeSuite\Origin\OriginUpdateStatus;
 use NeNeSuite\SiblingHealth\InstalledVersionResolver;
 use NeNeSuite\Tests\SiblingHealth\FakeSiblingHealthClient;
+use NeNeSuite\Tests\SiblingHealth\FakeSuiteAppMachineKeyReader;
 use NeNeSuite\Tests\SiblingHealth\InMemoryInstalledVersionRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -75,6 +76,7 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
             new OriginClientConfig('https://origin.example.com', 10, 1, 1, $anchorPath),
             $anchorPath,
             ['https://example.com/nene-invoice/' => '1.3.0'],
+            ['nene-invoice' => 'machine-key'],
         );
 
         $output = $useCase->execute(new DateTimeImmutable(self::NOW));
@@ -90,8 +92,9 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
 
     /**
      * @param array<string, ?string> $versionsByUrl
+     * @param array<string, ?string> $keysByCatalogId
      */
-    private function useCase(OriginClientConfig $config, ?string $anchorPath, array $versionsByUrl = []): GetOriginUpdatesUseCase
+    private function useCase(OriginClientConfig $config, ?string $anchorPath, array $versionsByUrl = [], array $keysByCatalogId = []): GetOriginUpdatesUseCase
     {
         return new GetOriginUpdatesUseCase(
             $config,
@@ -99,7 +102,11 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
             new FakeListInstalledAppsUseCase(new ListInstalledAppsOutput([
                 new InstalledApp('nene-invoice', 'NeNe Invoice', 'https://example.com/nene-invoice/', null, SsotRole::None),
             ])),
-            new InstalledVersionResolver(new FakeSiblingHealthClient($versionsByUrl), new InMemoryInstalledVersionRepository()),
+            new InstalledVersionResolver(
+                new FakeSiblingHealthClient($versionsByUrl),
+                new InMemoryInstalledVersionRepository(),
+                new FakeSuiteAppMachineKeyReader($keysByCatalogId),
+            ),
             new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-update-reduced'),
             new OriginUpdateAggregator(new OriginReadModelVerifier()),
             new InMemoryOriginGenWatermarkRepository(),
