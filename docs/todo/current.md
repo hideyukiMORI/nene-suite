@@ -1,6 +1,6 @@
 # Current TODO
 
-**Status (2026-06-25).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
+**Status (2026-06-26).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
 (A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅ ·
 **Origin consumption client** (O0–O5b, epic #230) ✅. Control DB + provisioning are
 PostgreSQL-capable (ADR 0016); the Origin consumption contract (ADR 0017) is now
@@ -216,4 +216,21 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   `NENE_ORIGIN_TRUST_ANCHOR_PATH`); once configured, the placeholders become live data.
 - Gate state verified green: PHPUnit **431** / vitest **68**.
 
-Last updated: 2026-06-25
+### 2026-06-26
+
+- **O6 upgrade contract corrected — ADR 0018 superseded by ADR 0019 (deployment-driven).** Review
+  found ADR 0018's apply mechanism (a sibling runtime `POST /machine/update` self-apply) wrong — a
+  running app cannot redeploy itself. **ADR 0019** (proposed) makes the apply **deployment-driven**:
+  Suite (Tier B compose owner) recreates the sibling container at the new image in dependency order
+  with min-version gating + halt-don't-unwind + audit; the sibling migrates on boot (its own Tier A,
+  ADR 0014). No sibling runtime endpoint — **NENE2#1416 withdrawn**. (#266/#268 ADR 0018
+  proposed→accepted, then #272 supersede.) ADR 0019 open questions — deploy-control mechanism
+  (Docker socket vs host-side deploy agent), image provenance, Tier A coexistence — are the next gate.
+- **NENE2 framework-health audit — Suite-agnostic confirmed.** NENE2 has zero code/config coupling to
+  Suite (one-directional Suite→NENE2). The only blemish (generic "suite/orchestrator" prose in the
+  #1414 PHPDoc/CHANGELOG, seeded by our issue wording) was fixed on the NENE2 side (NENE2#1417/#1418).
+  Principle recorded: request only generic framework features from NENE2; never name/allude to Suite.
+- Session handover: [`docs/handover/2026-06-26-origin-and-o6-prerequisites.md`](../handover/2026-06-26-origin-and-o6-prerequisites.md).
+- Gate state: PHPUnit **431** / vitest **68**, all green.
+
+Last updated: 2026-06-26

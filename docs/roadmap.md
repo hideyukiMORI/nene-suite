@@ -92,4 +92,4 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Shared application database **across products** (each app keeps its own DB;
   hosted multi-tenancy is per-app `organization_id` scoping, not a shared app DB)
 
-Last updated: 2026-06-25
+Last updated: 2026-06-26
