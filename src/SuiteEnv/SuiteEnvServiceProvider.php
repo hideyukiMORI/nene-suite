@@ -22,6 +22,10 @@ final readonly class SuiteEnvServiceProvider implements ServiceProviderInterface
                 static fn (ContainerInterface $container): SuiteAppUrlReaderInterface => new EnvSuiteAppUrlReader(),
             )
             ->set(
+                SuiteAppMachineKeyReaderInterface::class,
+                static fn (ContainerInterface $container): SuiteAppMachineKeyReaderInterface => new EnvSuiteAppMachineKeyReader(),
+            )
+            ->set(
                 SuiteEnvConfigFactory::class,
                 static fn (ContainerInterface $container): SuiteEnvConfigFactory => new SuiteEnvConfigFactory(),
             )
