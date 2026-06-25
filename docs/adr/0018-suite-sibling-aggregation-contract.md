@@ -2,7 +2,12 @@
 
 ## Status
 
-proposed
+accepted (2026-06-25)
+
+The contract shape (§1–§6, decisions A / B1 / C1) is accepted and the four open questions are
+resolved below. Implementation is follow-up: NENE2 implements the `/machine/update` endpoints
+(cross-repo, like NENE2#1414), and Suite builds the dependency-ordered orchestrator + apex
+"update all" UI (O6, epic #251).
 
 ## Context
 
@@ -47,7 +52,8 @@ Two endpoints:
 ```
 
 Idempotent per target: a repeat call while an apply to the same `target_version` is in flight returns
-the same `operation_id` (it does not start a second apply).
+the same `operation_id` (it does not start a second apply). A concurrent `POST` for a *different*
+target while an apply is in flight is rejected with `409 Conflict` — one apply per sibling at a time.
 
 **`GET /machine/update/status`** — Suite polls progress of the in-flight (or last) operation.
 
@@ -83,9 +89,11 @@ Operator-initiated **"update all"**:
 - **Min-version gating.** Honor the Origin manifest's min-compatible versions (ADR 0013 §3): Suite
   **refuses/halts** a set that would leave a dependent below its required minimum, surfacing the
   conflict instead of applying a breaking set.
-- **Drive + poll.** Trigger each sibling's `POST /machine/update` in dependency order, poll
-  `GET /machine/update/status`, and **stop the chain on a failed apply** — never start a dependent on
-  a broken dependency.
+- **Drive + poll.** Trigger each sibling's `POST /machine/update` with the Origin-verified
+  `target_version` in dependency order, poll `GET /machine/update/status`, and **halt the chain on a
+  failed apply** — never start a dependent on a broken dependency. Halting does **not** unwind
+  already-applied dependencies (each apply was atomic); re-running "update all" resumes from the
+  failed step.
 - **Audit.** Record each operator-initiated orchestration action in the suite audit trail with
   before/after (ADR 0007), e.g. `update all: invoice 1.3.0→1.4.0, clear 1.1.0→1.2.0`.
 
@@ -103,20 +111,21 @@ over the internal network. No new credential type.
 - This ADR does not implement the endpoints (NENE2) or the orchestrator/apex UI (Suite); those are O6
   follow-up (#251).
 
-## Open questions (resolve at acceptance)
+## Resolved at acceptance (2026-06-25)
 
-- **OQ1 — status endpoint shape.** `GET /machine/update/status` (single in-flight op per app) vs
-  `GET /machine/update/{operation_id}` (addressable history). Lean: single in-flight + `operation_id`
-  echo; history is YAGNI for "update all".
-- **OQ2 — concurrency.** One in-flight apply per sibling (a second `POST` returns `409` while one is
-  running), and Suite serializes the dependency chain anyway. Confirm.
-- **OQ3 — failure policy.** On a mid-chain failure Suite **halts and reports a partial result**
-  (`applied: [...]`, `halted_at`); already-applied dependencies are **not** auto-unwound (each
-  sibling's apply was itself atomic). Confirm "halt, don't unwind".
-- **OQ4 — target selection.** Suite passes an explicit `target_version` (from its Origin-verified
-  aggregation), re-verified by the sibling (§3) — vs the sibling resolving "latest" itself. Lean:
-  explicit target from Suite (keeps ordering/gating meaningful) + sibling re-verification (keeps the
-  sibling the authority on its own artifact).
+- **OQ1 — status endpoint shape → single in-flight.** `GET /machine/update/status` returns the
+  current (or last) operation with its `operation_id`. No addressable per-id history endpoint —
+  YAGNI for "update all".
+- **OQ2 — concurrency → one apply per sibling.** A second `POST /machine/update` for a *different*
+  target while an apply is in flight returns `409 Conflict` (a repeat for the *same* in-flight target
+  is the idempotent no-op of §2). Suite also serializes the dependency chain.
+- **OQ3 — failure policy → halt, don't unwind.** On a mid-chain failure Suite stops the chain and
+  reports a partial result (applied set + halted-at); already-applied dependencies stay in place
+  (each apply was atomic). Re-running "update all" resumes from the failed step.
+- **OQ4 — target selection → explicit + re-verified.** Suite passes an explicit `target_version`
+  from its Origin-verified aggregation; the sibling re-verifies that target against Origin before
+  applying (§3). Suite never selects an unverified target, and the sibling stays the authority on its
+  own artifact.
 
 ## Terminology impact (ADR 0006)
 
