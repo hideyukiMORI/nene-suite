@@ -58,12 +58,17 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   and the update / announcements / house-ads read APIs + dashboard wiring
   (O0–O5b, epic #230; ADR 0017 consumer). Disabled-degrade until the trust anchor
   is configured.
+- ✅ Installed-version tracking + **catalog version mirror** — the sibling auth-gated
+  `/machine/health` `version` probe (NENE2 v1.5.330) feeds the update diff, and the catalog API
+  mirrors `installedVersion` / `availableVersion` per app (ADR 0013 §4, **accepted**). Sibling
+  adoption is cross-repo (nene-invoice#496 / nene-clear#182 / nene-records#586).
 - ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
 - ⏳ Upgrade **orchestration** — version-compare vs the installed version +
   dependency-ordered "update all". **Suite orders / gates / relays only; the apply
-  stays with each sibling's own Tier A** (Origin ADR 0001 §5 / ADR 0013). Backlog
-  epic #251; first prerequisite is installed-version tracking.
+  stays with each sibling's own Tier A** (Origin ADR 0001 §5 / ADR 0013, accepted). Backlog
+  epic #251; the prerequisites (installed-version tracking, catalog version mirror, ADR 0013
+  acceptance) have landed — the aggregation-contract spec + orchestrator are the remaining work.
 
 ## Phase 3: Tier A Web Installer
 
