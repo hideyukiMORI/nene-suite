@@ -25,6 +25,18 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                 static fn (ContainerInterface $container): AppDatabaseNamer => new AppDatabaseNamer(),
             )
             ->set(
+                DatabaseTargetResolverInterface::class,
+                static function (ContainerInterface $container): DatabaseTargetResolverInterface {
+                    $namer = $container->get(AppDatabaseNamer::class);
+
+                    if (!$namer instanceof AppDatabaseNamer) {
+                        throw new LogicException('App database namer service is invalid.');
+                    }
+
+                    return new EnvDatabaseTargetResolver($namer);
+                },
+            )
+            ->set(
                 DatabaseProvisionerInterface::class,
                 static function (ContainerInterface $container): DatabaseProvisionerInterface {
                     // Provision with the same engine as the control DB (ADR 0016): derive
@@ -65,7 +77,7 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                 ProvisionAppDatabasesUseCaseInterface::class,
                 static function (ContainerInterface $container): ProvisionAppDatabasesUseCaseInterface {
                     $sessions = $container->get(InstallSessionRepositoryInterface::class);
-                    $namer = $container->get(AppDatabaseNamer::class);
+                    $targets = $container->get(DatabaseTargetResolverInterface::class);
                     $provisioner = $container->get(DatabaseProvisionerInterface::class);
                     $audit = $container->get(SuiteAuditRecorderInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
@@ -74,8 +86,8 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                         throw new LogicException('Install session repository service is invalid.');
                     }
 
-                    if (!$namer instanceof AppDatabaseNamer) {
-                        throw new LogicException('App database namer service is invalid.');
+                    if (!$targets instanceof DatabaseTargetResolverInterface) {
+                        throw new LogicException('Database target resolver service is invalid.');
                     }
 
                     if (!$provisioner instanceof DatabaseProvisionerInterface) {
@@ -90,7 +102,7 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                         throw new LogicException('Suite id service is invalid.');
                     }
 
-                    return new ProvisionAppDatabasesUseCase($sessions, $namer, $provisioner, $audit, $suiteId);
+                    return new ProvisionAppDatabasesUseCase($sessions, $targets, $provisioner, $audit, $suiteId);
                 },
             );
     }

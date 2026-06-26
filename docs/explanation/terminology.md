@@ -225,6 +225,24 @@ Canonical object / field names the Suite client consumes; do not rename or inven
 > `manifest` + JWKS `key_set` shape**. The signing/transport primitive (detached JWS, RFC 7515 +
 > 7797 `b64:false`) is unchanged. Origin owns the authoritative spec.
 
+### 4.4 Per-app database target (pattern — [ADR 0021](../adr/0021-app-database-topology.md))
+
+**Pattern:** `NENE_SUITE_APP_{SNAKE}_DB_*` (parallel to §4.1 `_URL`; `{SNAKE}` per §4.1). The
+**suite-facing** database target — *not* the app's own runtime connection (that uses the catalog
+`database.env_prefix`, §2.4, and is owned by the app).
+
+| Concept | Canonical | Default / values | Never |
+| --- | --- | --- | --- |
+| Target mode | `NENE_SUITE_APP_{SNAKE}_DB_MODE` | `provision` (default) \| `adopt` | `DB_TYPE`, `DB_KIND`, `ADOPT` |
+| Target server | `NENE_SUITE_APP_{SNAKE}_DB_SERVER` | non-secret host / label; unset = suite server | `DB_HOST` (that's the app's own runtime key), `DB_INSTANCE` |
+| Adopt database name | `NENE_SUITE_APP_{SNAKE}_DB_NAME` | adopt only; unset = suite convention | — |
+
+**Database target mode** values (exact strings): `provision` | `adopt`. Never: `create` / `new`
+(for provision), `import` / `existing` / `register` (for adopt). External-server `provision` is
+refused in the Tier B MVP — external is adopt-only (ADR 0021 OQ2). The default-server privileged
+provisioning connection stays `NENE_SUITE_PROVISION_DB_*` (§4). Manifest `apps[].mode` / `apps[].server`
+register with the install-manifest schema change (ADR 0021 implementation ②).
+
 ---
 
 ## 5. JWT claims (suite mode)
