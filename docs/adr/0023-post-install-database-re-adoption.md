@@ -2,7 +2,7 @@
 
 ## Status
 
-proposed (2026-06-26)
+accepted (2026-06-26 — OQ1–5 resolved)
 
 Extends **ADR 0021** (per-app database target / adopt) and **ADR 0022** (app onboarding modes) with a
 **post-install** entry for changing an app's database target, and defines **who judges whether a
@@ -119,23 +119,35 @@ with an operator **override** that is itself audited (so the responsibility is e
 - New audit actions: **`database.preflight_evaluated`** (verdict + reason codes; no raw data) and
   **`database.readopted`** (the post-install target change; before/after target, operator, token id).
 
-## Open questions
+## Resolved at acceptance (2026-06-26)
 
-- **OQ1 — candidate profile env naming.** The exact key for the operator-placed candidate connection
-  (`NENE_SUITE_APP_{SNAKE}_DB_CANDIDATE_*` vs a profile-list shape vs a per-app `database.candidates`
-  catalog field).
-- **OQ2 — `adoption_token` signing.** Reuse the federation JWKS (asymmetric, ADR 0012 B1) so the suite
-  verifies the app's token, vs a per-app HMAC from the machine service credential. Trades key
-  management against the app↔suite trust direction.
-- **OQ3 — `tenant_match` key.** Confirm the canonical marker the app stores and compares against the
-  expected `org_external_id` (ADR 0012 §5), and the behaviour for single-tenant OSS installs (where
-  there is no federation org).
-- **OQ4 — preflight-unsupported policy default.** `unknown` → hard refuse vs operator-override-by-default;
-  and the minimum framework version that guarantees preflight (gated like the `/machine/health` version,
-  NENE2#1414).
-- **OQ5 — is live-app re-adoption in scope now, or read-only first?** A first slice could ship the
-  Admin **read** surface (view targets) + the preflight contract, and gate the actual **write**
-  (re-adopt of a running app) behind a later milestone, given its operational weight.
+- **OQ1 — candidate profile env naming → `NENE_SUITE_APP_{SNAKE}_DB_CANDIDATE_{SERVER,NAME}`.** Mirrors
+  the active `NENE_SUITE_APP_{SNAKE}_DB_*` target keys (terminology §4.4) with a `_CANDIDATE_` infix the
+  app reads read-only — no new shape to learn, and the env allowlist (§3) is simply "the candidate env
+  exists."
+
+- **OQ2 — `adoption_token` signing → per-app HMAC from the machine service credential, not federation
+  JWKS.** The token flows **app → suite** (the app issues it after preflight; the suite verifies it at
+  confirm). The federation JWKS is the suite's **outbound** assertion plane (suite → app, ADR 0012 B1) —
+  the wrong direction. The machine credential (`X-NENE2-API-Key`) is already a suite↔app shared secret,
+  so an HMAC the suite recomputes is the minimal, correctly-directed choice; JWKS stays login-only.
+
+- **OQ3 — `tenant_match` key → the federation `org_external_id` (ADR 0012 §5).** The app stores the
+  expected org marker (set at install / enrollment) and compares the candidate database's marker; a
+  mismatch is a hard refuse. For **single-tenant OSS** installs (no federation org) `tenant_match` is
+  reported `not_applicable` and does not gate the verdict.
+
+- **OQ4 — preflight-unsupported policy → refuse-by-default with an audited operator override.** An app
+  that does not implement preflight (or is below the minimum framework version, gated like the
+  `/machine/health` version, NENE2#1414) returns `unknown` → the suite refuses; an operator may override,
+  and `database.readopted` records `override: true` + the actor. Safe default, explicit accountability.
+
+- **OQ5 — scope → read-only first.** The first slice ships **(a)** the sibling **preflight contract**
+  (NENE2 generic) and **(b)** the Suite **Admin "Databases" read surface** (view each app's current
+  target; run preflight to show a verdict) — **no write**. The actual re-adopt **write** of a running
+  app (deployment-driven apply) is a **subsequent slice** gated behind this foundation. Rationale:
+  changing a live app's database is high-stakes; shipping visibility + validation first delivers value
+  at low risk and proves the preflight contract before any mutation.
 
 ## Terminology registry impact (ADR 0006)
 
@@ -172,5 +184,5 @@ are handled by OQ4 (refuse-by-default).
   env contract), ADR 0019 (deployment-driven apply), ADR 0010 (install manifest).
 - Sibling side: a **generic** NENE2 framework capability ("diagnose a candidate database"), never
   Suite-named — file the cross-repo issue without naming the suite (precedent: NENE2#1414 → #1417/#1418).
-- Issue: `#303`. PR: _pending_.
+- Issue: `#303` (proposed), `#305` (accepted). PR: `#304` (proposed).
 - Superseded by: none.
