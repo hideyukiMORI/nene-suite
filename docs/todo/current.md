@@ -24,7 +24,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **68**, all green.
+vitest **72**, all green.
 
 ---
 
@@ -97,7 +97,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] Operator provisioning HTTP endpoint — `POST /api/v1/operators` + `ProvisionApexOperatorUseCase` (default-org `Admin` membership) — A4.5, PR #154
 - [ ] Shared apex auth middleware — **deferred by design.** Per-handler default-deny via `BearerTokenAuthenticator` / `SuperadminGuard` (first line of `handle()`) is the deliberate pattern while few endpoints need auth (handover §4.3). Revisit only if the authenticated-endpoint count grows.
 - [ ] `IntegrationWiring` — Phase 2 scope
-- [x] **App database topology**（ADR 0021 accepted, OQ1–5 確定）— per-app database target（`mode=provision|adopt` ＋ server）。**実装① env 駆動 target ＋ adopt 対応エンジン（#280）**・**実装② manifest `apps[]` に `mode`/`server` 記録＋CompleteInstallSession を resolver 配線（#284）** 完了＝**機能的に完結**。既定（provision・suite サーバ）は現行と byte 一致、adopt は register-only（DDL/DML なし）、MVP は外部サーバ **adopt-only**（外部 provision は defer, OQ2）・単一エンジン維持（OQ5）。**adopt 入口は ADR 0022（App Onboarding Modes, accepted）で契約化** — mode A（suite-driven install adopt・今すぐ実装可）と mode B（standalone-first inbound join・B2 依存）を 1 onboarding モデルの 2 entry mode として固定し、database target を install-session 専用にしない（A→B rework 回避）。**mode A PR1（backend）landed（#292）** — install-session が per-app target override（`AppDatabaseTargetSelection`）を carry・layered resolver `SessionDatabaseTargetResolver`（session→env→default・検証は `DatabaseTargetFactory` 共有）・専用オペ `PUT /install-sessions/{id}/database-targets`（`setDatabaseTargets`）＋audit `database_targets.configured`＋`database_targets_json` 永続化。既定（provision）は behavior-preserving。**次: mode A PR2（frontend wizard の database step）。** mode B（§7/§8・identity 突合）は B2 後（OQ2–4）。
+- [x] **App database topology**（ADR 0021 accepted, OQ1–5 確定）— per-app database target（`mode=provision|adopt` ＋ server）。**実装① env 駆動 target ＋ adopt 対応エンジン（#280）**・**実装② manifest `apps[]` に `mode`/`server` 記録＋CompleteInstallSession を resolver 配線（#284）** 完了＝**機能的に完結**。既定（provision・suite サーバ）は現行と byte 一致、adopt は register-only（DDL/DML なし）、MVP は外部サーバ **adopt-only**（外部 provision は defer, OQ2）・単一エンジン維持（OQ5）。**adopt 入口は ADR 0022（App Onboarding Modes, accepted）で契約化** — mode A（suite-driven install adopt・今すぐ実装可）と mode B（standalone-first inbound join・B2 依存）を 1 onboarding モデルの 2 entry mode として固定し、database target を install-session 専用にしない（A→B rework 回避）。**mode A PR1（backend）landed（#292）** — install-session が per-app target override（`AppDatabaseTargetSelection`）を carry・layered resolver `SessionDatabaseTargetResolver`（session→env→default・検証は `DatabaseTargetFactory` 共有）・専用オペ `PUT /install-sessions/{id}/database-targets`（`setDatabaseTargets`）＋audit `database_targets.configured`＋`database_targets_json` 永続化。既定（provision）は behavior-preserving。**mode A PR2（frontend, #296）landed＝mode A 完結** — install wizard に `database` step（app ごとに provision/adopt、adopt は server/name）を追加し `setDatabaseTargets` を呼ぶ。mode B（§7/§8・identity 突合）は B2 後（OQ2–4）。
 - [x] `app_versions` の version mirror — **catalog version mirror** が landed（#260, ADR 0013 §4 read-model: `installedVersion`/`availableVersion`）。installed は sibling `/machine/health` 由来（#256/#258）、version-compare は `OriginUpdateAggregator`。manifest への静的 pin はしない（live mirror）。
 
 ## Next (hosted edition / NeNe Cloud Free — ADR 0015 draft)
@@ -239,7 +239,7 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   #1414 PHPDoc/CHANGELOG, seeded by our issue wording) was fixed on the NENE2 side (NENE2#1417/#1418).
   Principle recorded: request only generic framework features from NENE2; never name/allude to Suite.
 - Session handover: [`docs/handover/2026-06-26-origin-and-o6-prerequisites.md`](../handover/2026-06-26-origin-and-o6-prerequisites.md).
-- **Federation lifecycle ＋ DB topology session** — **ADR 0020**（federated user lifecycle）/ **ADR 0021**（app database topology）/ **ADR 0022**（app onboarding modes）accepted；ADR 0021 を impl ①②（#280/#284）で機能完結。続けて **ADR 0022 mode A PR1（backend）landed（#292）**：install-session が per-app database target override を carry し、layered resolver（session→env→default）＋専用オペ `setDatabaseTargets` で受ける。次は mode A PR2（frontend wizard step）。Handover: [`docs/handover/2026-06-26-federation-lifecycle-and-db-topology.md`](../handover/2026-06-26-federation-lifecycle-and-db-topology.md).
-- Gate state: PHPUnit **468** / vitest **68**, all green.
+- **Federation lifecycle ＋ DB topology session** — **ADR 0020**（federated user lifecycle）/ **ADR 0021**（app database topology）/ **ADR 0022**（app onboarding modes）accepted；ADR 0021 を impl ①②（#280/#284）で機能完結。続けて **ADR 0022 mode A 完結（PR1 backend #292 ＋ PR2 frontend #296）**：install-session が per-app database target override を carry し layered resolver（session→env→default）＋専用オペ `setDatabaseTargets` で受け、install wizard に `database` step を追加。Handover: [`docs/handover/2026-06-26-federation-lifecycle-and-db-topology.md`](../handover/2026-06-26-federation-lifecycle-and-db-topology.md).
+- Gate state: PHPUnit **468** / vitest **72**, all green.
 
 Last updated: 2026-06-26
