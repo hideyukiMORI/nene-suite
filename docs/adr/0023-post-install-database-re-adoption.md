@@ -101,10 +101,19 @@ connect to an attacker-chosen host, because only operator-placed env profiles ar
 
 ### 5. TOCTOU: bind the diagnosis to the confirmation
 
-Between preflight and confirmation the candidate database could change (time-of-check / time-of-use).
-The preflight returns a content `fingerprint` and a **short-lived signed `adoption_token`**; the
-suite's confirm operation **requires the token** and the app **re-verifies the fingerprint** at
-confirm time. An expired token or a fingerprint mismatch refuses the change.
+Between preflight and apply the candidate database could change (time-of-check / time-of-use). The
+preflight returns a content `fingerprint` and a **short-lived signed `adoption_token`**; the apply
+**requires the token** and the app **re-verifies the fingerprint at apply time**. An expired token or a
+fingerprint mismatch aborts the change.
+
+> **Apply model & C deferral (NENE2#1421).** The token's consumer is the **apply**, and the apply is
+> **deployment-driven** (§4 + ADR 0019) — *not* a runtime "app switches its own DB" endpoint (a running
+> app cannot safely re-point its own live connection — cf. the withdrawn NENE2#1416). So the
+> re-verification is a **boot-time self-check**: the deployer rewrites the connection env and recreates
+> the container; the app re-verifies the `token` + `fingerprint` **on boot, before migrating / serving**,
+> and aborts startup on an expired / forged / mismatched token. **C (fingerprint + token, NENE2#1421) is
+> deferred until the apply slice is designed** — a signed token with no apply is a speculative surface
+> (NENE2#1421's acceptance bars a consumer-less token). A + B (read-only diagnosis) stand alone and ship now.
 
 ### 6. Responsibility model
 
