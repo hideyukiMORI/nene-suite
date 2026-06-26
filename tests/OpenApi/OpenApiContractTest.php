@@ -29,6 +29,7 @@ final class OpenApiContractTest extends TestCase
         'startInstallSession',
         'getInstallSession',
         'updateAppSelection',
+        'setDatabaseTargets',
         'acceptDisclaimer',
         'completeInstallSession',
         'failInstallSession',

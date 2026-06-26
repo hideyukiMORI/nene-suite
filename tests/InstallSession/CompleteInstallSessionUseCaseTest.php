@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Tests\InstallSession;
 
+use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
 use NeNeSuite\DatabaseProvision\DatabaseTarget;
+use NeNeSuite\DatabaseProvision\DatabaseTargetFactory;
 use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
 use NeNeSuite\DatabaseProvision\DatabaseTargetResolverInterface;
+use NeNeSuite\DatabaseProvision\SessionDatabaseTargetResolver;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
+use NeNeSuite\InstallSession\AppDatabaseTargetSelection;
 use NeNeSuite\InstallSession\CompleteInstallSessionInput;
 use NeNeSuite\InstallSession\CompleteInstallSessionUseCase;
 use NeNeSuite\InstallSession\InstallSession;
@@ -135,6 +139,33 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         ], $manifest->body['apps'][0]);
     }
 
+    public function testRecordsSessionOverrideInManifestApp(): void
+    {
+        // ADR 0022 mode A: an operator override carried on the session (not a fixed resolver)
+        // must flow through to the manifest app entry.
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->readySession(
+            selectedApps: ['nene-invoice'],
+            databaseTargets: [
+                new AppDatabaseTargetSelection('nene-invoice', DatabaseTargetMode::Adopt, 'legacy-db.internal', 'invoice_prod'),
+            ],
+        ));
+        $manifests = new InMemoryInstallManifestRepository();
+
+        $useCase = $this->useCase($sessions, $manifests, null, ['nene-invoice' => 'https://example.com/nene-invoice/']);
+        $output = $useCase->execute(new CompleteInstallSessionInput(self::SESSION_ID));
+
+        $manifest = $manifests->findById((string) $output->session->installManifestId);
+        self::assertNotNull($manifest);
+        self::assertSame([
+            'catalog_id' => 'nene-invoice',
+            'public_url' => 'https://example.com/nene-invoice/',
+            'database_name' => 'invoice_prod',
+            'mode' => 'adopt',
+            'server' => 'legacy-db.internal',
+        ], $manifest->body['apps'][0]);
+    }
+
     public function testOmitsManifestAppsWhenNoUrlsConfigured(): void
     {
         $sessions = new InMemoryInstallSessionRepository();
@@ -207,20 +238,25 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
             new InstallManifestFactory(),
             $recorder ?? new RecordingSuiteAuditRecorder(),
             new FixedSuiteAppUrlReader($urls),
-            $databaseTargets ?? new FixedDatabaseTargetResolver(),
+            new SessionDatabaseTargetResolver(
+                $databaseTargets ?? new FixedDatabaseTargetResolver(),
+                new DatabaseTargetFactory(new AppDatabaseNamer()),
+            ),
             self::SUITE_ID,
             self::ORG_ID,
         );
     }
 
     /**
-     * @param list<string> $selectedApps
+     * @param list<string>                     $selectedApps
+     * @param list<AppDatabaseTargetSelection> $databaseTargets
      */
     private function readySession(
         InstallSessionStatus $status = InstallSessionStatus::InProgress,
         bool $disclaimerAccepted = true,
         array $selectedApps = ['nene-invoice'],
         ?string $orgExternalId = null,
+        array $databaseTargets = [],
     ): InstallSession {
         return new InstallSession(
             id: self::SESSION_ID,
@@ -238,6 +274,7 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
             createdAt: '2026-05-30T09:48:46Z',
             updatedAt: '2026-05-30T09:48:46Z',
             completedAt: null,
+            databaseTargets: $databaseTargets,
         );
     }
 }

@@ -7,6 +7,8 @@ namespace NeNeSuite\Tests\InstallSession;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
+use NeNeSuite\InstallSession\AppDatabaseTargetSelection;
 use NeNeSuite\InstallSession\InstallSession;
 use NeNeSuite\InstallSession\InstallSessionStatus;
 use NeNeSuite\InstallSession\InstallTier;
@@ -113,5 +115,45 @@ final class PdoInstallSessionRepositoryTest extends TestCase
         self::assertNotNull($found);
         self::assertSame(['nene-invoice', 'nene-clear'], $found->selectedApps);
         self::assertSame('2026-05-30T10:00:00Z', $found->updatedAt);
+    }
+
+    public function testRoundTripsDatabaseTargets(): void
+    {
+        $repository = new PdoInstallSessionRepository($this->executor);
+
+        $session = new InstallSession(
+            id: '01J8XR4ZS6Q9V2H7K3N5M0B8TC',
+            suiteId: '01J8XRDEV000000000000000ZA',
+            status: InstallSessionStatus::InProgress,
+            tier: InstallTier::B,
+            catalogRevision: 1,
+            selectedApps: ['nene-invoice', 'nene-clear'],
+            disclaimerAccepted: false,
+            disclaimerAcceptedAt: null,
+            orgExternalId: null,
+            orgDisplayName: null,
+            installManifestId: null,
+            failureCode: null,
+            createdAt: '2026-05-30T09:48:46Z',
+            updatedAt: '2026-05-30T09:48:46Z',
+            completedAt: null,
+            databaseTargets: [
+                new AppDatabaseTargetSelection('nene-invoice', DatabaseTargetMode::Adopt, 'legacy-db.internal', 'invoice_prod'),
+                new AppDatabaseTargetSelection('nene-clear', DatabaseTargetMode::Provision, null, null),
+            ],
+        );
+
+        $repository->save($session);
+        $found = $repository->findById('01J8XR4ZS6Q9V2H7K3N5M0B8TC');
+
+        self::assertNotNull($found);
+        self::assertCount(2, $found->databaseTargets);
+        self::assertSame('nene-invoice', $found->databaseTargets[0]->catalogId);
+        self::assertSame(DatabaseTargetMode::Adopt, $found->databaseTargets[0]->mode);
+        self::assertSame('legacy-db.internal', $found->databaseTargets[0]->server);
+        self::assertSame('invoice_prod', $found->databaseTargets[0]->name);
+        self::assertSame(DatabaseTargetMode::Provision, $found->databaseTargets[1]->mode);
+        self::assertNull($found->databaseTargets[1]->server);
+        self::assertNull($found->databaseTargets[1]->name);
     }
 }

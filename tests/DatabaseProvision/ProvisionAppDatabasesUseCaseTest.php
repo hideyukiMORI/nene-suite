@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Tests\DatabaseProvision;
 
+use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
 use NeNeSuite\DatabaseProvision\DatabaseTarget;
+use NeNeSuite\DatabaseProvision\DatabaseTargetFactory;
 use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
 use NeNeSuite\DatabaseProvision\ProvisionAppDatabasesInput;
 use NeNeSuite\DatabaseProvision\ProvisionAppDatabasesUseCase;
+use NeNeSuite\DatabaseProvision\SessionDatabaseTargetResolver;
+use NeNeSuite\InstallSession\AppDatabaseTargetSelection;
 use NeNeSuite\InstallSession\InstallSession;
 use NeNeSuite\InstallSession\InstallSessionNotFoundException;
 use NeNeSuite\InstallSession\InstallSessionStatus;
@@ -93,6 +97,30 @@ final class ProvisionAppDatabasesUseCaseTest extends TestCase
         ], $event->afterJson);
     }
 
+    public function testAdoptViaSessionOverrideRegistersWithoutProvisioning(): void
+    {
+        // ADR 0022 mode A: the operator's per-app override carried on the session drives
+        // adopt — no fixed resolver override, so the env fallback would otherwise provision.
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->completedSession(['nene-invoice'], [
+            new AppDatabaseTargetSelection('nene-invoice', DatabaseTargetMode::Adopt, 'legacy-db.internal', 'invoice_prod'),
+        ]));
+        $provisioner = new RecordingDatabaseProvisioner();
+        $recorder = new RecordingSuiteAuditRecorder();
+
+        $output = $this->useCase($sessions, $provisioner, $recorder)
+            ->execute(new ProvisionAppDatabasesInput(self::SESSION_ID));
+
+        self::assertSame([], $provisioner->provisioned);
+        self::assertCount(1, $output->provisioned);
+        self::assertSame(DatabaseTargetMode::Adopt, $output->provisioned[0]->mode);
+        self::assertSame('invoice_prod', $output->provisioned[0]->databaseName);
+        self::assertSame('legacy-db.internal', $output->provisioned[0]->server);
+
+        self::assertCount(1, $recorder->commands);
+        self::assertSame('database.adopted', $recorder->commands[0]->action);
+    }
+
     public function testReturnsEmptyWhenNoAppsSelected(): void
     {
         $sessions = new InMemoryInstallSessionRepository();
@@ -124,7 +152,10 @@ final class ProvisionAppDatabasesUseCaseTest extends TestCase
     ): ProvisionAppDatabasesUseCase {
         return new ProvisionAppDatabasesUseCase(
             sessions: $sessions,
-            targets: $resolver ?? new FixedDatabaseTargetResolver(),
+            targets: new SessionDatabaseTargetResolver(
+                $resolver ?? new FixedDatabaseTargetResolver(),
+                new DatabaseTargetFactory(new AppDatabaseNamer()),
+            ),
             provisioner: $provisioner ?? new RecordingDatabaseProvisioner(),
             audit: $recorder ?? new RecordingSuiteAuditRecorder(),
             suiteId: self::SUITE_ID,
@@ -132,9 +163,10 @@ final class ProvisionAppDatabasesUseCaseTest extends TestCase
     }
 
     /**
-     * @param list<string> $selectedApps
+     * @param list<string>                     $selectedApps
+     * @param list<AppDatabaseTargetSelection> $databaseTargets
      */
-    private function completedSession(array $selectedApps): InstallSession
+    private function completedSession(array $selectedApps, array $databaseTargets = []): InstallSession
     {
         return new InstallSession(
             id: self::SESSION_ID,
@@ -152,6 +184,7 @@ final class ProvisionAppDatabasesUseCaseTest extends TestCase
             createdAt: '2026-05-31T09:58:00Z',
             updatedAt: '2026-05-31T10:00:00Z',
             completedAt: '2026-05-31T10:00:00Z',
+            databaseTargets: $databaseTargets,
         );
     }
 }

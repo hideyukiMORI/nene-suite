@@ -6,6 +6,7 @@ namespace NeNeSuite\Tests\DatabaseProvision;
 
 use InvalidArgumentException;
 use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
+use NeNeSuite\DatabaseProvision\DatabaseTargetFactory;
 use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
 use NeNeSuite\DatabaseProvision\EnvDatabaseTargetResolver;
 use NeNeSuite\DatabaseProvision\ExternalProvisionNotSupportedException;
@@ -105,6 +106,6 @@ final class EnvDatabaseTargetResolverTest extends TestCase
 
     private function resolver(): EnvDatabaseTargetResolver
     {
-        return new EnvDatabaseTargetResolver(new AppDatabaseNamer());
+        return new EnvDatabaseTargetResolver(new DatabaseTargetFactory(new AppDatabaseNamer()));
     }
 }
