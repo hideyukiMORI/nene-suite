@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { DatabaseTargetInput } from '@/entities/install-session'
 import { useTranslation } from '@/shared/i18n'
+import { Icon } from '@/shared/ui'
 import styles from '../install-wizard.module.css'
 
 interface DatabaseStepApp {
@@ -29,10 +30,11 @@ function draftOf(drafts: Record<string, Draft>, id: string): Draft {
 }
 
 /**
- * Per-app database target step (ADR 0022 mode A): the operator picks `provision`
- * (the suite creates a new database) or `adopt` (register an existing one), and for
- * adopt may supply a non-secret server label and the existing database name. Both
- * adopt fields are optional — empty means the suite server / naming convention.
+ * Per-app database target step (ADR 0022 mode A). Presentation polish only — the
+ * `DatabaseTargetInput` payload, the draft state, the submit mapping, and the
+ * `suite.install.database.*` keys are unchanged. The plain `<select>` becomes a
+ * segmented Provision/Adopt toggle; the adopt sub-form is a revealed tinted panel;
+ * each app shows a one-line summary.
  */
 export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
   const { t } = useTranslation()
@@ -60,6 +62,17 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
     onSubmit(targets)
   }
 
+  const initialOf = (name: string): string =>
+    name
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+
+  const slugOf = (name: string): string => name.toLowerCase().replace(/\s+/g, '-')
+
   return (
     <div>
       <h3 className={styles['stepTitle']}>{t('suite.install.database.title')}</h3>
@@ -71,53 +84,104 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
         <div className={styles['appList']}>
           {apps.map((app) => {
             const draft = draftOf(drafts, app.id)
+            const isAdopt = draft.mode === 'adopt'
+            const slug = slugOf(app.name)
+            const summary = isAdopt
+              ? `${slug} → ${t('suite.install.database.summary.adopt')}`
+              : `${slug} → ${t('suite.install.database.summary.provision')}`
+
             return (
               <div key={app.id} className={styles['dbAppCard']}>
                 <div className={styles['dbAppHead']}>
-                  <span className={styles['appName']}>{app.name}</span>
-                  <select
-                    className={styles['dbSelect']}
+                  <span className={styles['dbAppIdentity']}>
+                    <span className={styles['dbAppMark']}>{initialOf(app.name)}</span>
+                    <span>
+                      <span className={styles['dbAppName']}>{app.name}</span>
+                      <span className={styles['dbAppSlug']}>{slug}</span>
+                    </span>
+                  </span>
+
+                  <div
+                    className={styles['dbToggle']}
+                    role="radiogroup"
                     aria-label={t('suite.install.database.mode.label', { appName: app.name })}
-                    value={draft.mode}
-                    onChange={(event) => {
-                      update(app.id, { mode: event.target.value as Mode })
-                    }}
                   >
-                    <option value="provision">{t('suite.install.database.mode.provision')}</option>
-                    <option value="adopt">{t('suite.install.database.mode.adopt')}</option>
-                  </select>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={!isAdopt}
+                      data-active={!isAdopt}
+                      className={styles['dbToggleBtn']}
+                      onClick={() => {
+                        update(app.id, { mode: 'provision' })
+                      }}
+                    >
+                      <Icon name="add_circle" size={16} />
+                      {t('suite.install.database.mode.provision')}
+                    </button>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={isAdopt}
+                      data-active={isAdopt}
+                      className={styles['dbToggleBtn']}
+                      onClick={() => {
+                        update(app.id, { mode: 'adopt' })
+                      }}
+                    >
+                      <Icon name="link" size={16} />
+                      {t('suite.install.database.mode.adopt')}
+                    </button>
+                  </div>
                 </div>
 
-                {draft.mode === 'adopt' ? (
-                  <div className={styles['dbAdoptFields']}>
-                    <label className={styles['dbField']}>
-                      <span className={styles['dbLabel']}>
-                        {t('suite.install.database.server.label')}
-                      </span>
-                      <input
-                        className={styles['dbInput']}
-                        value={draft.server}
-                        placeholder={t('suite.install.database.server.placeholder')}
-                        onChange={(event) => {
-                          update(app.id, { server: event.target.value })
-                        }}
-                      />
-                    </label>
-                    <label className={styles['dbField']}>
-                      <span className={styles['dbLabel']}>
-                        {t('suite.install.database.name.label')}
-                      </span>
-                      <input
-                        className={styles['dbInput']}
-                        value={draft.name}
-                        placeholder={t('suite.install.database.name.placeholder')}
-                        onChange={(event) => {
-                          update(app.id, { name: event.target.value })
-                        }}
-                      />
-                    </label>
+                {isAdopt ? (
+                  <div className={styles['dbAdoptPanel']}>
+                    <p className={styles['dbAdoptNote']}>
+                      <Icon name="info" size={16} className={styles['dbAdoptNoteIcon']} />
+                      {t('suite.install.database.adopt.note')}
+                    </p>
+                    <div className={styles['dbAdoptGrid']}>
+                      <label className={styles['dbField']}>
+                        <span className={styles['dbLabel']}>
+                          {t('suite.install.database.server.label')}
+                        </span>
+                        <input
+                          className={styles['dbInput']}
+                          value={draft.server}
+                          placeholder={t('suite.install.database.server.placeholder')}
+                          onChange={(event) => {
+                            update(app.id, { server: event.target.value })
+                          }}
+                        />
+                        <span className={styles['dbFieldHelp']}>
+                          {t('suite.install.database.server.help')}
+                        </span>
+                      </label>
+                      <label className={styles['dbField']}>
+                        <span className={styles['dbLabel']}>
+                          {t('suite.install.database.name.label')}
+                        </span>
+                        <input
+                          className={styles['dbInputMono']}
+                          value={draft.name}
+                          placeholder={t('suite.install.database.name.placeholder')}
+                          onChange={(event) => {
+                            update(app.id, { name: event.target.value })
+                          }}
+                        />
+                        <span className={styles['dbFieldHelp']}>
+                          {t('suite.install.database.name.help')}
+                        </span>
+                      </label>
+                    </div>
                   </div>
                 ) : null}
+
+                <p className={styles['dbSummary']}>
+                  <Icon name="bolt" size={15} className={styles['dbSummaryIcon']} />
+                  {summary}
+                </p>
               </div>
             )
           })}
@@ -132,6 +196,7 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
           onClick={submit}
         >
           {t('common.actions.next')}
+          <Icon name="arrow_forward" size={18} />
         </button>
       </div>
     </div>

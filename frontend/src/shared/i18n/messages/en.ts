@@ -244,6 +244,12 @@ export const en = {
   'suite.install.database.name.label': 'Database name',
   'suite.install.database.name.placeholder': 'Suite convention (default)',
   'suite.install.database.empty': 'No apps selected.',
+  'suite.install.database.adopt.note':
+    'Both fields are optional. Leave blank to use suite defaults.',
+  'suite.install.database.server.help': "Blank uses the suite's default server.",
+  'suite.install.database.name.help': 'Blank follows the suite naming convention.',
+  'suite.install.database.summary.provision': 'provision · suite server',
+  'suite.install.database.summary.adopt': 'adopt existing',
 
   // ── Installer — disclaimer ───────────────────────────────────────────────
   'suite.disclaimer.title': 'Important notice',
@@ -346,9 +352,11 @@ export const en = {
   'suite.member.grant.noOperators': 'No operators available to add.',
   'suite.member.grant.roleLabel': 'Role',
   'suite.member.grant.submit': 'Add',
+  'suite.member.grant.subtitle': 'Add an operator to this organization and set their role.',
   'suite.member.grant.submitting': 'Adding…',
   'suite.member.stale': 'Removed operator ({{operatorId}})',
   'suite.member.revoke.action': 'Remove',
+  'suite.member.revoke.confirm': 'Revoke this member?',
   'suite.member.error.conflict': 'This operator is already a member of the organization.',
   'suite.member.error.invariant': 'The organization must keep at least one admin.',
   'suite.member.error.validation': 'Check the operator and role.',

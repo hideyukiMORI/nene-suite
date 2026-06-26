@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -28,7 +28,12 @@ describe('DatabaseStep', () => {
     const onSubmit = vi.fn()
     renderWithProviders(<DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} />)
 
-    await user.selectOptions(screen.getByLabelText('Database mode for NeNe Invoice'), 'adopt')
+    await user.click(
+      within(screen.getByRole('radiogroup', { name: 'Database mode for NeNe Invoice' })).getByRole(
+        'radio',
+        { name: 'Adopt existing' },
+      ),
+    )
     await user.type(screen.getByPlaceholderText('Suite server (default)'), 'legacy-db.internal')
     await user.type(screen.getByPlaceholderText('Suite convention (default)'), 'invoice_prod')
     await user.click(screen.getByRole('button', { name: 'Next' }))
@@ -49,7 +54,12 @@ describe('DatabaseStep', () => {
     const onSubmit = vi.fn()
     renderWithProviders(<DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} />)
 
-    await user.selectOptions(screen.getByLabelText('Database mode for NeNe Clear'), 'adopt')
+    await user.click(
+      within(screen.getByRole('radiogroup', { name: 'Database mode for NeNe Clear' })).getByRole(
+        'radio',
+        { name: 'Adopt existing' },
+      ),
+    )
     await user.click(screen.getByRole('button', { name: 'Next' }))
 
     expect(onSubmit).toHaveBeenCalledWith([

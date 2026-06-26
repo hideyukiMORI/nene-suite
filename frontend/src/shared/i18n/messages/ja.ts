@@ -222,6 +222,11 @@ export const ja: Partial<MessageCatalog> = {
   'suite.install.database.name.label': 'データベース名',
   'suite.install.database.name.placeholder': 'Suite の命名規約（既定）',
   'suite.install.database.empty': 'アプリが選択されていません。',
+  'suite.install.database.adopt.note': 'どちらも任意です。空欄で Suite の既定を使用します。',
+  'suite.install.database.server.help': '空欄で Suite 既定のサーバーを使用します。',
+  'suite.install.database.name.help': '空欄で Suite の命名規約に従います。',
+  'suite.install.database.summary.provision': '新規作成 · Suite サーバー',
+  'suite.install.database.summary.adopt': '既存を引き継ぐ',
 
   'suite.disclaimer.title': '重要なお知らせ',
   'suite.disclaimer.shortNotice':
@@ -319,9 +324,11 @@ export const ja: Partial<MessageCatalog> = {
   'suite.member.grant.noOperators': '追加できるオペレーターがいません。',
   'suite.member.grant.roleLabel': 'ロール',
   'suite.member.grant.submit': '追加',
+  'suite.member.grant.subtitle': 'オペレーターをこの組織に追加し、ロールを設定します。',
   'suite.member.grant.submitting': '追加中…',
   'suite.member.stale': '削除済みオペレーター（{{operatorId}}）',
   'suite.member.revoke.action': '削除',
+  'suite.member.revoke.confirm': 'このメンバーを解除しますか？',
   'suite.member.error.conflict': 'このオペレーターは既に組織のメンバーです。',
   'suite.member.error.invariant': '組織には少なくとも 1 人の管理者が必要です。',
   'suite.member.error.validation': 'オペレーターとロールを確認してください。',
