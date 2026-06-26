@@ -48,6 +48,7 @@ extends **0012**), **0021** (app database topology). Authoritative shipped recor
 | ADR 0021 | App Database Topology — proposed → **accepted** (OQ1–5 resolved) | #277 / #278 |
 | ADR 0021 impl ① | env-driven `DatabaseTarget` + `DatabaseTargetMode` + `EnvDatabaseTargetResolver`; `ProvisionAppDatabasesUseCase` resolver-driven (provision = `CREATE`, **adopt = register-only** + audit `database.adopted`); audit-trail §4, terminology §4.4, env-contract, `.env.suite.example` | #279 / #280 |
 | ADR 0021 impl ② | install manifest records the target — `InstallManifestApp` + factory + schema gain `mode` / `server` (omitted at defaults = byte-identical); `CompleteInstallSessionUseCase` resolves the target via `DatabaseTargetResolverInterface`; terminology §10 | #283 / #284 |
+| ADR 0022 | App Onboarding Modes — proposed → **accepted** (OQ1 resolved; mode B OQ2–4 deferred to B2). Contracts the adopt entry as one model / two modes; decouples the target from the install-session so mode A is forward-compatible with mode B | #287 / #288 |
 
 No cross-repo (NENE2) requests were filed this session — by design, the NENE2 generic features for
 both ADRs wait until B2 is in view (see §4).
@@ -88,13 +89,17 @@ manifest fields register with impl ②.
 **ADR 0021 implementation ① + ② — done (#280, #284).** The engine + the manifest surface are on
 `main`. What remains for ADR 0021 is only the operator-facing adopt entry-point (below).
 
-**Immediate — adopt entry-point flow (ADR 0021 OQ3):**
+**Immediate — adopt entry-point: mode A (contracted by ADR 0022, accepted):**
 
-- Today adopt is fully wired *underneath* (env target → register-only provisioning → manifest records
-  `mode`/`server`); what's missing is the **operator-facing flow** to register an externally-installed
-  app, unified with **ADR 0012 §8 self-registration** (inbound app registration). §8 is unbuilt — this
-  is the next ADR 0021 slice and the natural place the operator chooses `adopt` + supplies the existing
-  `{server, database name}`.
+- The adopt entry is now contracted as **ADR 0022 (App Onboarding Modes)** — one onboarding model with
+  two entry modes. **Mode A** (suite-driven install adopt) is unblocked and is the next implementation:
+  a dedicated **`PUT /api/v1/install-sessions/{id}/database-targets`** operation carrying per-app
+  `{mode, server, name}`, resolved **session → env → default**, plus a wizard `database` step
+  (`apps → database → disclaimer → review`). The database target is **decoupled from the install-session**
+  (ADR 0022 §2) so mode B reuses the same path — this is what removes the A→B rework risk.
+- **Mode B** (standalone-first inbound join — ADR 0012 §7 enrollment + §8 self-registration + identity
+  linking) stays deferred to **B2**; its specifics are ADR 0022 OQ2–OQ4. The sibling side is a generic
+  "join an upstream hub" framework feature (never Suite-named).
 
 **Later — not blocking, dependency-ordered:**
 - **ADR 0020 implementation** (federated user lifecycle) — the pull lifecycle delta feed + back-channel

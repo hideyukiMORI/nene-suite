@@ -2,12 +2,13 @@
 
 ## Status
 
-proposed (2026-06-26)
+accepted (2026-06-26 — OQ1 resolved; mode B OQ2–4 deferred to B2)
 
 Concretizes **ADR 0012 §7 (enrollment) + §8 (self-registration)** to the level that lets the
 suite-driven adopt entry point ship now while staying **forward-compatible** with the standalone-first
 inbound join. Builds on **ADR 0021** (the per-app database target / adopt mechanism) and **ADR 0010**
-(install manifest). Does not supersede ADR 0012.
+(install manifest). Does not supersede ADR 0012. **Mode A (suite-driven install adopt) is unblocked
+for implementation** under this contract; mode B's full build waits on B2.
 
 ## Context
 
@@ -99,19 +100,22 @@ reuses them, not so they hard-bind to the install-session.
 - No secret in the manifest / audit — `server` is a non-secret label; runtime credentials stay the
   app's own `database.env_prefix` (ADR 0004).
 
-## Open questions
+## Resolved at acceptance (2026-06-26)
 
-- **OQ1 — mode A target threading (resolve at acceptance; needed for mode A).** The exact shape of the
-  per-app target override on the install-session, and the API surface — extend `updateAppSelection`
-  vs a dedicated configure-database-targets operation.
-- **OQ2 — registration entity (defer — B2).** Does inbound self-registration extend the
-  `install_manifest` / installed-apps entity (ADR 0010), or add a parallel `registered_app` record?
-- **OQ3 — identity reconciliation (defer — B2).** How an inbound app's existing org (`external_id`)
-  and users (by `email`) reconcile with the suite directory, and conflict handling — depends on the
-  federation org resolution (B2).
-- **OQ4 — provenance & trust (defer — B2).** A self-registering app asserts its own DB / org; how much
-  the suite verifies vs trusts (the app is domain SSOT, ADR 0012 §11), plus the enrollment-token
-  security model (§7) — an implementation-time security review, as ADR 0012 scheduled for its IdP path.
+- **OQ1 — mode A target threading → a dedicated operation.** The per-app database target override is
+  carried on the install-session and set via a **dedicated `PUT /api/v1/install-sessions/{id}/database-targets`**
+  operation, separate from `updateAppSelection`. Rationale: `updateAppSelection` is dependency-resolved
+  (the server may add apps the operator did not pick), so database configuration is a distinct concern;
+  the wizard gains a clean `apps → database → disclaimer → review` step; `updateAppSelection` stays
+  unchanged (lower risk to the tested flow); and a first-class target operation honors §2 (the target
+  is not app-selection-bound, so mode B reuses it without an install-session). The request carries
+  per-app `{mode, server, name}` overrides for the resolved app set; resolution stays **session
+  override → env → default** (§3), and an app with no override defaults to `provision`.
+
+- **OQ2 / OQ3 / OQ4 — deferred to B2.** The mode B specifics — registration entity, identity
+  reconciliation, and provenance / trust (incl. the §7 enrollment-token security model) — stay open and
+  resolve when mode B is designed against the federation org-resolution surface (B2). They do **not**
+  block mode A.
 
 ## Terminology registry impact (ADR 0006)
 
@@ -143,5 +147,5 @@ app asserting its own state (mode B) is a trust surface → OQ4 + ADR 0012 §11 
   (orchestrator), orchestration-compliance §3, ADR 0004 (env contract), ADR 0015 §5 (portability /
   data custody).
 - Milestone: B2 (federation org resolution) — mode B's blocker.
-- Issue: `#287`. PR: `#000` (TBD).
+- Issue: `#287`. PR: `#288`.
 - Superseded by: none.
