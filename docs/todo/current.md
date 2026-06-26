@@ -240,6 +240,7 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   Principle recorded: request only generic framework features from NENE2; never name/allude to Suite.
 - Session handover: [`docs/handover/2026-06-26-origin-and-o6-prerequisites.md`](../handover/2026-06-26-origin-and-o6-prerequisites.md).
 - **Federation lifecycle ＋ DB topology session** — **ADR 0020**（federated user lifecycle）/ **ADR 0021**（app database topology）/ **ADR 0022**（app onboarding modes）accepted；ADR 0021 を impl ①②（#280/#284）で機能完結。続けて **ADR 0022 mode A 完結（PR1 backend #292 ＋ PR2 frontend #296）**：install-session が per-app database target override を carry し layered resolver（session→env→default）＋専用オペ `setDatabaseTargets` で受け、install wizard に `database` step を追加。Handover: [`docs/handover/2026-06-26-federation-lifecycle-and-db-topology.md`](../handover/2026-06-26-federation-lifecycle-and-db-topology.md).
+- **Mode A 実装セッションの実績＋再開 handover**: [`docs/handover/2026-06-26-mode-a-implementation.md`](../handover/2026-06-26-mode-a-implementation.md) — 4 PR・コードに今あるもの（backend / frontend）・key decisions・プロセス教訓（codegen freshness / frontend `npm run check` / .env caveat / review-before-merge）・次の入口（§5 deferred は B2 ブロック、unblocked は epic #251）。
 - Gate state: PHPUnit **468** / vitest **72**, all green.
 
 Last updated: 2026-06-26
