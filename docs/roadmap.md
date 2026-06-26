@@ -51,7 +51,14 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   one onboarding model with two entry modes — **mode A** suite-driven install adopt (implementable now;
   a dedicated `PUT /install-sessions/{id}/database-targets` + wizard step) and **mode B** standalone-first
   inbound join (ADR 0012 §7/§8; depends on B2). The database target is decoupled from the install-session
-  so both modes feed one path (no A→B rework). **Mode A is the next implementation.**
+  so both modes feed one path (no A→B rework). **Mode A shipped** (backend #292, frontend #296).
+- ⏳ **Post-install database re-adoption** — change an app's database target after install. The app
+  **self-diagnoses** a candidate database (a sibling **preflight** contract: generic, read-only, never
+  Suite-named) and the suite orchestrates + records — the app stays the legitimacy judge (suite stays
+  app-agnostic). Contract **accepted** as **ADR 0023**: HMAC-signed `adoption_token` (TOCTOU),
+  credentials never on the wire (env-allowlist candidate → SSRF closed), register-only / reversible,
+  deployment-driven apply (ADR 0019). **Read-only first** (Admin "Databases" view + preflight); the
+  live re-adopt write is a later slice.
 - Document add-app workflow (remaining minor doc task)
 
 ## Phase 2: Federation Contract — in progress
