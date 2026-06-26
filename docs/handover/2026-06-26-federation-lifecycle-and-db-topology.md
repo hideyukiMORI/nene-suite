@@ -19,9 +19,9 @@ Three design contracts were accepted and one of them was implemented to completi
 implemented end to end** (the env-driven per-app database target + register-only **adopt** engine, and
 the install manifest now records each app's target). The adopt **entry point** was then contracted as
 **ADR 0022** (app onboarding modes), which splits it into **mode A** (suite-driven install adopt —
-unblocked, the next implementation) and **mode B** (standalone-first inbound join — deferred to B2).
+**PR1 backend landed (#292)**; PR2 frontend next) and **mode B** (standalone-first inbound join — deferred to B2).
 Everything is backward-compatible (an unset target = today's provision behavior) and non-destructive
-(adopt runs no DDL/DML). Gate: **PHPUnit 445 / vitest 68**, all green.
+(adopt runs no DDL/DML). Gate: **PHPUnit 468 / vitest 68**, all green.
 
 ---
 
@@ -36,6 +36,7 @@ Everything is backward-compatible (an unset target = today's provision behavior)
 | 5 | **ADR 0021 impl ②** — install manifest records the target | #283 / #284 |
 | 6 | doc-sync (impl ①② landed) | #285 / #286 |
 | 7 | **ADR 0022** App Onboarding Modes — accepted | #287 / #288 |
+| 8 | **ADR 0022 mode A impl PR1** — backend: session-carried target + layered resolver + `setDatabaseTargets` op | #291 / #292 |
 
 ### 2.1 ADR 0021 implementation — what exists in code now
 
@@ -104,6 +105,14 @@ operator entry** (mode A, below).
 ADR 0022 §3 + OQ1. Goal: let an operator choose `provision`/`adopt` per app (and supply
 `{server, name}` for adopt) through the install wizard / API / CLI, instead of hand-editing env.
 
+> **Update (2026-06-26): PR1 (backend, §4.2) landed as #292** (reviewed + merged). The session now
+> carries `databaseTargets` (`AppDatabaseTargetSelection`); resolution is layered via
+> `SessionDatabaseTargetResolver` (session override → env → default), with validation shared in the
+> extracted `DatabaseTargetFactory`; and the op **`setDatabaseTargets`**
+> (`PUT …/install-sessions/{id}/database-targets`, `src/DatabaseTargets/`) is live, with audit
+> `database_targets.configured` and the `database_targets_json` column. **The active next task is the
+> §4.3 frontend plan (PR2).** Gate: PHPUnit 468 / vitest 68.
+
 ### 4.1 The install flow (map — this is what `/clear` erases, so it's captured here)
 
 - **CLI** `installer/install.php` → `src/Installer/InstallerUseCase.php`, **8 ordered steps**:
@@ -129,7 +138,7 @@ ADR 0022 §3 + OQ1. Goal: let an operator choose `provision`/`adopt` per app (an
   ['apps','disclaimer','review','complete']` (`ui/InstallWizard.tsx`); `steps/AppSelectionStep.tsx`
   collects `string[]`; `hooks/use-install-wizard.ts` drives the steps. No per-app DB UI yet.
 
-### 4.2 Backend plan (PR 1 — Suite-contained, no cross-repo)
+### 4.2 Backend plan (PR 1 — Suite-contained, no cross-repo) — ✅ landed (#292)
 
 1. **Domain:** a per-app target override carried on `InstallSession` (e.g. a value object
    `AppDatabaseTargetSelection { catalogId, mode, ?server, ?name }` + a map / list on the session, plus
@@ -150,7 +159,7 @@ ADR 0022 §3 + OQ1. Goal: let an operator choose `provision`/`adopt` per app (an
 4. **Tests:** the session VO, the layered resolver (override wins / falls back / validates), the new op
    handler, and that Provision + CompleteInstallSession honor an adopt override.
 
-### 4.3 Frontend plan (PR 2)
+### 4.3 Frontend plan (PR 2) — ◀ active next
 
 - Add a `database` step: `STEP_ORDER = ['apps','database','disclaimer','review','complete']`.
 - `steps/DatabaseStep.tsx`: per selected app, choose provision/adopt; adopt → `server` + existing
