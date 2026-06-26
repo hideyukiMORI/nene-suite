@@ -876,7 +876,7 @@ export interface components {
              * @description Per-app database target overrides (ADR 0022 mode A). Empty = env / default
              *     targets (provision on the suite server). Set via `setDatabaseTargets`.
              */
-            databaseTargets?: components["schemas"]["DatabaseTargetSelection"][];
+            databaseTargets: components["schemas"]["DatabaseTargetSelection"][];
             disclaimerAccepted: boolean;
             /** Format: date-time */
             disclaimerAcceptedAt?: string | null;
@@ -1456,6 +1456,7 @@ export interface operations {
                      *         "nene-invoice",
                      *         "nene-clear"
                      *       ],
+                     *       "databaseTargets": [],
                      *       "disclaimerAccepted": false,
                      *       "disclaimerAcceptedAt": null,
                      *       "orgExternalId": null,
@@ -1506,6 +1507,7 @@ export interface operations {
                      *         "nene-invoice",
                      *         "nene-clear"
                      *       ],
+                     *       "databaseTargets": [],
                      *       "disclaimerAccepted": true,
                      *       "disclaimerAcceptedAt": "2026-05-30T09:50:00Z",
                      *       "orgExternalId": null,
@@ -1567,6 +1569,7 @@ export interface operations {
                      *         "nene-invoice",
                      *         "nene-clear"
                      *       ],
+                     *       "databaseTargets": [],
                      *       "disclaimerAccepted": false,
                      *       "disclaimerAcceptedAt": null,
                      *       "orgExternalId": null,
@@ -1699,6 +1702,7 @@ export interface operations {
                      *         "nene-invoice",
                      *         "nene-clear"
                      *       ],
+                     *       "databaseTargets": [],
                      *       "disclaimerAccepted": true,
                      *       "disclaimerAcceptedAt": "2026-05-30T09:50:00Z",
                      *       "orgExternalId": null,
@@ -1751,6 +1755,7 @@ export interface operations {
                      *         "nene-invoice",
                      *         "nene-clear"
                      *       ],
+                     *       "databaseTargets": [],
                      *       "disclaimerAccepted": true,
                      *       "disclaimerAcceptedAt": "2026-05-30T09:50:00Z",
                      *       "orgExternalId": "01J8XR0G7Q9V2H7K3N5M0BRZX9",
@@ -1824,6 +1829,7 @@ export interface operations {
                      *         "nene-invoice",
                      *         "nene-clear"
                      *       ],
+                     *       "databaseTargets": [],
                      *       "disclaimerAccepted": true,
                      *       "disclaimerAcceptedAt": "2026-05-30T09:50:00Z",
                      *       "orgExternalId": null,

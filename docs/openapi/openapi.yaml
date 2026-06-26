@@ -194,6 +194,7 @@ paths:
                 tier: B
                 catalogRevision: 1
                 selectedApps: [nene-invoice, nene-clear]
+                databaseTargets: []
                 disclaimerAccepted: false
                 disclaimerAcceptedAt: null
                 orgExternalId: null
@@ -231,6 +232,7 @@ paths:
                 tier: B
                 catalogRevision: 1
                 selectedApps: [nene-invoice, nene-clear]
+                databaseTargets: []
                 disclaimerAccepted: true
                 disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
                 orgExternalId: null
@@ -283,6 +285,7 @@ paths:
                 tier: B
                 catalogRevision: 1
                 selectedApps: [nene-invoice, nene-clear]
+                databaseTargets: []
                 disclaimerAccepted: false
                 disclaimerAcceptedAt: null
                 orgExternalId: null
@@ -428,6 +431,7 @@ paths:
                 tier: B
                 catalogRevision: 1
                 selectedApps: [nene-invoice, nene-clear]
+                databaseTargets: []
                 disclaimerAccepted: true
                 disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
                 orgExternalId: null
@@ -478,6 +482,7 @@ paths:
                 tier: B
                 catalogRevision: 1
                 selectedApps: [nene-invoice, nene-clear]
+                databaseTargets: []
                 disclaimerAccepted: true
                 disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
                 orgExternalId: 01J8XR0G7Q9V2H7K3N5M0BRZX9
@@ -549,6 +554,7 @@ paths:
                 tier: B
                 catalogRevision: 1
                 selectedApps: [nene-invoice, nene-clear]
+                databaseTargets: []
                 disclaimerAccepted: true
                 disclaimerAcceptedAt: '2026-05-30T09:50:00Z'
                 orgExternalId: null
@@ -1976,6 +1982,7 @@ components:
         - tier
         - catalogRevision
         - selectedApps
+        - databaseTargets
         - disclaimerAccepted
         - createdAt
         - updatedAt
