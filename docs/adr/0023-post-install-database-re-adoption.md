@@ -182,8 +182,12 @@ are handled by OQ4 (refuse-by-default).
   install-time entry; reuses the §2 decoupling so the target is not install-session-bound).
 - **Builds on**: ADR 0012 (§7 enrollment auth reuse, §11 app-as-SSOT), ADR 0011 / ADR 0004 (secrets /
   env contract), ADR 0019 (deployment-driven apply), ADR 0010 (install manifest).
-- Sibling side: a **generic** NENE2 framework capability ("diagnose a candidate database"), never
-  Suite-named — filed as **NENE2#1419** (`/machine/database/preflight`, `DatabaseCandidateInspector`;
-  Suite-unnamed; precedent: NENE2#1414 → #1417/#1418).
+- Sibling side: a **generic** NENE2 framework capability (`/machine/database/preflight`,
+  `DatabaseCandidateInspector`), never Suite-named — filed as **NENE2#1419** and split by the
+  maintainer into **#1419** (A: read-only diagnosis + verdict, MVP), **#1420** (B: app identity /
+  tenant match), **#1421** (C: fingerprint + HMAC token, paired with apply). The read-only consumer
+  (slice ①) needs **A + B** (tenant_match is a multi-tenant hard-stop); **C** pairs with the
+  deferred write / apply slice (token is speculative without an apply). Suite-unnamed (precedent:
+  NENE2#1414 → #1417/#1418).
 - Issue: `#303` (proposed), `#305` (accepted). PR: `#304` (proposed).
 - Superseded by: none.
