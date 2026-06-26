@@ -192,6 +192,8 @@ are handled by OQ4 (refuse-by-default).
   (C: fingerprint + HMAC token) still open** (pairs with the deferred write / apply slice; token is
   speculative without an apply). The read-only consumer (slice ①) needs **A + B** (both shipped) and can
   now be wired to the concrete contract; **C** lands with the write/apply slice. Suite-unnamed
-  (precedent: NENE2#1414 → #1417/#1418).
+  (precedent: NENE2#1414 → #1417/#1418). Per-app adoption (the endpoint is **opt-in** — 404 until an
+  app wires the inspector + identity marker + candidate profiles) is tracked at **nene-invoice#497 /
+  nene-clear#183 / nene-records#648**; an app that has not adopted is the OQ4 `unknown` → refuse case.
 - Issue: `#303` (proposed), `#305` (accepted). PR: `#304` (proposed).
 - Superseded by: none.
