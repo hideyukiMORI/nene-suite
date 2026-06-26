@@ -129,6 +129,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/install-sessions/{installSessionId}/database-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ULID of the install session (maps to `install_session_id`).
+                 * @example 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                 */
+                installSessionId: components["parameters"]["InstallSessionId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Configure per-app database targets for a session (ADR 0022 mode A).
+         * @description Sets the operator's per-app database target overrides (`provision` | `adopt`,
+         *     plus an adopt `server` / `name`) on an in-progress install session. The choice
+         *     is carried on the session and consulted when databases are provisioned/adopted
+         *     (install step 4) and when the install manifest is written (step 8). A target
+         *     may only name an app already in the session's `selectedApps`; apps with no
+         *     entry keep the default (`provision` on the suite server). `provision` on an
+         *     external `server` is refused — external is adopt-only in the Tier B MVP
+         *     (ADR 0021 OQ2).
+         *
+         *     **Audit:** emits `database_targets.configured` (entity `app_database`,
+         *     `before_json` prior targets → `after_json` new targets) per audit-trail §4.
+         */
+        put: operations["setDatabaseTargets"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/install-sessions/{installSessionId}/disclaimer-acceptance": {
         parameters: {
             query?: never;
@@ -805,6 +841,26 @@ export interface components {
          * @enum {string}
          */
         Tier: "B";
+        /**
+         * @description How the suite obtains an app's database (ADR 0021, terminology §4.4):
+         *     `provision` (suite `CREATE`s it) | `adopt` (suite registers an existing
+         *     database, no DDL/DML). PHP `DatabaseTargetMode`.
+         * @enum {string}
+         */
+        DatabaseTargetMode: "provision" | "adopt";
+        /**
+         * @description One app's database target choice (ADR 0022 mode A). `server` (non-secret host
+         *     / label) and `name` (existing database name) apply to `adopt`; both are
+         *     absent for the default provision-on-suite-server case. No secrets.
+         */
+        DatabaseTargetSelection: {
+            catalogId: components["schemas"]["CatalogId"];
+            mode: components["schemas"]["DatabaseTargetMode"];
+            /** @description Non-secret host / label; null / absent = suite server. */
+            server?: string | null;
+            /** @description Existing database name (adopt only); null / absent = suite convention. */
+            name?: string | null;
+        };
         /** @description Installer wizard run. Persisted in the `nene_suite` control DB (no secrets). */
         InstallSession: {
             id: components["schemas"]["Ulid"];
@@ -816,6 +872,11 @@ export interface components {
             catalogRevision: number;
             /** @description Catalog ids selected, dependency-resolved and ordered. */
             selectedApps: components["schemas"]["CatalogId"][];
+            /**
+             * @description Per-app database target overrides (ADR 0022 mode A). Empty = env / default
+             *     targets (provision on the suite server). Set via `setDatabaseTargets`.
+             */
+            databaseTargets?: components["schemas"]["DatabaseTargetSelection"][];
             disclaimerAccepted: boolean;
             /** Format: date-time */
             disclaimerAcceptedAt?: string | null;
@@ -845,6 +906,13 @@ export interface components {
              *     (adds required apps) and rejects non-`installable` entries.
              */
             selectedApps: components["schemas"]["CatalogId"][];
+        };
+        SetDatabaseTargetsRequest: {
+            /**
+             * @description Per-app database target overrides for apps in the session's selection.
+             *     Apps with no entry keep the default (provision on the suite server).
+             */
+            targets: components["schemas"]["DatabaseTargetSelection"][];
         };
         AcceptDisclaimerRequest: {
             /**
@@ -1519,6 +1587,64 @@ export interface operations {
              * @description Validation failed. Common slugs: `validation-failed` (bad shape),
              *     `dependency-unmet` (a required app was omitted),
              *     `app-not-installable` (a `planned`/`deprecated` app was selected).
+             */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblemDetails"];
+                };
+            };
+            500: components["responses"]["ServerError"];
+        };
+    };
+    setDatabaseTargets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ULID of the install session (maps to `install_session_id`).
+                 * @example 01J8XR4ZS6Q9V2H7K3N5M0B8TC
+                 */
+                installSessionId: components["parameters"]["InstallSessionId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "targets": [
+                 *         {
+                 *           "catalogId": "nene-invoice",
+                 *           "mode": "adopt",
+                 *           "server": "legacy-db.internal",
+                 *           "name": "invoice_prod"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                "application/json": components["schemas"]["SetDatabaseTargetsRequest"];
+            };
+        };
+        responses: {
+            /** @description Targets configured (echoed back in `databaseTargets`). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstallSession"];
+                };
+            };
+            404: components["responses"]["InstallSessionNotFound"];
+            409: components["responses"]["InstallSessionConflict"];
+            /**
+             * @description Validation failed. `validation-failed` for a bad shape or unknown `mode`;
+             *     per-target codes `app_not_selected`, `external_provision_unsupported`
+             *     (provision on an external server), `invalid_database_name`, `duplicate`.
              */
             422: {
                 headers: {
