@@ -339,6 +339,8 @@ prohibited (ADR 0015).
 | Catalog app versions | `app_versions` | `versions` (alone) |
 | Federation UUID | `org_external_id` | `external_id` (in manifest — use full name) |
 | Enabled integrations | `enabled_integrations` | `integrations`, `wiring` |
+| App database target mode | `apps[].mode` (omitted = `provision`) | `db_mode`, `provisioning` (ADR 0021, §4.4 values) |
+| App database server | `apps[].server` (omitted = suite server) | `db_server`, `host` (non-secret label only; no credentials) |
 
 | Control DB URL env | `NENE_SUITE_CONTROL_DATABASE_URL` | `SUITE_DB_URL`, `AUDIT_DATABASE_URL` |
 

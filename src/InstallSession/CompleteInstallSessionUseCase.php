@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeSuite\InstallSession;
 
-use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
+use NeNeSuite\DatabaseProvision\DatabaseTargetResolverInterface;
 use NeNeSuite\InstallManifest\InstallManifestApp;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
@@ -26,7 +26,7 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
         private InstallManifestFactory $manifestFactory,
         private SuiteAuditRecorderInterface $audit,
         private SuiteAppUrlReaderInterface $urls,
-        private AppDatabaseNamer $databaseNamer,
+        private DatabaseTargetResolverInterface $databaseTargets,
         private string $suiteId,
         private string $orgExternalId,
     ) {
@@ -125,7 +125,14 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
                 continue;
             }
 
-            $apps[] = new InstallManifestApp($catalogId, $publicUrl, $this->databaseNamer->databaseName($catalogId));
+            $target = $this->databaseTargets->resolve($catalogId);
+            $apps[] = new InstallManifestApp(
+                $catalogId,
+                $publicUrl,
+                $target->databaseName,
+                $target->mode,
+                $target->server,
+            );
         }
 
         return $apps;
