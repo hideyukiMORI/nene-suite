@@ -34,7 +34,12 @@ describe('useInstallWizard', () => {
 
     act(() => {
       result.current.setDatabaseTargets([
-        { catalogId: 'nene-invoice', mode: 'adopt', server: 'legacy-db.internal', name: 'invoice_prod' },
+        {
+          catalogId: 'nene-invoice',
+          mode: 'adopt',
+          server: 'legacy-db.internal',
+          name: 'invoice_prod',
+        },
       ])
     })
 

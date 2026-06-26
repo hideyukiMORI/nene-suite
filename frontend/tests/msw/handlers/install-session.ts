@@ -7,7 +7,12 @@ interface MockSession {
   tier: string
   catalogRevision: number
   selectedApps: string[]
-  databaseTargets: { catalogId: string; mode: string; server?: string | null; name?: string | null }[]
+  databaseTargets: {
+    catalogId: string
+    mode: string
+    server?: string | null
+    name?: string | null
+  }[]
   disclaimerAccepted: boolean
   disclaimerAcceptedAt: string | null
   orgExternalId: string | null
