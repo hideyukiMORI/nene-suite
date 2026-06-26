@@ -5,5 +5,7 @@ export type InstallSessionStatusDto = components['schemas']['InstallSessionStatu
 export type InstallSessionDto = components['schemas']['InstallSession']
 export type StartInstallSessionRequestDto = components['schemas']['StartInstallSessionRequest']
 export type UpdateAppSelectionRequestDto = components['schemas']['UpdateAppSelectionRequest']
+export type SetDatabaseTargetsRequestDto = components['schemas']['SetDatabaseTargetsRequest']
+export type DatabaseTargetSelectionDto = components['schemas']['DatabaseTargetSelection']
 export type AcceptDisclaimerRequestDto = components['schemas']['AcceptDisclaimerRequest']
 export type FailInstallSessionRequestDto = components['schemas']['FailInstallSessionRequest']

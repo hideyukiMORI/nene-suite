@@ -10,7 +10,7 @@ describe('useInstallWizard', () => {
     resetInstallSessionState()
   })
 
-  it('starts a session then advances to the disclaimer step after selecting apps', async () => {
+  it('advances apps → database → disclaimer through the session', async () => {
     const { result } = renderHookWithProviders(() => useInstallWizard())
 
     expect(result.current.sessionId).toBeNull()
@@ -26,6 +26,16 @@ describe('useInstallWizard', () => {
 
     act(() => {
       result.current.selectApps(['nene-invoice'])
+    })
+
+    await waitFor(() => {
+      expect(result.current.step).toBe('database')
+    })
+
+    act(() => {
+      result.current.setDatabaseTargets([
+        { catalogId: 'nene-invoice', mode: 'adopt', server: 'legacy-db.internal', name: 'invoice_prod' },
+      ])
     })
 
     await waitFor(() => {

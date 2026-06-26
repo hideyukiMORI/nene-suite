@@ -7,6 +7,7 @@ interface MockSession {
   tier: string
   catalogRevision: number
   selectedApps: string[]
+  databaseTargets: { catalogId: string; mode: string; server?: string | null; name?: string | null }[]
   disclaimerAccepted: boolean
   disclaimerAcceptedAt: string | null
   orgExternalId: string | null
@@ -30,6 +31,7 @@ function newSession(): MockSession {
     tier: 'B',
     catalogRevision: 1,
     selectedApps: [],
+    databaseTargets: [],
     disclaimerAccepted: false,
     disclaimerAcceptedAt: null,
     orgExternalId: null,
@@ -59,6 +61,13 @@ export const installSessionHandlers = [
     const body = (await request.json()) as { selectedApps?: string[] }
     if (session !== null) {
       session = { ...session, selectedApps: body.selectedApps ?? [] }
+    }
+    return HttpResponse.json(session)
+  }),
+  http.put('/api/v1/install-sessions/:id/database-targets', async ({ request }) => {
+    const body = (await request.json()) as { targets?: MockSession['databaseTargets'] }
+    if (session !== null) {
+      session = { ...session, databaseTargets: body.targets ?? [] }
     }
     return HttpResponse.json(session)
   }),

@@ -5,13 +5,15 @@ import { useInstallWizard, type WizardStep } from '../hooks/use-install-wizard'
 import styles from './install-wizard.module.css'
 import { AppSelectionStep } from './steps/AppSelectionStep'
 import { CompleteStep } from './steps/CompleteStep'
+import { DatabaseStep } from './steps/DatabaseStep'
 import { DisclaimerStep } from './steps/DisclaimerStep'
 import { ReviewStep } from './steps/ReviewStep'
 
-const STEP_ORDER: readonly WizardStep[] = ['apps', 'disclaimer', 'review', 'complete']
+const STEP_ORDER: readonly WizardStep[] = ['apps', 'database', 'disclaimer', 'review', 'complete']
 
 const STEP_LABEL: Record<WizardStep, MessageKey> = {
   apps: 'suite.install.wizard.step.apps',
+  database: 'suite.install.wizard.step.database',
   disclaimer: 'suite.install.wizard.step.disclaimer',
   review: 'suite.install.wizard.step.review',
   complete: 'suite.install.wizard.step.complete',
@@ -70,6 +72,17 @@ export function InstallWizard() {
             apps={wizard.catalogApps}
             isPending={wizard.isMutating}
             onSubmit={wizard.selectApps}
+          />
+        ) : null}
+
+        {wizard.step === 'database' ? (
+          <DatabaseStep
+            apps={(wizard.session?.selectedApps ?? []).map((id) => ({
+              id,
+              name: wizard.catalogApps.find((app) => app.id === id)?.name ?? id,
+            }))}
+            isPending={wizard.isMutating}
+            onSubmit={wizard.setDatabaseTargets}
           />
         ) : null}
 
