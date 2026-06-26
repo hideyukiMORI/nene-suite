@@ -8,10 +8,12 @@ implemented end to end — detached-JWS verification with conformance-corpus par
 per-product `gen` watermark, three read APIs, and dashboard wiring. The **O6 upgrade
 orchestration prerequisites are all landed** (installed-version tracking, catalog version mirror,
 ADR 0013 acceptance, and the upgrade-orchestration contract — **ADR 0019**, which supersedes the
-mis-specified ADR 0018; see below). **Next: B2** — sibling-side org resolution +
-authorization-code assertion flow (cross-repo) — and, for O6, the Suite **deployment-driven**
-orchestrator (Tier B compose: dependency-ordered image recreate + min-version gating; the sibling
-migrates on boot) + apex "update all" UI (epic #251).
+mis-specified ADR 0018; see below). The **federated user lifecycle** contract — prompt
+deprovisioning beyond JIT-on-login (pull lifecycle delta feed + best-effort back-channel logout) —
+is now **accepted as ADR 0020** (extends ADR 0012, OQ1–5 resolved; a B2 follow-on, no terminology
+change). **Next: B2** — sibling-side org resolution + authorization-code assertion flow (cross-repo)
+— and, for O6, the Suite **deployment-driven** orchestrator (Tier B compose: dependency-ordered
+image recreate + min-version gating; the sibling migrates on boot) + apex "update all" UI (epic #251).
 
 The Phase A / B1 build-out is tracked in
 [`docs/milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md)
@@ -106,6 +108,7 @@ Done (Phase A + B1 — `main`):
 Remaining (B2–B6 — see milestone §3):
 
 - [ ] アプリの org 解決（`subdomain` / `custom_domain`）+ authorization-code assertion flow を Suite から driving（B2 — cross-repo）
+- [ ] **Federated user lifecycle**（B2 follow-on）— JIT-on-login を超える即時 deprovisioning。pull lifecycle delta feed（SCIM 形・§5 roster-pull の user 粒度拡張）＋ best-effort back-channel logout（OIDC 形・login と同じ JWKS 検証）。suite 側の disable/role-revoke/delete を member tool へ伝播。契約は **ADR 0020 accepted**（ADR 0012 を extend・cross-DB 書き込みなし・NENE2 へは generic framework 機能としてのみ依頼）。前提: B1 keys（landed）＋ B2 org 解決＋ ADR 0012 §5 roster-pull surface。実装は別作業。
 - [x] Suite Origin **消費**クライアント実装 — profiled-TUF read model：detached-JWS（EdDSA）検証＋conformance corpus parity（15/15, `nene-origin@d5882cf` pin）・per-product `gen` watermark・update/announcements/house-ads read API＋dashboard 配線（O0–O5b, epic #230 closed; PR #232–#250）。trust anchor 未設定時は disabled-degrade。
 - [ ] アップグレード **orchestration** — dependency-ordered "update all"。**deployment-driven**（Tier B：Suite が依存順に新イメージ recreate＋min-version gating＋audit、各 sibling は起動時 migrate＝Tier A）。**Suite はデプロイ駆動・apply 実体は sibling の boot migrate**（Origin ADR 0001 §5 / ADR 0013 §3/§8 / ADR 0014 / **ADR 0019**）。backlog epic #251；**前提①②③④ landed**（installed-version 追跡 #256/#258・catalog version mirror #260・ADR 0013 accepted #262・upgrade orchestration ADR 0019（ADR 0018 を supersede））→ 次は Suite のデプロイ駆動 orchestrator＋apex "update all" UI（sibling runtime endpoint は不要・NENE2#1416 取り下げ）。
 - [ ] catalog schema 拡張（`icon` / `description` / `category` / `min_suite_version`）+ フロント IA 配線（updates badge / announcements rail / ad slot）
