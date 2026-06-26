@@ -40,6 +40,13 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Apex shell (login + app links + install wizard + audit viewer) ✅
 - Staging on ConoHa VPS with automatic deploy from `main` ✅
 - Control DB + provisioning are PostgreSQL-capable as well as MySQL ✅ (ADR 0016)
+- ⏳ **App database topology** — generalize the implicit single model (same server, suite
+  creates, catalog-id name) to a per-app **database target**: `provision` | `adopt` modes +
+  configurable server. Default target = today's behavior (unchanged); MVP adds **external-server
+  adopt** (register an existing DB, no DDL) for "bring an existing tool under the suite" — the
+  data-plane companion to ADR 0012 §8. Contract **accepted** as **ADR 0021** (§3 invariant holds:
+  one DB per app, no shared schema, no cross-DB writes). Implementation (env/manifest + adopt path)
+  is follow-up.
 - Document add-app workflow (remaining minor doc task)
 
 ## Phase 2: Federation Contract — in progress

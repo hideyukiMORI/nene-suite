@@ -11,7 +11,11 @@ ADR 0013 acceptance, and the upgrade-orchestration contract — **ADR 0019**, wh
 mis-specified ADR 0018; see below). The **federated user lifecycle** contract — prompt
 deprovisioning beyond JIT-on-login (pull lifecycle delta feed + best-effort back-channel logout) —
 is now **accepted as ADR 0020** (extends ADR 0012, OQ1–5 resolved; a B2 follow-on, no terminology
-change). **Next: B2** — sibling-side org resolution + authorization-code assertion flow (cross-repo)
+change). The **app database topology** contract is **accepted as ADR 0021** — a per-app database
+target (`provision` | `adopt` + configurable server); the default reproduces today's behavior, the
+MVP adds external-server **adopt** (register an existing DB, no DDL) as the data-plane companion to
+ADR 0012 §8, with the §3 one-DB-per-app invariant held. **Next: B2** — sibling-side org resolution +
+authorization-code assertion flow (cross-repo)
 — and, for O6, the Suite **deployment-driven** orchestrator (Tier B compose: dependency-ordered
 image recreate + min-version gating; the sibling migrates on boot) + apex "update all" UI (epic #251).
 
@@ -93,6 +97,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] Operator provisioning HTTP endpoint — `POST /api/v1/operators` + `ProvisionApexOperatorUseCase` (default-org `Admin` membership) — A4.5, PR #154
 - [ ] Shared apex auth middleware — **deferred by design.** Per-handler default-deny via `BearerTokenAuthenticator` / `SuperadminGuard` (first line of `handle()`) is the deliberate pattern while few endpoints need auth (handover §4.3). Revisit only if the authenticated-endpoint count grows.
 - [ ] `IntegrationWiring` — Phase 2 scope
+- [ ] **App database topology**（ADR 0021 accepted, OQ1–5 確定）— per-app database target（`mode=provision|adopt` ＋ server）。実装: ① env 拡張 `NENE_SUITE_APP_{SNAKE}_DB_*`（OQ1）② manifest `apps[]` に `mode`/`server` 追加・省略可（OQ4）③ provisioner を per-app target へ一般化 ④ adopt（register-only・DDL/DML なし・非破壊）パス＋safety test。MVP は外部サーバ **adopt-only**（外部 provision は defer, OQ2）・単一エンジン維持（OQ5）・adopt 入口は ADR 0012 §8 self-registration と統合（OQ3）。識別子は各実装 PR で terminology 登録（ADR 0018 precedent）。
 - [x] `app_versions` の version mirror — **catalog version mirror** が landed（#260, ADR 0013 §4 read-model: `installedVersion`/`availableVersion`）。installed は sibling `/machine/health` 由来（#256/#258）、version-compare は `OriginUpdateAggregator`。manifest への静的 pin はしない（live mirror）。
 
 ## Next (hosted edition / NeNe Cloud Free — ADR 0015 draft)
