@@ -23,7 +23,7 @@ The Phase A / B1 build-out is tracked in
 [`docs/milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md)
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
-`main`'s git log is the authoritative shipped record. Gate state: PHPUnit **431** /
+`main`'s git log is the authoritative shipped record. Gate state: PHPUnit **445** /
 vitest **68**, all green.
 
 ---
@@ -97,7 +97,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 - [x] Operator provisioning HTTP endpoint — `POST /api/v1/operators` + `ProvisionApexOperatorUseCase` (default-org `Admin` membership) — A4.5, PR #154
 - [ ] Shared apex auth middleware — **deferred by design.** Per-handler default-deny via `BearerTokenAuthenticator` / `SuperadminGuard` (first line of `handle()`) is the deliberate pattern while few endpoints need auth (handover §4.3). Revisit only if the authenticated-endpoint count grows.
 - [ ] `IntegrationWiring` — Phase 2 scope
-- [ ] **App database topology**（ADR 0021 accepted, OQ1–5 確定）— per-app database target（`mode=provision|adopt` ＋ server）。実装: ① env 拡張 `NENE_SUITE_APP_{SNAKE}_DB_*`（OQ1）② manifest `apps[]` に `mode`/`server` 追加・省略可（OQ4）③ provisioner を per-app target へ一般化 ④ adopt（register-only・DDL/DML なし・非破壊）パス＋safety test。MVP は外部サーバ **adopt-only**（外部 provision は defer, OQ2）・単一エンジン維持（OQ5）・adopt 入口は ADR 0012 §8 self-registration と統合（OQ3）。識別子は各実装 PR で terminology 登録（ADR 0018 precedent）。
+- [x] **App database topology**（ADR 0021 accepted, OQ1–5 確定）— per-app database target（`mode=provision|adopt` ＋ server）。**実装① env 駆動 target ＋ adopt 対応エンジン（#280）**・**実装② manifest `apps[]` に `mode`/`server` 記録＋CompleteInstallSession を resolver 配線（#284）** 完了＝**機能的に完結**。既定（provision・suite サーバ）は現行と byte 一致、adopt は register-only（DDL/DML なし）、MVP は外部サーバ **adopt-only**（外部 provision は defer, OQ2）・単一エンジン維持（OQ5）。残: **adopt 入口フロー**（OQ3）を **ADR 0012 §8 self-registration と統合**（§8 未実装の別作業）。
 - [x] `app_versions` の version mirror — **catalog version mirror** が landed（#260, ADR 0013 §4 read-model: `installedVersion`/`availableVersion`）。installed は sibling `/machine/health` 由来（#256/#258）、version-compare は `OriginUpdateAggregator`。manifest への静的 pin はしない（live mirror）。
 
 ## Next (hosted edition / NeNe Cloud Free — ADR 0015 draft)
