@@ -12,7 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\AppCatalog\CatalogAppRepositoryInterface;
-use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
+use NeNeSuite\DatabaseProvision\DatabaseTargetResolverInterface;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
@@ -237,7 +237,7 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                     $factory = $container->get(InstallManifestFactory::class);
                     $audit = $container->get(SuiteAuditRecorderInterface::class);
                     $urls = $container->get(SuiteAppUrlReaderInterface::class);
-                    $databaseNamer = $container->get(AppDatabaseNamer::class);
+                    $databaseTargets = $container->get(DatabaseTargetResolverInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
                     $orgExternalId = $container->get(RuntimeServiceProvider::SUITE_ORG_EXTERNAL_ID);
 
@@ -261,8 +261,8 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('Suite app URL reader service is invalid.');
                     }
 
-                    if (!$databaseNamer instanceof AppDatabaseNamer) {
-                        throw new LogicException('App database namer service is invalid.');
+                    if (!$databaseTargets instanceof DatabaseTargetResolverInterface) {
+                        throw new LogicException('Database target resolver service is invalid.');
                     }
 
                     if (!is_string($suiteId) || $suiteId === '') {
@@ -273,7 +273,7 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('Suite org external id service is invalid.');
                     }
 
-                    return new CompleteInstallSessionUseCase($sessions, $manifests, $factory, $audit, $urls, $databaseNamer, $suiteId, $orgExternalId);
+                    return new CompleteInstallSessionUseCase($sessions, $manifests, $factory, $audit, $urls, $databaseTargets, $suiteId, $orgExternalId);
                 },
             )
             ->set(

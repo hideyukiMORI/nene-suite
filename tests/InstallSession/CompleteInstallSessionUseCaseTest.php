@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Tests\InstallSession;
 
-use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
+use NeNeSuite\DatabaseProvision\DatabaseTarget;
+use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
+use NeNeSuite\DatabaseProvision\DatabaseTargetResolverInterface;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallSession\CompleteInstallSessionInput;
 use NeNeSuite\InstallSession\CompleteInstallSessionUseCase;
@@ -14,6 +16,7 @@ use NeNeSuite\InstallSession\InstallSessionNotFoundException;
 use NeNeSuite\InstallSession\InstallSessionNotReadyException;
 use NeNeSuite\InstallSession\InstallSessionStatus;
 use NeNeSuite\InstallSession\InstallTier;
+use NeNeSuite\Tests\DatabaseProvision\FixedDatabaseTargetResolver;
 use NeNeSuite\Tests\InstalledApps\FixedSuiteAppUrlReader;
 use NeNeSuite\Tests\InstallManifest\InMemoryInstallManifestRepository;
 use NeNeSuite\Tests\SuiteAudit\RecordingSuiteAuditRecorder;
@@ -102,6 +105,36 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         ], $manifest->body['apps'][0]);
     }
 
+    public function testRecordsAdoptModeAndServerInManifestApp(): void
+    {
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->readySession(selectedApps: ['nene-invoice']));
+        $manifests = new InMemoryInstallManifestRepository();
+
+        $targets = (new FixedDatabaseTargetResolver())->with(
+            new DatabaseTarget('nene-invoice', DatabaseTargetMode::Adopt, 'invoice_prod', 'legacy-db.internal'),
+        );
+
+        $useCase = $this->useCase(
+            $sessions,
+            $manifests,
+            null,
+            ['nene-invoice' => 'https://example.com/nene-invoice/'],
+            $targets,
+        );
+        $output = $useCase->execute(new CompleteInstallSessionInput(self::SESSION_ID));
+
+        $manifest = $manifests->findById((string) $output->session->installManifestId);
+        self::assertNotNull($manifest);
+        self::assertSame([
+            'catalog_id' => 'nene-invoice',
+            'public_url' => 'https://example.com/nene-invoice/',
+            'database_name' => 'invoice_prod',
+            'mode' => 'adopt',
+            'server' => 'legacy-db.internal',
+        ], $manifest->body['apps'][0]);
+    }
+
     public function testOmitsManifestAppsWhenNoUrlsConfigured(): void
     {
         $sessions = new InMemoryInstallSessionRepository();
@@ -166,6 +199,7 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
         ?InMemoryInstallManifestRepository $manifests = null,
         ?RecordingSuiteAuditRecorder $recorder = null,
         array $urls = [],
+        ?DatabaseTargetResolverInterface $databaseTargets = null,
     ): CompleteInstallSessionUseCase {
         return new CompleteInstallSessionUseCase(
             $sessions,
@@ -173,7 +207,7 @@ final class CompleteInstallSessionUseCaseTest extends TestCase
             new InstallManifestFactory(),
             $recorder ?? new RecordingSuiteAuditRecorder(),
             new FixedSuiteAppUrlReader($urls),
-            new AppDatabaseNamer(),
+            $databaseTargets ?? new FixedDatabaseTargetResolver(),
             self::SUITE_ID,
             self::ORG_ID,
         );

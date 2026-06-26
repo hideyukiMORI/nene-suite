@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeSuite\InstallManifest;
 
+use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
 use stdClass;
 use Symfony\Component\Uid\Ulid;
 
@@ -45,11 +46,25 @@ final readonly class InstallManifestFactory
 
         if ($apps !== []) {
             $body['apps'] = array_map(
-                static fn (InstallManifestApp $app): array => [
-                    'catalog_id' => $app->catalogId,
-                    'public_url' => $app->publicUrl,
-                    'database_name' => $app->databaseName,
-                ],
+                static function (InstallManifestApp $app): array {
+                    $entry = [
+                        'catalog_id' => $app->catalogId,
+                        'public_url' => $app->publicUrl,
+                        'database_name' => $app->databaseName,
+                    ];
+
+                    // Omit the database target fields at their defaults (provision on the
+                    // suite server) so the common case stays byte-identical (ADR 0021).
+                    if ($app->mode !== DatabaseTargetMode::Provision) {
+                        $entry['mode'] = $app->mode->value;
+                    }
+
+                    if ($app->server !== null) {
+                        $entry['server'] = $app->server;
+                    }
+
+                    return $entry;
+                },
                 $apps,
             );
         }
