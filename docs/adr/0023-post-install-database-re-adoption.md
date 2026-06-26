@@ -183,6 +183,7 @@ are handled by OQ4 (refuse-by-default).
 - **Builds on**: ADR 0012 (§7 enrollment auth reuse, §11 app-as-SSOT), ADR 0011 / ADR 0004 (secrets /
   env contract), ADR 0019 (deployment-driven apply), ADR 0010 (install manifest).
 - Sibling side: a **generic** NENE2 framework capability ("diagnose a candidate database"), never
-  Suite-named — file the cross-repo issue without naming the suite (precedent: NENE2#1414 → #1417/#1418).
+  Suite-named — filed as **NENE2#1419** (`/machine/database/preflight`, `DatabaseCandidateInspector`;
+  Suite-unnamed; precedent: NENE2#1414 → #1417/#1418).
 - Issue: `#303` (proposed), `#305` (accepted). PR: `#304` (proposed).
 - Superseded by: none.
