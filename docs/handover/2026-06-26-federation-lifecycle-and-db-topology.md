@@ -26,13 +26,15 @@ extends **0012**), **0021** (app database topology). Authoritative shipped recor
   `CREATE`s, catalog-id name) generalized to a per-app **database target** (`provision` | `adopt` +
   configurable server). The default reproduces today's behavior exactly; the MVP adds external-server
   **adopt** (register an existing DB, no DDL) — the data-plane companion to ADR 0012 §8.
-- **ADR 0021 implementation ① — landed.** The env-driven target model + adopt-aware provisioning
-  engine is on `main` (behavior-preserving, fully tested). **Implementation ② (manifest surface) is
-  the immediate next task** and is in progress.
+- **ADR 0021 implementation ① + ② — landed; ADR 0021 is functionally complete.** ① the env-driven
+  target model + adopt-aware provisioning engine; ② the install manifest records each app's
+  `mode` / `server` and `CompleteInstallSessionUseCase` resolves the target via the resolver. Both on
+  `main`, behavior-preserving and fully tested. The remaining ADR 0021 work is the **operator-facing
+  adopt entry-point flow** (OQ3), tied to the unbuilt ADR 0012 §8 self-registration — a separate task.
 - Everything is **non-destructive and backward-compatible**: an unset target = today's provision
   behavior; adopt never runs DDL/DML; the §3 invariant (one DB per app, no shared schema, no cross-DB
   writes) holds across every mode and server.
-- Gate state: **PHPUnit 441 / vitest 68**, all green (the local-only `.env`-pollution flake on
+- Gate state: **PHPUnit 445 / vitest 68**, all green (the local-only `.env`-pollution flake on
   `ControlDatabaseConfigResolverTest` is unrelated and green in CI — see
   the local phpunit caveat in the team notes).
 
@@ -45,6 +47,7 @@ extends **0012**), **0021** (app database topology). Authoritative shipped recor
 | ADR 0020 | Federated User Lifecycle — proposed → **accepted** (OQ1–5 resolved); extends ADR 0012; no terminology change | #275 / #276 |
 | ADR 0021 | App Database Topology — proposed → **accepted** (OQ1–5 resolved) | #277 / #278 |
 | ADR 0021 impl ① | env-driven `DatabaseTarget` + `DatabaseTargetMode` + `EnvDatabaseTargetResolver`; `ProvisionAppDatabasesUseCase` resolver-driven (provision = `CREATE`, **adopt = register-only** + audit `database.adopted`); audit-trail §4, terminology §4.4, env-contract, `.env.suite.example` | #279 / #280 |
+| ADR 0021 impl ② | install manifest records the target — `InstallManifestApp` + factory + schema gain `mode` / `server` (omitted at defaults = byte-identical); `CompleteInstallSessionUseCase` resolves the target via `DatabaseTargetResolverInterface`; terminology §10 | #283 / #284 |
 
 No cross-repo (NENE2) requests were filed this session — by design, the NENE2 generic features for
 both ADRs wait until B2 is in view (see §4).
@@ -82,21 +85,18 @@ manifest fields register with impl ②.
 
 ## 4. Remaining tasks
 
-**Immediate — ADR 0021 implementation ② (manifest surface):**
+**ADR 0021 implementation ① + ② — done (#280, #284).** The engine + the manifest surface are on
+`main`. What remains for ADR 0021 is only the operator-facing adopt entry-point (below).
 
-- `InstallManifestApp` + `InstallManifestFactory` gain `mode` + `server`; `schema/install-manifest.schema.json`
-  `apps[]` adds `mode` (enum `provision`/`adopt`, default `provision`) + `server` (string), both omittable
-  (back-compat).
-- `CompleteInstallSessionUseCase` resolves the per-app `DatabaseTarget` (reuse `DatabaseTargetResolverInterface`)
-  to populate `database_name` + `mode` + `server`, instead of computing the name via `AppDatabaseNamer` directly.
-- Register manifest `apps[].mode` / `apps[].server` in terminology §10 (install manifest fields).
-- Tests: factory (omit defaults / include overrides), schema validity, CompleteInstallSession wiring.
-- Result: an adopted DB's mode/server are recorded in the manifest → ADR 0021 is complete.
+**Immediate — adopt entry-point flow (ADR 0021 OQ3):**
+
+- Today adopt is fully wired *underneath* (env target → register-only provisioning → manifest records
+  `mode`/`server`); what's missing is the **operator-facing flow** to register an externally-installed
+  app, unified with **ADR 0012 §8 self-registration** (inbound app registration). §8 is unbuilt — this
+  is the next ADR 0021 slice and the natural place the operator chooses `adopt` + supplies the existing
+  `{server, database name}`.
 
 **Later — not blocking, dependency-ordered:**
-
-- **adopt entry-point flow** (ADR 0021 OQ3) unified with **ADR 0012 §8 self-registration** (externally-installed
-  app registers inbound). §8 is unbuilt; this is where the operator-facing adopt path lives.
 - **ADR 0020 implementation** (federated user lifecycle) — the pull lifecycle delta feed + back-channel
   logout sender (Suite) and the NENE2 *generic* SCIM/back-channel-logout feature. Depends on **B2** (org
   resolution) + the **ADR 0012 §5 roster-pull surface** (both unbuilt). File the NENE2 generic feature
