@@ -11,7 +11,8 @@ interface IconProps {
   weight?: number
   /** CSS color value — defaults to currentColor (inherits text color). */
   color?: string
-  className?: string
+  /** Optional extra class (e.g. a CSS-module lookup, which is `string | undefined`). */
+  className?: string | undefined
 }
 
 /**
