@@ -2,13 +2,20 @@
 
 ## Status
 
-proposed (2026-06-26)
+accepted (2026-06-26 — OQ1–5 resolved below)
 
 **Extends ADR 0012 (Federation Participation Contract) — does not supersede it.** ADR 0012 §6
 established just-in-time (JIT) user provisioning on first SSO login. This ADR adds the missing
 *negative / out-of-band* half of the lifecycle — deactivate, reactivate, role-revoke, delete, and
 immediate session revocation — for suite-member siblings. ADR 0012's JIT-on-login remains the
 baseline for create and positive update; this ADR layers prompt deprovisioning on top.
+
+This ADR introduces **no new compliance obligation**: it strengthens the data-custody posture of the
+hosted edition (ADR 0015 §5) rather than creating any business or legal warranty, and it inherits the
+2026-05-31 公認会計士・税理士 sign-off (#75). The data-custody legal review stays the **B6 terminal gate**
+(ADR 0015 §5); OQ4 routes hard-purge there. A security review of the back-channel logout /
+lifecycle-feed path (token forgery, replay, authz scoping) is an **implementation-time follow-up, not a
+precondition** of this architecture decision — the same posture ADR 0012 took for its IdP key handling.
 
 ## Context
 
@@ -132,30 +139,55 @@ pushes. Single-org OSS has no second tool to propagate to, so the plane is inert
   §10 hub-down resilience and add latency.
 - **No business/domain data ever flows** (ADR 0012 §2/§11; orchestration-compliance §3).
 
-## Open questions (resolve at acceptance)
+## Resolved at acceptance (2026-06-26)
 
-- **OQ1 — push transport & auth.** Sign the back-channel logout token with the **federation JWKS key**
-  (sibling already trusts it; symmetric with login) vs the machine **service token** (ADR 0012 §7).
-  Leaning JWKS for the logout token + service-token auth for the pull feed.
-- **OQ2 — freshness SLA when push is unavailable.** Maximum acceptable staleness on the negative path
-  when push could not be delivered (sibling was down) — this drives the recommended pull interval and
-  a ceiling on sibling local-session TTL.
-- **OQ3 — role-change grain.** Does a privilege **downgrade** need push (like deactivate), while a
-  **grant** stays pull-lazy? Reducing privilege promptly is the security-relevant direction.
-- **OQ4 — hard-purge authority.** Confirm delete = soft-disable-only mirrors §11 exactly, and who
-  authorizes a hard purge (operator + retention policy — B6 legal-review territory, ADR 0015 §5).
-- **OQ5 — sequencing vs B2.** B2 ships the login-assertion mint + org resolution; does the lifecycle
-  plane ship inside B2 or as a follow-on (B2.x)? It depends on B1 keys + B2 org resolution being in
-  place.
+- **OQ1 — push token signing → federation JWKS key.** The back-channel logout token is a short-lived
+  JWT signed with the **federation signing key** and verified by the sibling via `NENE_SUITE_JWKS_URL`
+  — the **same trust root** as the login assertion (ADR 0012 §3/§4), so no new key type and the same
+  forgery defenses apply (alg-pin, `kid`, `aud`, `exp`, `jti` replay guard). The pull feed
+  authenticates the sibling→suite direction with the §7 enrollment **machine service credential**. No
+  new credential type is introduced.
+- **OQ2 — freshness SLA → ≤ 5 min detectable; existing sessions bounded by a recommended TTL.** With
+  push working, revocation is effectively immediate (best-effort, sub-second). When push cannot be
+  delivered, the negative change is detectable within the pull interval (**≤ 5 min**) for *new*
+  authorizations; for *already-issued* sibling local sessions the contract **recommends** (the sibling
+  owns its session, ADR 0012 §4) a suite-mode access-token lifetime ceiling (≈ ≤ 15 min) with
+  mirror active-state re-validation on refresh, so a missed push still closes within one refresh cycle.
+  Suite does not mandate the sibling's session TTL; it sets the SLA target and the recommended ceiling.
+- **OQ3 — role-change grain → reductions push, grants pull.** A privilege **reduction** (role
+  downgrade / capability revoke) propagates via **push** (treated like deactivate — fail-safe). A
+  privilege **grant** is **pull-lazy**: the user simply cannot exercise the new capability until the
+  mirror catches up, which is safe. The security-relevant direction (reduction) is always prompt.
+- **OQ4 — hard-purge authority → soft-disable only here; hard purge to B6.** This contract mandates
+  **soft-disable** for delete (mirrors ADR 0012 §11 org soft-disable; a lifecycle event never destroys
+  sibling domain data). A hard purge is a **separate, explicit, operator-initiated, audited** operation
+  governed by retention policy and routed to the **B6 legal review** (ADR 0015 §5 — data custody /
+  個人情報保護法). Deletion that could destroy domain records is a compliance decision, not an
+  identity-lifecycle event.
+- **OQ5 — sequencing → follow-on after B2.** The lifecycle plane is **not** part of B2's minimal login
+  flow. It ships as a later federation slice once its foundations exist: B1 keys (landed), B2 org
+  resolution, and the ADR 0012 §5 roster-pull + §7 enrollment surface (it is the **user-grain
+  extension** of roster-pull). Building it before those is out of order.
 
-## Terminology registry impact (must land in the same PR before accept — ADR 0006)
+## Terminology registry impact (ADR 0006)
 
-- **Add**: the lifecycle delta feed endpoint identifier, the back-channel logout/revocation endpoint
-  identifier (sibling-published) and/or logout-token identifier, and the lifecycle action vocabulary
-  (`deactivate` / `reactivate` / `revoke` / `soft-disable`). Register spellings in terminology §4/§5,
-  kept **generic** — no `suite_*`-flavored naming that would leak intent into siblings.
-- **Reaffirm**: the federated subject join key is `sub` + `org_external_id`; `suite_org_id` stays
-  prohibited (terminology §6).
+This contract **coins no new canonical identifier**: propagation rides recognized standard shapes
+(SCIM 2.0 `active` / role patch / delete; OIDC Back-Channel Logout token) and reuses already-registered
+suite identifiers (`NENE_SUITE_JWKS_URL`, `NENE_SUITE_EDITION`, `NENE_SUITE_MODE`, claims `sub` /
+`org_external_id`). The lifecycle transitions named above (deactivate / reactivate / revoke /
+soft-disable) are **prose descriptions of standard transitions, not Suite-coined enums**.
+
+Endpoint identifiers register **at implementation, with the surface they extend** (the ADR 0018
+precedent — Suite registers only what it serves/consumes, when it is built):
+
+- The Suite-**served** lifecycle delta feed registers with the **ADR 0012 §5 organization roster-pull
+  API** (both unbuilt; the feed is its user-grain extension).
+- The sibling-**published** back-channel logout endpoint is a **NENE2-side identifier**, registered
+  when NENE2 implements the generic feature (cross-repo, like ADR 0018's `/machine/update`) — in
+  NENE2's own registry, never Suite-aliased.
+
+Reaffirmed: the federated subject join key is `sub` + `org_external_id`; `suite_org_id` stays
+prohibited (terminology §6). **No change to `docs/explanation/terminology.md` is required at acceptance.**
 
 ## Consequences
 
@@ -190,5 +222,5 @@ hosted edition; stays **HTTP-only and §3-clean** (no cross-DB writes); NENE2 st
 - Standards: SCIM 2.0 (RFC 7643 / 7644), OIDC Back-Channel Logout.
 - NENE2: generic framework feature request (issue TBD) — suite-agnostic; never name the suite
   (lesson: NENE2#1414 → NENE2#1417/#1418).
-- Issue: `#000` (TBD). PR: `#000` (TBD).
+- Issue: `#275`. PR: `#276`.
 - Superseded by: none.

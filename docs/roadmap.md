@@ -64,6 +64,12 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   adoption is cross-repo (nene-invoice#496 / nene-clear#182 / nene-records#586).
 - ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
+- ⏳ **Federated user lifecycle** — prompt deprovisioning beyond JIT-on-login: a pull
+  lifecycle delta feed (SCIM-shaped) + best-effort back-channel logout (OIDC-shaped) so a
+  suite-side disable / role-revoke / delete takes effect across member tools. Contract
+  **accepted** as **ADR 0020** (extends ADR 0012; no cross-DB writes; NENE2 gets a generic
+  framework feature, never Suite-named). A B2 follow-on (depends on B1 keys + B2 org resolution
+  + the ADR 0012 §5 roster-pull surface).
 - ⏳ Upgrade **orchestration** — dependency-ordered "update all", **deployment-driven** (Tier B:
   Suite recreates each sibling container at the new image in dependency order with min-version
   gating; the sibling migrates on boot — its own Tier A). **Suite drives deployment; the apply stays
