@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeSuite\InstallSession;
 
-use NeNeSuite\DatabaseProvision\DatabaseTargetResolverInterface;
+use NeNeSuite\DatabaseProvision\SessionDatabaseTargetResolver;
 use NeNeSuite\InstallManifest\InstallManifestApp;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
@@ -26,7 +26,7 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
         private InstallManifestFactory $manifestFactory,
         private SuiteAuditRecorderInterface $audit,
         private SuiteAppUrlReaderInterface $urls,
-        private DatabaseTargetResolverInterface $databaseTargets,
+        private SessionDatabaseTargetResolver $databaseTargets,
         private string $suiteId,
         private string $orgExternalId,
     ) {
@@ -70,7 +70,7 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
             $orgExternalId,
             $session->orgDisplayName,
             $session->disclaimerAcceptedAt,
-            $this->manifestApps($session->selectedApps),
+            $this->manifestApps($session),
         );
         $this->manifests->save($manifest);
 
@@ -111,21 +111,21 @@ final readonly class CompleteInstallSessionUseCase implements CompleteInstallSes
     /**
      * Builds manifest apps[] for selected apps that have a configured public URL.
      * Apps without a URL are omitted (their entry is added once the env is wired).
-     *
-     * @param list<string> $selectedApps
+     * Each app's database target is resolved with the session in context, so an
+     * operator's per-app override (ADR 0022 mode A) is honoured in the manifest.
      *
      * @return list<InstallManifestApp>
      */
-    private function manifestApps(array $selectedApps): array
+    private function manifestApps(InstallSession $session): array
     {
         $apps = [];
-        foreach ($selectedApps as $catalogId) {
+        foreach ($session->selectedApps as $catalogId) {
             $publicUrl = $this->urls->publicUrl($catalogId);
             if ($publicUrl === null) {
                 continue;
             }
 
-            $target = $this->databaseTargets->resolve($catalogId);
+            $target = $this->databaseTargets->resolve($session, $catalogId);
             $apps[] = new InstallManifestApp(
                 $catalogId,
                 $publicUrl,

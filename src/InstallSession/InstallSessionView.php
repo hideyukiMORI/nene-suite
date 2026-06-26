@@ -24,6 +24,15 @@ final readonly class InstallSessionView
             'tier' => $session->tier->value,
             'catalogRevision' => $session->catalogRevision,
             'selectedApps' => $session->selectedApps,
+            'databaseTargets' => array_map(
+                static fn (AppDatabaseTargetSelection $selection): array => [
+                    'catalogId' => $selection->catalogId,
+                    'mode' => $selection->mode->value,
+                    'server' => $selection->server,
+                    'name' => $selection->name,
+                ],
+                $session->databaseTargets,
+            ),
             'disclaimerAccepted' => $session->disclaimerAccepted,
             'disclaimerAcceptedAt' => $session->disclaimerAcceptedAt,
             'orgExternalId' => $session->orgExternalId,

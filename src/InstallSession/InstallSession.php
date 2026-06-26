@@ -11,7 +11,8 @@ namespace NeNeSuite\InstallSession;
 final readonly class InstallSession
 {
     /**
-     * @param list<string> $selectedApps catalog ids, dependency-resolved
+     * @param list<string>                     $selectedApps    catalog ids, dependency-resolved
+     * @param list<AppDatabaseTargetSelection> $databaseTargets per-app database target overrides (ADR 0022 mode A); empty = env/default targets
      */
     public function __construct(
         public string $id,
@@ -29,7 +30,23 @@ final readonly class InstallSession
         public string $createdAt,
         public string $updatedAt,
         public ?string $completedAt,
+        public array $databaseTargets = [],
     ) {
+    }
+
+    /**
+     * The operator's database target override for one app, or null when the app
+     * carries no override (the resolver then falls back to env / default).
+     */
+    public function databaseTargetFor(string $catalogId): ?AppDatabaseTargetSelection
+    {
+        foreach ($this->databaseTargets as $selection) {
+            if ($selection->catalogId === $catalogId) {
+                return $selection;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -53,6 +70,7 @@ final readonly class InstallSession
             createdAt: $this->createdAt,
             updatedAt: $updatedAt,
             completedAt: $this->completedAt,
+            databaseTargets: $this->databaseTargets,
         );
     }
 
@@ -74,6 +92,7 @@ final readonly class InstallSession
             createdAt: $this->createdAt,
             updatedAt: $updatedAt,
             completedAt: $this->completedAt,
+            databaseTargets: $this->databaseTargets,
         );
     }
 
@@ -95,6 +114,7 @@ final readonly class InstallSession
             createdAt: $this->createdAt,
             updatedAt: $updatedAt,
             completedAt: $this->completedAt,
+            databaseTargets: $this->databaseTargets,
         );
     }
 
@@ -116,6 +136,7 @@ final readonly class InstallSession
             createdAt: $this->createdAt,
             updatedAt: $updatedAt,
             completedAt: $completedAt,
+            databaseTargets: $this->databaseTargets,
         );
     }
 
@@ -137,6 +158,32 @@ final readonly class InstallSession
             createdAt: $this->createdAt,
             updatedAt: $updatedAt,
             completedAt: $this->completedAt,
+            databaseTargets: $this->databaseTargets,
+        );
+    }
+
+    /**
+     * @param list<AppDatabaseTargetSelection> $databaseTargets
+     */
+    public function withDatabaseTargets(array $databaseTargets, string $updatedAt): self
+    {
+        return new self(
+            id: $this->id,
+            suiteId: $this->suiteId,
+            status: $this->status,
+            tier: $this->tier,
+            catalogRevision: $this->catalogRevision,
+            selectedApps: $this->selectedApps,
+            disclaimerAccepted: $this->disclaimerAccepted,
+            disclaimerAcceptedAt: $this->disclaimerAcceptedAt,
+            orgExternalId: $this->orgExternalId,
+            orgDisplayName: $this->orgDisplayName,
+            installManifestId: $this->installManifestId,
+            failureCode: $this->failureCode,
+            createdAt: $this->createdAt,
+            updatedAt: $updatedAt,
+            completedAt: $this->completedAt,
+            databaseTargets: $databaseTargets,
         );
     }
 }

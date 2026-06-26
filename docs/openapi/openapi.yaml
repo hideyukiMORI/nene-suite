@@ -321,6 +321,74 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/install-sessions/{installSessionId}/database-targets:
+    parameters:
+      - $ref: '#/components/parameters/InstallSessionId'
+    put:
+      tags: [Install session]
+      operationId: setDatabaseTargets
+      summary: Configure per-app database targets for a session (ADR 0022 mode A).
+      description: |
+        Sets the operator's per-app database target overrides (`provision` | `adopt`,
+        plus an adopt `server` / `name`) on an in-progress install session. The choice
+        is carried on the session and consulted when databases are provisioned/adopted
+        (install step 4) and when the install manifest is written (step 8). A target
+        may only name an app already in the session's `selectedApps`; apps with no
+        entry keep the default (`provision` on the suite server). `provision` on an
+        external `server` is refused — external is adopt-only in the Tier B MVP
+        (ADR 0021 OQ2).
+
+        **Audit:** emits `database_targets.configured` (entity `app_database`,
+        `before_json` prior targets → `after_json` new targets) per audit-trail §4.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetDatabaseTargetsRequest'
+            example:
+              targets:
+                - catalogId: nene-invoice
+                  mode: adopt
+                  server: legacy-db.internal
+                  name: invoice_prod
+      responses:
+        '200':
+          description: Targets configured (echoed back in `databaseTargets`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallSession'
+        '404':
+          $ref: '#/components/responses/InstallSessionNotFound'
+        '409':
+          $ref: '#/components/responses/InstallSessionConflict'
+        '422':
+          description: |
+            Validation failed. `validation-failed` for a bad shape or unknown `mode`;
+            per-target codes `app_not_selected`, `external_provision_unsupported`
+            (provision on an external server), `invalid_database_name`, `duplicate`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ValidationProblemDetails'
+              examples:
+                externalProvisionUnsupported:
+                  summary: Provision requested on an external server
+                  value:
+                    type: https://nene-suite.dev/problems/validation-failed
+                    title: Validation failed
+                    status: 422
+                    detail: 'One or more database targets are invalid.'
+                    instance: /api/v1/install-sessions/01J8XR4ZS6Q9V2H7K3N5M0B8TC/database-targets
+                    errors:
+                      - field: targets.0
+                        code: external_provision_unsupported
+                        detail: 'External-server provisioning is not supported; adopt instead.'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/install-sessions/{installSessionId}/disclaimer-acceptance:
     parameters:
       - $ref: '#/components/parameters/InstallSessionId'
@@ -1870,6 +1938,34 @@ components:
         Deployment tier (terminology §11). Phase 1 ships **Tier B** (Docker / VPS)
         only; **Tier A** (shared hosting) follows in Phase 3 and will extend this enum.
 
+    DatabaseTargetMode:
+      type: string
+      enum: [provision, adopt]
+      description: |
+        How the suite obtains an app's database (ADR 0021, terminology §4.4):
+        `provision` (suite `CREATE`s it) | `adopt` (suite registers an existing
+        database, no DDL/DML). PHP `DatabaseTargetMode`.
+
+    DatabaseTargetSelection:
+      type: object
+      additionalProperties: false
+      required: [catalogId, mode]
+      description: |
+        One app's database target choice (ADR 0022 mode A). `server` (non-secret host
+        / label) and `name` (existing database name) apply to `adopt`; both are
+        absent for the default provision-on-suite-server case. No secrets.
+      properties:
+        catalogId:
+          $ref: '#/components/schemas/CatalogId'
+        mode:
+          $ref: '#/components/schemas/DatabaseTargetMode'
+        server:
+          type: [string, 'null']
+          description: Non-secret host / label; null / absent = suite server.
+        name:
+          type: [string, 'null']
+          description: Existing database name (adopt only); null / absent = suite convention.
+
     InstallSession:
       type: object
       additionalProperties: false
@@ -1904,6 +2000,13 @@ components:
           description: Catalog ids selected, dependency-resolved and ordered.
           items:
             $ref: '#/components/schemas/CatalogId'
+        databaseTargets:
+          type: array
+          description: |
+            Per-app database target overrides (ADR 0022 mode A). Empty = env / default
+            targets (provision on the suite server). Set via `setDatabaseTargets`.
+          items:
+            $ref: '#/components/schemas/DatabaseTargetSelection'
         disclaimerAccepted:
           type: boolean
         disclaimerAcceptedAt:
@@ -1963,6 +2066,19 @@ components:
             (adds required apps) and rejects non-`installable` entries.
           items:
             $ref: '#/components/schemas/CatalogId'
+
+    SetDatabaseTargetsRequest:
+      type: object
+      additionalProperties: false
+      required: [targets]
+      properties:
+        targets:
+          type: array
+          description: |
+            Per-app database target overrides for apps in the session's selection.
+            Apps with no entry keep the default (provision on the suite server).
+          items:
+            $ref: '#/components/schemas/DatabaseTargetSelection'
 
     AcceptDisclaimerRequest:
       type: object

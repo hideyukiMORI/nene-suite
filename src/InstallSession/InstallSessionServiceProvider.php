@@ -12,7 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\AppCatalog\CatalogAppRepositoryInterface;
-use NeNeSuite\DatabaseProvision\DatabaseTargetResolverInterface;
+use NeNeSuite\DatabaseProvision\SessionDatabaseTargetResolver;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstallManifest\InstallManifestFactory;
 use NeNeSuite\InstallManifest\InstallManifestRepositoryInterface;
@@ -237,7 +237,7 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                     $factory = $container->get(InstallManifestFactory::class);
                     $audit = $container->get(SuiteAuditRecorderInterface::class);
                     $urls = $container->get(SuiteAppUrlReaderInterface::class);
-                    $databaseTargets = $container->get(DatabaseTargetResolverInterface::class);
+                    $databaseTargets = $container->get(SessionDatabaseTargetResolver::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
                     $orgExternalId = $container->get(RuntimeServiceProvider::SUITE_ORG_EXTERNAL_ID);
 
@@ -261,8 +261,8 @@ final readonly class InstallSessionServiceProvider implements ServiceProviderInt
                         throw new LogicException('Suite app URL reader service is invalid.');
                     }
 
-                    if (!$databaseTargets instanceof DatabaseTargetResolverInterface) {
-                        throw new LogicException('Database target resolver service is invalid.');
+                    if (!$databaseTargets instanceof SessionDatabaseTargetResolver) {
+                        throw new LogicException('Session database target resolver service is invalid.');
                     }
 
                     if (!is_string($suiteId) || $suiteId === '') {

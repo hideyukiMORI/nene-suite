@@ -21,6 +21,8 @@ use NeNeSuite\Auth\OperatorEmailConflictExceptionHandler;
 use NeNeSuite\Auth\OperatorValidationExceptionHandler;
 use NeNeSuite\Auth\UnauthorizedExceptionHandler;
 use NeNeSuite\DatabaseProvision\DatabaseProvisionServiceProvider;
+use NeNeSuite\DatabaseTargets\DatabaseTargetsRouteRegistrar;
+use NeNeSuite\DatabaseTargets\DatabaseTargetsServiceProvider;
 use NeNeSuite\Http\Edition;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstalledApps\InstalledAppsRouteRegistrar;
@@ -73,6 +75,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new AuthServiceProvider())
             ->addProvider(new SuiteEnvServiceProvider())
             ->addProvider(new DatabaseProvisionServiceProvider())
+            ->addProvider(new DatabaseTargetsServiceProvider())
             ->addProvider(new InstalledAppsServiceProvider())
             ->addProvider(new InstallerServiceProvider())
             ->addProvider(new TenancyServiceProvider())
@@ -86,6 +89,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $appCatalog = $container->get('nene-suite.route_registrar.app_catalog');
                     $installSession = $container->get('nene-suite.route_registrar.install_session');
                     $appSelection = $container->get('nene-suite.route_registrar.app_selection');
+                    $databaseTargets = $container->get('nene-suite.route_registrar.database_targets');
                     $auth = $container->get('nene-suite.route_registrar.auth');
                     $suiteAudit = $container->get('nene-suite.route_registrar.suite_audit');
                     $installedApps = $container->get('nene-suite.route_registrar.installed_apps');
@@ -103,6 +107,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
                     if (!$appSelection instanceof AppSelectionRouteRegistrar) {
                         throw new LogicException('App selection route registrar service is invalid.');
+                    }
+
+                    if (!$databaseTargets instanceof DatabaseTargetsRouteRegistrar) {
+                        throw new LogicException('Database targets route registrar service is invalid.');
                     }
 
                     if (!$auth instanceof AuthRouteRegistrar) {
@@ -133,6 +141,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $appCatalog,
                         $installSession,
                         $appSelection,
+                        $databaseTargets,
                         $auth,
                         $suiteAudit,
                         $installedApps,

@@ -7,6 +7,7 @@ CREATE TABLE install_sessions (
   tier VARCHAR(8) NOT NULL,                      -- Deployment tier: B (Docker/VPS, current) | A (shared hosting, planned).
   catalog_revision INTEGER NOT NULL,             -- App-catalog schema revision captured at install start.
   selected_apps_json TEXT NOT NULL,              -- JSON array of selected catalog ids (dependency-resolved).
+  database_targets_json TEXT NULL,               -- JSON array of per-app database target overrides (ADR 0022 mode A). NULL/[] = env/default targets.
   disclaimer_accepted INTEGER NOT NULL DEFAULT 0,-- Whether the operator accepted the installer disclaimer (0/1).
   disclaimer_accepted_at VARCHAR(32) NULL,       -- When the disclaimer was accepted, ISO-8601 UTC string. NULL until accepted.
   org_external_id CHAR(26) NULL,                 -- Federation UUID (ULID) chosen for the organization. NULL until set.

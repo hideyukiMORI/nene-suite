@@ -243,6 +243,12 @@ refused in the Tier B MVP — external is adopt-only (ADR 0021 OQ2). The default
 provisioning connection stays `NENE_SUITE_PROVISION_DB_*` (§4). Manifest `apps[].mode` / `apps[].server`
 register with the install-manifest schema change (ADR 0021 implementation ②).
 
+**Operator entry (mode A — [ADR 0022](../adr/0022-app-onboarding-modes.md)).** Instead of hand-editing
+env, an operator may set the same per-app target through the install wizard / the `setDatabaseTargets`
+op (`PUT …/install-sessions/{id}/database-targets`). The choice is carried on the install session
+(`databaseTargets`) and resolved with the env value as fallback (session override → env → default).
+Same canonical `mode` values; the request fields are `catalogId` / `mode` / `server` / `name`.
+
 ---
 
 ## 5. JWT claims (suite mode)

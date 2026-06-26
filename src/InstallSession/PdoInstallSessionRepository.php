@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeSuite\InstallSession;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
 
 final readonly class PdoInstallSessionRepository implements InstallSessionRepositoryInterface
 {
@@ -19,10 +20,10 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
             <<<'SQL'
                 INSERT INTO install_sessions (
                     id, suite_id, status, tier, catalog_revision, selected_apps_json,
-                    disclaimer_accepted, disclaimer_accepted_at, org_external_id,
+                    database_targets_json, disclaimer_accepted, disclaimer_accepted_at, org_external_id,
                     org_display_name, install_manifest_id, failure_code,
                     created_at, updated_at, completed_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 SQL,
             [
                 $session->id,
@@ -31,6 +32,7 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
                 $session->tier->value,
                 $session->catalogRevision,
                 json_encode($session->selectedApps, JSON_THROW_ON_ERROR),
+                $this->encodeDatabaseTargets($session->databaseTargets),
                 $session->disclaimerAccepted ? 1 : 0,
                 $session->disclaimerAcceptedAt,
                 $session->orgExternalId,
@@ -50,7 +52,7 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
             <<<'SQL'
                 UPDATE install_sessions SET
                     status = ?, tier = ?, catalog_revision = ?, selected_apps_json = ?,
-                    disclaimer_accepted = ?, disclaimer_accepted_at = ?, org_external_id = ?,
+                    database_targets_json = ?, disclaimer_accepted = ?, disclaimer_accepted_at = ?, org_external_id = ?,
                     org_display_name = ?, install_manifest_id = ?, failure_code = ?,
                     updated_at = ?, completed_at = ?
                 WHERE id = ?
@@ -60,6 +62,7 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
                 $session->tier->value,
                 $session->catalogRevision,
                 json_encode($session->selectedApps, JSON_THROW_ON_ERROR),
+                $this->encodeDatabaseTargets($session->databaseTargets),
                 $session->disclaimerAccepted ? 1 : 0,
                 $session->disclaimerAcceptedAt,
                 $session->orgExternalId,
@@ -121,6 +124,7 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
             createdAt: (string) $row['created_at'],
             updatedAt: (string) $row['updated_at'],
             completedAt: $this->nullableString($row['completed_at'] ?? null),
+            databaseTargets: $this->decodeDatabaseTargets($row['database_targets_json'] ?? null),
         );
     }
 
@@ -149,6 +153,77 @@ final readonly class PdoInstallSessionRepository implements InstallSessionReposi
         }
 
         return $apps;
+    }
+
+    /**
+     * @param list<AppDatabaseTargetSelection> $targets
+     */
+    private function encodeDatabaseTargets(array $targets): string
+    {
+        $rows = [];
+
+        foreach ($targets as $target) {
+            $row = [
+                'catalog_id' => $target->catalogId,
+                'mode'       => $target->mode->value,
+            ];
+
+            if ($target->server !== null) {
+                $row['server'] = $target->server;
+            }
+
+            if ($target->name !== null) {
+                $row['name'] = $target->name;
+            }
+
+            $rows[] = $row;
+        }
+
+        return json_encode($rows, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @return list<AppDatabaseTargetSelection>
+     */
+    private function decodeDatabaseTargets(mixed $value): array
+    {
+        if (!is_string($value) || $value === '') {
+            return [];
+        }
+
+        /** @var mixed $decoded */
+        $decoded = json_decode($value, true);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $targets = [];
+
+        foreach ($decoded as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+
+            $catalogId = $entry['catalog_id'] ?? null;
+            $mode = is_string($entry['mode'] ?? null) ? DatabaseTargetMode::tryFrom($entry['mode']) : null;
+
+            if (!is_string($catalogId) || $mode === null) {
+                continue;
+            }
+
+            $server = $entry['server'] ?? null;
+            $name = $entry['name'] ?? null;
+
+            $targets[] = new AppDatabaseTargetSelection(
+                $catalogId,
+                $mode,
+                is_string($server) ? $server : null,
+                is_string($name) ? $name : null,
+            );
+        }
+
+        return $targets;
     }
 
     private function nullableString(mixed $value): ?string

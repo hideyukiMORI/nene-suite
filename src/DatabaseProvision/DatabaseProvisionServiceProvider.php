@@ -25,15 +25,44 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                 static fn (ContainerInterface $container): AppDatabaseNamer => new AppDatabaseNamer(),
             )
             ->set(
-                DatabaseTargetResolverInterface::class,
-                static function (ContainerInterface $container): DatabaseTargetResolverInterface {
+                DatabaseTargetFactory::class,
+                static function (ContainerInterface $container): DatabaseTargetFactory {
                     $namer = $container->get(AppDatabaseNamer::class);
 
                     if (!$namer instanceof AppDatabaseNamer) {
                         throw new LogicException('App database namer service is invalid.');
                     }
 
-                    return new EnvDatabaseTargetResolver($namer);
+                    return new DatabaseTargetFactory($namer);
+                },
+            )
+            ->set(
+                DatabaseTargetResolverInterface::class,
+                static function (ContainerInterface $container): DatabaseTargetResolverInterface {
+                    $factory = $container->get(DatabaseTargetFactory::class);
+
+                    if (!$factory instanceof DatabaseTargetFactory) {
+                        throw new LogicException('Database target factory service is invalid.');
+                    }
+
+                    return new EnvDatabaseTargetResolver($factory);
+                },
+            )
+            ->set(
+                SessionDatabaseTargetResolver::class,
+                static function (ContainerInterface $container): SessionDatabaseTargetResolver {
+                    $fallback = $container->get(DatabaseTargetResolverInterface::class);
+                    $factory = $container->get(DatabaseTargetFactory::class);
+
+                    if (!$fallback instanceof DatabaseTargetResolverInterface) {
+                        throw new LogicException('Database target resolver service is invalid.');
+                    }
+
+                    if (!$factory instanceof DatabaseTargetFactory) {
+                        throw new LogicException('Database target factory service is invalid.');
+                    }
+
+                    return new SessionDatabaseTargetResolver($fallback, $factory);
                 },
             )
             ->set(
@@ -77,7 +106,7 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                 ProvisionAppDatabasesUseCaseInterface::class,
                 static function (ContainerInterface $container): ProvisionAppDatabasesUseCaseInterface {
                     $sessions = $container->get(InstallSessionRepositoryInterface::class);
-                    $targets = $container->get(DatabaseTargetResolverInterface::class);
+                    $targets = $container->get(SessionDatabaseTargetResolver::class);
                     $provisioner = $container->get(DatabaseProvisionerInterface::class);
                     $audit = $container->get(SuiteAuditRecorderInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
@@ -86,8 +115,8 @@ final readonly class DatabaseProvisionServiceProvider implements ServiceProvider
                         throw new LogicException('Install session repository service is invalid.');
                     }
 
-                    if (!$targets instanceof DatabaseTargetResolverInterface) {
-                        throw new LogicException('Database target resolver service is invalid.');
+                    if (!$targets instanceof SessionDatabaseTargetResolver) {
+                        throw new LogicException('Session database target resolver service is invalid.');
                     }
 
                     if (!$provisioner instanceof DatabaseProvisionerInterface) {

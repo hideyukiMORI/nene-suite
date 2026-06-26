@@ -21,7 +21,7 @@ final readonly class ProvisionAppDatabasesUseCase implements ProvisionAppDatabas
 {
     public function __construct(
         private InstallSessionRepositoryInterface $sessions,
-        private DatabaseTargetResolverInterface $targets,
+        private SessionDatabaseTargetResolver $targets,
         private DatabaseProvisionerInterface $provisioner,
         private SuiteAuditRecorderInterface $audit,
         private string $suiteId,
@@ -38,7 +38,7 @@ final readonly class ProvisionAppDatabasesUseCase implements ProvisionAppDatabas
 
         $provisioned = [];
         foreach ($session->selectedApps as $catalogId) {
-            $target = $this->targets->resolve($catalogId);
+            $target = $this->targets->resolve($session, $catalogId);
 
             // Adopt is register-only: the suite never creates or mutates an existing
             // database (ADR 0021 §3). Only provision runs DDL, and only on the suite server.

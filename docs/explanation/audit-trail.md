@@ -104,6 +104,7 @@ code merge.
 | `env_config.written` | `suite_env_config` | prior sanitized env map | new sanitized env map | Secrets redacted per §5 |
 | `database.provisioned` | `app_database` | NULL | `{catalog_id, database_name, mode}` | `provision` target — suite `CREATE`d the DB. **No** connection passwords |
 | `database.adopted` | `app_database` | NULL | `{catalog_id, database_name, mode, server?}` | `adopt` target (ADR 0021) — existing DB **registered, not created**; no DDL/DML. `server` non-secret label only; **no** connection passwords |
+| `database_targets.configured` | `app_database` | prior `{targets:[…]}` | new `{targets:[…]}` | Operator's per-app target choice on the session (ADR 0022 mode A, `setDatabaseTargets`). `entity_id` = install_session id; `targets[]` = `{catalog_id, mode, server?, name?}`. **No** connection passwords |
 | `integration.enabled` | `integration_wiring` | disabled snapshot | enabled snapshot | e.g. Clear → Invoice; scopes list |
 | `integration.disabled` | `integration_wiring` | enabled snapshot | disabled snapshot | |
 | `manifest.created` | `install_manifest` | NULL | manifest body | No secrets |
