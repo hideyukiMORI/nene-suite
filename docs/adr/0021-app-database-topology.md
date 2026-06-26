@@ -2,7 +2,13 @@
 
 ## Status
 
-proposed (2026-06-26)
+accepted (2026-06-26 — OQ1–5 resolved below)
+
+The architecture (a per-app database target with `provision` / `adopt` modes and a configurable
+server) is settled. The MVP is deliberately scoped: same-server provision (the default, unchanged) +
+external-server **adopt-only** (OQ2). No new compliance obligation — the §3 invariant is preserved
+across every mode and server. Exact identifiers (env sub-keys, manifest fields) register with the
+implementation PRs that introduce them (see Terminology registry impact; ADR 0018 precedent).
 
 ## Context
 
@@ -95,30 +101,39 @@ and in both the app owns its tables.
 - External-server and adopt credentials follow the same rule — **no secret** in the manifest, audit
   events, or HTTP responses (ADR 0007 / 0011).
 
-## Open questions (resolve at acceptance)
+## Resolved at acceptance (2026-06-26)
 
-- **OQ1 — how the database target is expressed.** Extend the env contract (e.g.
-  `NENE_SUITE_APP_{SNAKE}_DB_*` for server/mode) vs an install-session input vs catalog metadata. Today
-  only `NENE_SUITE_PROVISION_DB_*` (one server) + the per-app `NENE_SUITE_APP_{SNAKE}_URL` exist.
-- **OQ2 — external-server privileged credentials for provision.** How an operator supplies a per-server
-  privileged connection, and whether external-server *provision* ships in the Tier B MVP or
-  **adopt-only first** for external servers (provision stays suite-server-only initially).
-- **OQ3 — adopt entry point.** An operator action at install-session time vs a separate "register
-  existing app" flow — this ties to ADR 0012 §8 self-registration (also unbuilt); ideally one flow.
-- **OQ4 — manifest schema change.** Adding `mode` / `server` to manifest `apps[]` (currently
-  `{catalog_id, public_url, database_name}`) — schema + terminology impact.
-- **OQ5 — engine per app.** Today the engine is derived from the single control URL scheme (ADR 0016).
-  An external server could run a different engine; is **heterogeneous-engine** support in scope, or is
-  a single-engine constraint kept for now?
+- **OQ1 — config shape → env-contract extension.** The database target is expressed as
+  `NENE_SUITE_APP_{SNAKE}_DB_*` env variables, parallel to the existing `NENE_SUITE_APP_{SNAKE}_URL`
+  (terminology §4.1): mode + server (host / port / credentials) per app. The exact sub-keys are
+  settled in the implementation env-contract change (see Terminology registry impact).
+- **OQ2 — external-server scope → adopt-only for external in the MVP.** Same-server `provision` (the
+  default) ships first; for an **external** server only **adopt** is supported in the Tier B MVP.
+  External *provision* (the suite holding a privileged credential for a server it does not own) is
+  **deferred** — least privilege, smallest blast radius. The target model still admits external
+  provision later **without a contract change**.
+- **OQ3 — adopt entry point → unified with ADR 0012 §8 self-registration.** Adopt is **one** "register
+  an existing app" flow that brings both the **data plane** (this ADR — point at the existing
+  database) and the **identity plane** (ADR 0012 §8 — link the existing org/users by `external_id` /
+  email) under the suite, non-destructively. Not a separate DB-only path.
+- **OQ4 — manifest schema → add `mode` + `server`, default-omittable.** Manifest `apps[]` gains `mode`
+  (default `provision`) and `server` (default = the suite provisioning server); both omittable so
+  existing manifests and the common case stay valid. The schema + field registration land with the
+  implementation PR.
+- **OQ5 — engine per app → single-engine constraint kept.** The engine stays derived from the control
+  URL scheme (ADR 0016) for all targets; **heterogeneous engines are out of scope** for now (an
+  external server is assumed to run the same engine). Revisit only if a real mixed-engine need appears.
 
 ## Terminology registry impact (ADR 0006)
 
-Proposed status coins **no** new canonical identifier yet. New identifiers — the mode values
-(`provision` / `adopt`), any `NENE_SUITE_APP_{SNAKE}_DB_*` server/mode env vars, and manifest
-`apps[].mode` / `apps[].server` fields — register **when their config shape is decided (OQ1 / OQ4) at
-acceptance/implementation**. Reaffirm: `NENE_SUITE_PROVISION_DB_*` (terminology §4) stays the
-**default-server** provisioning connection; the per-app DB env prefix stays `database.env_prefix`
-(terminology §2.4).
+This ADR introduces new identifiers — the mode values (`provision` / `adopt`), the per-app DB env
+pattern `NENE_SUITE_APP_{SNAKE}_DB_*`, and manifest `apps[].mode` / `apps[].server` — but, following
+the **ADR 0018 precedent** (a surface's identifiers register **when it is built**), they register with
+the **implementation PRs** that introduce them: the env sub-keys with the env-contract change, the
+manifest fields with the install-manifest schema change. Accepting the architecture does not itself
+add registry rows. Reaffirmed unchanged: `NENE_SUITE_PROVISION_DB_*` (terminology §4) is the
+**default-server** provisioning connection; the per-app DB credential prefix stays `database.env_prefix`
+(terminology §2.4). **No change to `docs/explanation/terminology.md` is required at acceptance.**
 
 ## Consequences
 
@@ -145,5 +160,5 @@ keep it explicit and audited; consider **adopt-only for external** in the MVP (O
   ADR 0014 (the sibling migrates its own schema on boot).
 - Code: `src/DatabaseProvision/*` (`ProvisionAppDatabasesUseCase`, `AppDatabaseNamer`,
   `PdoDatabaseProvisioner`); `catalog/apps.json` `database.env_prefix`.
-- Issue: `#277`. PR: `#000` (TBD).
+- Issue: `#277`. PR: `#278`.
 - Superseded by: none.
