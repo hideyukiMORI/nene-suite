@@ -4,14 +4,16 @@ import {
   useAcceptDisclaimer,
   useCompleteInstallSession,
   useInstallSession,
+  useSetDatabaseTargets,
   useStartInstallSession,
   useUpdateAppSelection,
+  type DatabaseTargetInput,
   type InstallSession,
 } from '@/entities/install-session'
 
-export type WizardStep = 'apps' | 'disclaimer' | 'review' | 'complete'
+export type WizardStep = 'apps' | 'database' | 'disclaimer' | 'review' | 'complete'
 
-const STEPS: readonly WizardStep[] = ['apps', 'disclaimer', 'review', 'complete']
+const STEPS: readonly WizardStep[] = ['apps', 'database', 'disclaimer', 'review', 'complete']
 const DISCLAIMER_VERSION = '2026-05-29'
 
 function toStep(value: string | null): WizardStep {
@@ -29,6 +31,7 @@ export interface UseInstallWizardResult {
   isMutating: boolean
   start: () => void
   selectApps: (ids: string[]) => void
+  setDatabaseTargets: (targets: DatabaseTargetInput[]) => void
   acceptDisclaimer: () => void
   complete: () => void
   goToStep: (step: WizardStep) => void
@@ -48,6 +51,7 @@ export function useInstallWizard(): UseInstallWizardResult {
   const catalogQuery = useCatalogApps()
   const startMutation = useStartInstallSession()
   const selectionMutation = useUpdateAppSelection()
+  const targetsMutation = useSetDatabaseTargets()
   const disclaimerMutation = useAcceptDisclaimer()
   const completeMutation = useCompleteInstallSession()
 
@@ -77,6 +81,20 @@ export function useInstallWizard(): UseInstallWizardResult {
     }
     selectionMutation.mutate(
       { installSessionId: sessionId, selectedApps: ids },
+      {
+        onSuccess: () => {
+          setStep('database')
+        },
+      },
+    )
+  }
+
+  const setDatabaseTargets = (targets: DatabaseTargetInput[]): void => {
+    if (sessionId === null) {
+      return
+    }
+    targetsMutation.mutate(
+      { installSessionId: sessionId, targets },
       {
         onSuccess: () => {
           setStep('disclaimer')
@@ -117,9 +135,13 @@ export function useInstallWizard(): UseInstallWizardResult {
     catalogApps: catalogQuery.data ?? [],
     isStarting: startMutation.isPending,
     isMutating:
-      selectionMutation.isPending || disclaimerMutation.isPending || completeMutation.isPending,
+      selectionMutation.isPending ||
+      targetsMutation.isPending ||
+      disclaimerMutation.isPending ||
+      completeMutation.isPending,
     start,
     selectApps,
+    setDatabaseTargets,
     acceptDisclaimer,
     complete,
     goToStep: (next) => {

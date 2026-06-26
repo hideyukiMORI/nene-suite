@@ -149,6 +149,70 @@
   color: var(--fg-3);
 }
 
+/* ── Database targets step ──────────────────────────────────────────────── */
+.dbAppCard {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 13px 15px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.dbAppHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dbSelect {
+  margin-left: auto;
+  padding: 7px 10px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dbAdoptFields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 11px;
+  border-top: 1px dashed var(--border-2);
+}
+
+.dbField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dbLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-3);
+}
+
+.dbInput {
+  padding: 9px 11px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.dbInput:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

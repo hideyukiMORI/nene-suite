@@ -195,6 +195,7 @@ export const ja: Partial<MessageCatalog> = {
 
   'suite.install.wizard.title': 'NeNe Suite インストーラー',
   'suite.install.wizard.step.apps': 'アプリ選択',
+  'suite.install.wizard.step.database': 'データベース',
   'suite.install.wizard.step.disclaimer': '免責事項',
   'suite.install.wizard.step.review': '確認',
   'suite.install.wizard.step.complete': '完了',
@@ -208,6 +209,19 @@ export const ja: Partial<MessageCatalog> = {
   'suite.install.apps.status.installable': '利用可能',
   'suite.install.apps.status.deprecated': '非推奨',
   'suite.install.apps.empty': 'カタログにインストール可能なアプリがありません。',
+
+  // ── Installer — database targets ─────────────────────────────────────────
+  'suite.install.database.title': 'データベースの割り当て',
+  'suite.install.database.description':
+    'アプリごとに、新規データベースを作成（provision）するか、既存のものを採用（adopt）するか選びます。採用したデータベースはそのまま登録され、Suite が作成・変更することはありません。',
+  'suite.install.database.mode.label': '{{appName}} のデータベースモード',
+  'suite.install.database.mode.provision': '新規作成',
+  'suite.install.database.mode.adopt': '既存を採用',
+  'suite.install.database.server.label': 'サーバー',
+  'suite.install.database.server.placeholder': 'Suite サーバー（既定）',
+  'suite.install.database.name.label': 'データベース名',
+  'suite.install.database.name.placeholder': 'Suite の命名規約（既定）',
+  'suite.install.database.empty': 'アプリが選択されていません。',
 
   'suite.disclaimer.title': '重要なお知らせ',
   'suite.disclaimer.shortNotice':

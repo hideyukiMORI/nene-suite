@@ -45,6 +45,32 @@ export function useUpdateAppSelection(): UseMutationResult<
   )
 }
 
+/** One app's database target choice (ADR 0022 mode A). `server`/`name` apply to adopt. */
+export interface DatabaseTargetInput {
+  catalogId: string
+  mode: 'provision' | 'adopt'
+  server?: string
+  name?: string
+}
+
+export interface SetDatabaseTargetsInput {
+  installSessionId: string
+  targets: DatabaseTargetInput[]
+}
+
+export function useSetDatabaseTargets(): UseMutationResult<
+  InstallSession,
+  AppError,
+  SetDatabaseTargetsInput
+> {
+  return useSessionWriter(({ installSessionId, targets }) =>
+    apiClient.put<InstallSessionDto>(
+      `/api/v1/install-sessions/${installSessionId}/database-targets`,
+      { targets },
+    ),
+  )
+}
+
 export interface AcceptDisclaimerInput {
   installSessionId: string
   disclaimerVersion: string

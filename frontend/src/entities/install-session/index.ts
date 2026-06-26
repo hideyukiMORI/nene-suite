@@ -3,12 +3,15 @@ export { useInstallSession } from './queries'
 export {
   useStartInstallSession,
   useUpdateAppSelection,
+  useSetDatabaseTargets,
   useAcceptDisclaimer,
   useCompleteInstallSession,
   useFailInstallSession,
 } from './mutations'
 export type {
   UpdateAppSelectionInput,
+  DatabaseTargetInput,
+  SetDatabaseTargetsInput,
   AcceptDisclaimerInput,
   FailInstallSessionInput,
 } from './mutations'

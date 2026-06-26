@@ -216,6 +216,7 @@ export const en = {
   // ── Installer wizard — shell ─────────────────────────────────────────────
   'suite.install.wizard.title': 'NeNe Suite installer',
   'suite.install.wizard.step.apps': 'Select apps',
+  'suite.install.wizard.step.database': 'Databases',
   'suite.install.wizard.step.disclaimer': 'Disclaimer',
   'suite.install.wizard.step.review': 'Review',
   'suite.install.wizard.step.complete': 'Complete',
@@ -230,6 +231,19 @@ export const en = {
   'suite.install.apps.status.installable': 'Available',
   'suite.install.apps.status.deprecated': 'Deprecated',
   'suite.install.apps.empty': 'No installable apps in the catalog.',
+
+  // ── Installer — database targets ─────────────────────────────────────────
+  'suite.install.database.title': 'Database targets',
+  'suite.install.database.description':
+    'For each app, provision a new database or adopt an existing one. An adopted database is registered as-is — the suite never creates or modifies it.',
+  'suite.install.database.mode.label': 'Database mode for {{appName}}',
+  'suite.install.database.mode.provision': 'Provision new',
+  'suite.install.database.mode.adopt': 'Adopt existing',
+  'suite.install.database.server.label': 'Server',
+  'suite.install.database.server.placeholder': 'Suite server (default)',
+  'suite.install.database.name.label': 'Database name',
+  'suite.install.database.name.placeholder': 'Suite convention (default)',
+  'suite.install.database.empty': 'No apps selected.',
 
   // ── Installer — disclaimer ───────────────────────────────────────────────
   'suite.disclaimer.title': 'Important notice',
