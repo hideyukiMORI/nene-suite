@@ -59,19 +59,23 @@ candidate database for this app" capability — it names no suite/orchestrator c
   wire. The candidate connection is a profile the **operator pre-placed in the app's own env**
   (e.g. `…_DB_CANDIDATE_*`, an env allowlist). The app connects to the candidate with **its own**
   credentials and **read-only**, with a timeout and a bounded connection budget.
-- **Output — a structured verdict** (no raw data; reason codes only):
-  - `reachable` — could the app open a read-only connection.
-  - `schema_recognized` — the candidate carries this framework's migration ledger (e.g. `phinx_log`).
-  - `app_identity_match` — an app-identity marker (an id row the app writes at init) matches this app.
-  - `tenant_match` — the candidate's org/tenant marker matches the expected federation org
-    (`org_external_id`); mismatch is a hard stop.
-  - `migration_state` — one of `fresh` (empty, ready to migrate) · `compatible` (at/behind this app's
-    known migration head) · `ahead` (DB newer than the app — **dangerous**) · `foreign` (ledger of a
-    different app / unknown) · `partial` (in-between — needs handling).
-  - `populated` — empty vs has data.
-  - `recommendation` — `adopt_safe` | `needs_migration` | `refuse`, plus `reason_codes`.
-  - a content `fingerprint` and a short-lived signed `adoption_token` (see §5).
-- **Auto-refuse** on `ahead`, `foreign`, or `tenant_match = false`.
+- **Output — a structured verdict** (no raw data; reason codes only). As shipped (NENE2 #1422 / #1423):
+  - `reachable` (bool) — could the app open a read-only connection.
+  - `schema_recognized` (bool|null) — the candidate carries this framework's migration ledger (`phinx_log`).
+  - `migration_state` — `fresh` · `compatible` · `ahead` · `foreign` · `partial` (or null).
+  - `populated` (bool|null) — empty vs has data.
+  - `recommendation` — **`safe` | `needs_migration` | `needs_review` | `refuse`**, plus `reason_codes`.
+  - `app_identity` — `not_evaluated` | `match` | `mismatch` | `absent` (an id-marker row the app stamps
+    at init, table `nene2_app_identity`).
+  - `tenant` — `not_applicable` | `match` | `mismatch` (the marker's tenant vs the app's configured tenant).
+- **Refuse** on `foreign`, `ahead`, `identity_mismatch`, or `tenant_mismatch`. A multi-tenant candidate
+  whose tenant cannot be evaluated, or an app that does not declare its known migration versions,
+  **downgrades to `needs_review`** (operator judgement) rather than `safe`. A **missing identity marker
+  does not fail closed** — a legitimate pre-existing database is flagged `identity_unverified`, not refused
+  (refinement over the original sketch's bool `tenant_match`).
+- The content `fingerprint` + short-lived signed `adoption_token` (§5, TOCTOU) are **NENE2#1421 (C), still
+  open** — they pair with the deferred write/apply slice; the read-only consumer (§4 read surface) does not
+  need them.
 - Framework shape: a generic `DatabaseAdoptionInspector` interface with a default implementation (most
   apps work unconfigured) and an app extension point. Defined and tracked as a **NENE2 framework
   feature** (cross-repo), never referencing the suite.
@@ -183,11 +187,11 @@ are handled by OQ4 (refuse-by-default).
 - **Builds on**: ADR 0012 (§7 enrollment auth reuse, §11 app-as-SSOT), ADR 0011 / ADR 0004 (secrets /
   env contract), ADR 0019 (deployment-driven apply), ADR 0010 (install manifest).
 - Sibling side: a **generic** NENE2 framework capability (`/machine/database/preflight`,
-  `DatabaseCandidateInspector`), never Suite-named — filed as **NENE2#1419** and split by the
-  maintainer into **#1419** (A: read-only diagnosis + verdict, MVP), **#1420** (B: app identity /
-  tenant match), **#1421** (C: fingerprint + HMAC token, paired with apply). The read-only consumer
-  (slice ①) needs **A + B** (tenant_match is a multi-tenant hard-stop); **C** pairs with the
-  deferred write / apply slice (token is speculative without an apply). Suite-unnamed (precedent:
-  NENE2#1414 → #1417/#1418).
+  `DatabaseCandidateInspector`), never Suite-named — filed as **NENE2#1419**, split into A / B / C: **#1419 (A: read-only diagnosis +
+  verdict) shipped (PR #1422)**, **#1420 (B: app identity / tenant match) shipped (PR #1423)**, **#1421
+  (C: fingerprint + HMAC token) still open** (pairs with the deferred write / apply slice; token is
+  speculative without an apply). The read-only consumer (slice ①) needs **A + B** (both shipped) and can
+  now be wired to the concrete contract; **C** lands with the write/apply slice. Suite-unnamed
+  (precedent: NENE2#1414 → #1417/#1418).
 - Issue: `#303` (proposed), `#305` (accepted). PR: `#304` (proposed).
 - Superseded by: none.
