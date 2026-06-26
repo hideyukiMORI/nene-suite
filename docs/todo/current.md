@@ -244,4 +244,18 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - **Mode A 実装セッションの実績＋再開 handover**: [`docs/handover/2026-06-26-mode-a-implementation.md`](../handover/2026-06-26-mode-a-implementation.md) — 4 PR・コードに今あるもの（backend / frontend）・key decisions・プロセス教訓（codegen freshness / frontend `npm run check` / .env caveat / review-before-merge）・次の入口（§5 deferred は B2 ブロック、unblocked は epic #251）。
 - Gate state: PHPUnit **468** / vitest **72**, all green.
 
-Last updated: 2026-06-26
+### 2026-06-27
+
+- **ADR 0022 mode A 完結＋ClaudeDesign 適用**: mode A backend/frontend（#292/#296）の後、admin
+  コンソール ＋ install database step に ClaudeDesign 返却デザインを適用（#302・presentation-only）。
+- **ADR 0023 — Post-Install Database Re-Adoption ＋ Sibling Preflight Contract** accepted（OQ1–5 確定）:
+  install 後の DB target 変更 ＋「候補 DB が正当か」を **app の自己診断（sibling preflight）** で判断し、
+  Suite は orchestration ＋ 記録に徹する（app-agnostic）。
+- **NENE2 generic preflight の cross-repo build-out**: 起票（NENE2#1419・Suite 非名指し）→ A/B/C 3分割
+  → **A+B 着地**（#1422/#1423）→ as-shipped 契約反映。`recommendation` に `needs_review` 追加・marker 不在は
+  fail-closed しない。**C(#1421) は apply と対で defer**（apply は deployment-driven＝boot 再検証、ADR 0019/
+  NENE2#1416 整合）。sibling 採用: nene-invoice#497 / nene-clear#183 / nene-records#648。
+- Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
+- Gate state: PHPUnit **468** / vitest **72**, all green.
+
+Last updated: 2026-06-27
