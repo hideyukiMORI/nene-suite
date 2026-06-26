@@ -57,4 +57,10 @@ describe('DatabaseStep', () => {
       { catalogId: 'nene-clear', mode: 'adopt' },
     ])
   })
+
+  it('disables Next when there are no apps (e.g. the session is still loading)', () => {
+    renderWithProviders(<DatabaseStep apps={[]} isPending={false} onSubmit={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+  })
 })

@@ -128,7 +128,7 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
         <button
           type="button"
           className={styles['primaryBtn']}
-          disabled={isPending}
+          disabled={isPending || apps.length === 0}
           onClick={submit}
         >
           {t('common.actions.next')}
