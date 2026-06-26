@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Tests\DatabaseProvision;
 
-use NeNeSuite\DatabaseProvision\AppDatabaseNamer;
+use NeNeSuite\DatabaseProvision\DatabaseTarget;
+use NeNeSuite\DatabaseProvision\DatabaseTargetMode;
 use NeNeSuite\DatabaseProvision\ProvisionAppDatabasesInput;
 use NeNeSuite\DatabaseProvision\ProvisionAppDatabasesUseCase;
 use NeNeSuite\InstallSession\InstallSession;
@@ -48,12 +49,48 @@ final class ProvisionAppDatabasesUseCaseTest extends TestCase
         self::assertSame([
             'catalog_id'    => 'nene-invoice',
             'database_name' => 'nene_invoice',
+            'mode'          => 'provision',
         ], $firstEvent->afterJson);
         self::assertSame(self::SESSION_ID, $firstEvent->installSessionId);
 
         $secondEvent = $recorder->commands[1];
         self::assertSame('nene-clear', $secondEvent->entityId);
         self::assertSame('nene_clear', $secondEvent->afterJson['database_name'] ?? null);
+    }
+
+    public function testAdoptModeRegistersWithoutProvisioningAndAuditsAdopted(): void
+    {
+        $sessions = new InMemoryInstallSessionRepository();
+        $sessions->save($this->completedSession(['nene-invoice']));
+        $provisioner = new RecordingDatabaseProvisioner();
+        $recorder = new RecordingSuiteAuditRecorder();
+
+        $resolver = (new FixedDatabaseTargetResolver())->with(
+            new DatabaseTarget('nene-invoice', DatabaseTargetMode::Adopt, 'invoice_prod', 'legacy-db.internal'),
+        );
+
+        $output = $this->useCase($sessions, $provisioner, $recorder, $resolver)
+            ->execute(new ProvisionAppDatabasesInput(self::SESSION_ID));
+
+        // Adopt is register-only: no DDL/DML runs (ADR 0021 §3).
+        self::assertSame([], $provisioner->provisioned);
+
+        self::assertCount(1, $output->provisioned);
+        self::assertSame(DatabaseTargetMode::Adopt, $output->provisioned[0]->mode);
+        self::assertSame('invoice_prod', $output->provisioned[0]->databaseName);
+        self::assertSame('legacy-db.internal', $output->provisioned[0]->server);
+
+        self::assertCount(1, $recorder->commands);
+        $event = $recorder->commands[0];
+        self::assertSame('database.adopted', $event->action);
+        self::assertSame('app_database', $event->entityType);
+        self::assertSame('nene-invoice', $event->entityId);
+        self::assertSame([
+            'catalog_id'    => 'nene-invoice',
+            'database_name' => 'invoice_prod',
+            'mode'          => 'adopt',
+            'server'        => 'legacy-db.internal',
+        ], $event->afterJson);
     }
 
     public function testReturnsEmptyWhenNoAppsSelected(): void
@@ -83,10 +120,11 @@ final class ProvisionAppDatabasesUseCaseTest extends TestCase
         InMemoryInstallSessionRepository $sessions,
         ?RecordingDatabaseProvisioner $provisioner = null,
         ?RecordingSuiteAuditRecorder $recorder = null,
+        ?FixedDatabaseTargetResolver $resolver = null,
     ): ProvisionAppDatabasesUseCase {
         return new ProvisionAppDatabasesUseCase(
             sessions: $sessions,
-            namer: new AppDatabaseNamer(),
+            targets: $resolver ?? new FixedDatabaseTargetResolver(),
             provisioner: $provisioner ?? new RecordingDatabaseProvisioner(),
             audit: $recorder ?? new RecordingSuiteAuditRecorder(),
             suiteId: self::SUITE_ID,

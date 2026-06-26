@@ -93,6 +93,27 @@ to the install manifest.
 
 ---
 
+## Per-app database target variables ([ADR 0021](../adr/0021-app-database-topology.md))
+
+Pattern: `NENE_SUITE_APP_{CATALOG_SNAKE}_DB_*` (parallel to the URL pattern above). Describes the
+**suite-facing target** — how the suite obtains the app's database — not the app's own runtime
+connection (that stays the app's `*_DB_*` block from the catalog `database.env_prefix`, owned by the
+app per [ADR 0004](../adr/0004-suite-environment-contract.md)).
+
+| Variable | Default | Notes |
+| --- | --- | --- |
+| `NENE_SUITE_APP_{SNAKE}_DB_MODE` | `provision` | `provision` (suite `CREATE`s the DB) or `adopt` (register an existing DB; **no DDL/DML**). |
+| `NENE_SUITE_APP_{SNAKE}_DB_SERVER` | *(suite provisioning server)* | Non-secret host / label of the server hosting the DB. Set only to point at an external server. |
+| `NENE_SUITE_APP_{SNAKE}_DB_NAME` | *(suite convention — catalog id, `-`→`_`)* | **`adopt` only** — the existing database's name. Ignored for `provision`. |
+
+The **default target reproduces the historical behavior**: `provision`, on the suite provisioning
+server, named by the suite convention. In the Tier B MVP, an external `_DB_SERVER` is **adopt-only**
+— `provision` on an external server is refused (ADR 0021 OQ2; least privilege). The engine stays the
+control DB's engine for every target (single-engine; ADR 0016). Secrets are never carried here — the
+`_DB_SERVER` value is a non-secret label and `adopt` needs no privileged credential.
+
+---
+
 ## JWT claims (user sessions, suite mode)
 
 | Claim | Purpose |
