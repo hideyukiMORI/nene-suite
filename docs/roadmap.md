@@ -45,8 +45,13 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   configurable server. Default target = today's behavior (unchanged); MVP adds **external-server
   adopt** (register an existing DB, no DDL) for "bring an existing tool under the suite" — the
   data-plane companion to ADR 0012 §8. Contract **accepted** as **ADR 0021** (§3 invariant holds:
-  one DB per app, no shared schema, no cross-DB writes). Implementation (env/manifest + adopt path)
-  is follow-up.
+  one DB per app, no shared schema, no cross-DB writes). Engine + manifest recording **shipped**
+  (#280, #284); adopt works via env end-to-end.
+- ⏳ **App onboarding modes** — the operator-facing adopt entry, contracted as **ADR 0022** (accepted):
+  one onboarding model with two entry modes — **mode A** suite-driven install adopt (implementable now;
+  a dedicated `PUT /install-sessions/{id}/database-targets` + wizard step) and **mode B** standalone-first
+  inbound join (ADR 0012 §7/§8; depends on B2). The database target is decoupled from the install-session
+  so both modes feed one path (no A→B rework). **Mode A is the next implementation.**
 - Document add-app workflow (remaining minor doc task)
 
 ## Phase 2: Federation Contract — in progress
