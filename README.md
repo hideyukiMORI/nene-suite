@@ -51,8 +51,9 @@ installable standalone via their own git clone or release ZIP.
 ## Repository status
 
 **Phase 1 (Tier B installer MVP) ✅ · multi-tenant Phase A + federation IdP key plane (B1) ✅ ·
-Origin consumption client ✅.** Docker Compose orchestrator and apex shell (login + app launcher +
-install wizard + audit viewer) with the Phase 1 OpenAPI operations; organizations / memberships /
+Origin consumption client ✅.** Docker Compose orchestrator and a **responsive left-sidebar** apex
+shell (login + app launcher + install wizard + an **audit viewer with before/after diff detail and
+evidence-grade CSV**) with the Phase 1 OpenAPI operations; organizations / memberships /
 roles + superadmin console; ES256 federation assertions + JWKS (edition-gated); and a profiled-TUF
 Origin update / announcement / house-ad client. The **O6 upgrade-orchestration prerequisites** have
 landed — installed-version tracking (via the sibling `/machine/health`), catalog version mirror, and
@@ -60,7 +61,9 @@ the upgrade contract (ADR 0013 + ADR 0019, deployment-driven). **Per-app databas
 **onboarding modes** (ADR 0021 / ADR 0022 — mode A suite-driven adopt shipped) plus **post-install
 database re-adoption** (ADR 0023, accepted) extend the installer; an **in-app help system** —
 glossary, per-screen guides, and tutorials for non-technical operators — ships behind a Help nav
-entry (ADR 0024). CI and automatic staging deployment
+entry (ADR 0024). **MFA / step-up** is decided (**ADR 0025**) — a generic TOTP primitive in NENE2 (no
+new auth repo), enforced at the Suite IdP when federated and available to standalone siblings. CI and
+automatic staging deployment
 to ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0025**, and the
 2026-05-31 professional sign-offs are on record. The
 repository is **public**; professional (legal /
