@@ -57,6 +57,9 @@ export const en = {
   'suite.nav.closeMenu': 'Close navigation menu',
   'suite.nav.appTitle': 'NeNe Suite',
   'suite.nav.organizations': 'Organizations',
+  'suite.nav.group.operations': 'Operations',
+  'suite.nav.group.governance': 'Governance',
+  'suite.nav.group.support': 'Support',
 
   // ── App shell (header chrome) ────────────────────────────────────────────
   'suite.shell.navLabel': 'Navigation',

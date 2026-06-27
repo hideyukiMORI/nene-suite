@@ -1,0 +1,238 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 248px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: var(--side-bg);
+  color: var(--side-fg);
+  border-right: 1px solid var(--side-line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 18px 18px 14px;
+}
+
+.brandText {
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--side-fg);
+  white-space: nowrap;
+}
+
+.edition {
+  font-family: var(--font-num), monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--side-fg-mut);
+  border: 1px solid var(--side-line);
+  border-radius: var(--r-sm);
+  padding: 2px 5px;
+}
+
+.nav {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 2px 12px 12px;
+}
+
+.group {
+  display: block;
+}
+
+.groupHeading {
+  margin: 16px 0 6px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--side-fg-mut);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  margin: 1px 0;
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  color: var(--side-fg);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.item:hover {
+  background: color-mix(in srgb, var(--side-fg) 8%, transparent);
+}
+
+.itemActive,
+.itemActive:hover {
+  background: var(--side-active);
+  color: var(--side-fg);
+}
+
+.label {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--side-line);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: var(--r-sm);
+  background: var(--side-brand);
+  color: var(--side-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.footText {
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.acctName {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--side-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.version {
+  display: block;
+  font-family: var(--font-num), monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--side-fg-mut);
+}
+
+/* ≤1000px — icon rail: labels and headings collapse, items center. */
+@media (max-width: 1000px) {
+  .sidebar {
+    width: 74px;
+  }
+
+  .brand {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .brandText,
+  .edition,
+  .label,
+  .footText {
+    display: none;
+  }
+
+  .groupHeading {
+    height: 1px;
+    margin: 14px 16px 9px;
+    padding: 0;
+    overflow: hidden;
+    background: var(--side-line);
+  }
+
+  .groupHeading > span {
+    display: none;
+  }
+
+  .item {
+    justify-content: center;
+    gap: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .foot {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* ≤680px — off-canvas drawer (restore labels at drawer width). */
+@media (max-width: 680px) {
+  .sidebar {
+    width: 268px;
+    transform: translateX(-102%);
+    transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .sidebar.open {
+    transform: none;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .brand {
+    justify-content: flex-start;
+    padding: 18px 18px 14px;
+  }
+
+  .brandText,
+  .edition,
+  .label,
+  .footText {
+    display: inline;
+  }
+
+  .groupHeading {
+    height: auto;
+    margin: 16px 0 6px;
+    padding: 0 8px;
+    overflow: visible;
+    background: none;
+  }
+
+  .groupHeading > span {
+    display: inline;
+  }
+
+  .item {
+    justify-content: flex-start;
+    gap: 12px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .foot {
+    justify-content: flex-start;
+    padding: 12px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}

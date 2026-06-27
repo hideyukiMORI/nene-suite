@@ -18,31 +18,32 @@ function seedSession(): void {
 }
 
 describe('AppHeader', () => {
-  it('renders the brand and primary navigation', async () => {
-    seedSession()
-    renderWithProviders(<AppHeader onOpenPalette={() => {}} />)
-
-    expect(await screen.findByRole('link', { name: 'NeNe Suite' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Home/ })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Catalog/ })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Audit log/ })).toBeInTheDocument()
-  })
-
   it('invokes the command palette from the search trigger', async () => {
     const user = userEvent.setup()
     const onOpenPalette = vi.fn()
     seedSession()
-    renderWithProviders(<AppHeader onOpenPalette={onOpenPalette} />)
+    renderWithProviders(<AppHeader onOpenPalette={onOpenPalette} onOpenMenu={() => {}} />)
 
     await user.click(screen.getByRole('button', { name: 'Command palette' }))
 
     expect(onOpenPalette).toHaveBeenCalledOnce()
   })
 
+  it('opens the sidebar drawer from the hamburger', async () => {
+    const user = userEvent.setup()
+    const onOpenMenu = vi.fn()
+    seedSession()
+    renderWithProviders(<AppHeader onOpenPalette={() => {}} onOpenMenu={onOpenMenu} />)
+
+    await user.click(screen.getByRole('button', { name: 'Open navigation menu' }))
+
+    expect(onOpenMenu).toHaveBeenCalledOnce()
+  })
+
   it('opens the account menu with a logout action', async () => {
     const user = userEvent.setup()
     seedSession()
-    renderWithProviders(<AppHeader onOpenPalette={() => {}} />)
+    renderWithProviders(<AppHeader onOpenPalette={() => {}} onOpenMenu={() => {}} />)
 
     await user.click(screen.getByRole('button', { name: 'Account menu' }))
 
