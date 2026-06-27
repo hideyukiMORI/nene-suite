@@ -37,6 +37,7 @@
 
 .name {
   font-weight: 700;
+  color: var(--accent);
 }
 
 .subtitle {
@@ -66,102 +67,6 @@
 
 .getApps:hover {
   background: var(--brand-strong);
-}
-
-/* ── Greet color picker ─────────────────────────────────────────────────── */
-.pickerWrap {
-  position: relative;
-  display: inline-flex;
-}
-
-.pickerBtn {
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-3);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pickerBtn:hover {
-  background: var(--surface-2);
-  color: var(--fg);
-}
-
-.scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  border: none;
-  background: transparent;
-  cursor: default;
-}
-
-.pickerPop {
-  position: absolute;
-  top: 32px;
-  left: 0;
-  z-index: 50;
-  width: 202px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: var(--shadow-lg);
-  padding: 13px;
-  animation: popIn 0.14s ease;
-}
-
-.pickerTitle {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--fg-3);
-  margin-bottom: 10px;
-}
-
-.swatchGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.swatch {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: var(--r-sm);
-  border: 2px solid transparent;
-  cursor: pointer;
-  padding: 0;
-}
-
-.swatch[data-active='true'] {
-  border-color: var(--fg);
-}
-
-.customRow {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--fg-2);
-  cursor: pointer;
-}
-
-.customInput {
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  padding: 2px;
-  cursor: pointer;
 }
 
 /* ── KPI strip ──────────────────────────────────────────────────────────── */
