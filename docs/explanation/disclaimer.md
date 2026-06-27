@@ -2,7 +2,9 @@
 
 **Status: binding.** NeNe Suite operators, contributors, and AI agents must treat
 this document as non-negotiable product posture. Changing it requires ADR 0003 or
-a superseding ADR plus professional review when legal exposure changes.
+a superseding ADR; professional review is **advisory** (not required to merge) and is
+consolidated into the recommended pre-release pass when legal exposure changes
+(amended 2026-06-27 — see ADR 0003).
 
 **Positive MUST rules** for SSOT, database separation, and federation are in
 [`orchestration-compliance.md`](./orchestration-compliance.md) (binding — ADR 0005).
@@ -124,12 +126,12 @@ When implementing installer UI, docs, or examples:
 
 | Field | Value |
 | --- | --- |
-| **Document status** | Binding — professional review complete |
-| **Public release** | ✅ Professional review gate cleared — both sign-offs on record |
+| **Document status** | Binding posture; professional review is advisory (amended 2026-06-27, ADR 0003) |
+| **Public release** | Repository is public. Professional review is consolidated (recommended) before a public product release — not a binding gate. 2026-05-31 sign-offs on record. |
 | **Legal review** | ✅ Completed 2026-05-31 — 西村法律事務所（弁護士）, scope: disclaimer.md + installer-disclaimer-copy.md. Record: [`sign-off-legal-2026-05-31.md`](./sign-off-legal-2026-05-31.md) |
 | **Tax/accounting review** | ✅ Completed 2026-05-31 — 辻村総合会計事務所（公認会計士・税理士）, scope: orchestration-compliance §2–§5, ADR 0005. Record: [`sign-off-tax-accounting-2026-05-31.md`](./sign-off-tax-accounting-2026-05-31.md) |
 | **Sign-off template** | [`professional-sign-off-record.md`](./professional-sign-off-record.md) |
 
 ---
 
-Last updated: 2026-05-31
+Last updated: 2026-06-27

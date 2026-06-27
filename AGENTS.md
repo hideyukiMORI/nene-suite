@@ -1,6 +1,6 @@
 # Agent / AI Guide
 
-Entry point for AI agents working on **NeNe Suite** (private repo `nene-suite`).
+Entry point for AI agents working on **NeNe Suite** (public repo `nene-suite`).
 
 ## Purpose (read first)
 
