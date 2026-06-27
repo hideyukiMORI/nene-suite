@@ -58,9 +58,12 @@ Origin update / announcement / house-ad client. The **O6 upgrade-orchestration p
 landed — installed-version tracking (via the sibling `/machine/health`), catalog version mirror, and
 the upgrade contract (ADR 0013 + ADR 0019, deployment-driven). **Per-app database topology** and
 **onboarding modes** (ADR 0021 / ADR 0022 — mode A suite-driven adopt shipped) plus **post-install
-database re-adoption** (ADR 0023, accepted) extend the installer. CI and automatic staging deployment
-to ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0023**, and the
-2026-05-31 professional sign-offs are on record. The repository is **public**; professional (legal /
+database re-adoption** (ADR 0023, accepted) extend the installer; an **in-app help system** —
+glossary, per-screen guides, and tutorials for non-technical operators — ships behind a Help nav
+entry (ADR 0024). CI and automatic staging deployment
+to ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0024**, and the
+2026-05-31 professional sign-offs are on record. The
+repository is **public**; professional (legal /
 tax) review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003).
 
 ## License

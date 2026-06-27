@@ -24,7 +24,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **72**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **81**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320).
@@ -265,7 +265,13 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - **Docs 鮮度パス＋ルール化（#321）**: README / roadmap / current / milestones を 2026-06-27 状態へ鮮度
   更新し、**日報作成時にドキュメント鮮度を更新する**ことを `workflow.md` / `AGENTS.md` に binding ルール
   として明記。
+- **アプリ内ヘルプ基盤（#323・ADR 0024）**: 用語集・各画面の使い方・チュートリアル＋難所の
+  インライン注釈（InfoHint）を追加。`../nene-origin`（feat(help) #143–#147）のパターンを参照し、
+  nene-suite のデザインシステム（CSS Modules/oklch）・en+ja UI 枠に合わせて移植。**日本語先行**
+  （ヘルプ本文は構造化TS・ADR 0009 への scoped 例外）、ホバー型 tooltip 非依存の a11y 設計。
+  `/help`・`/help/glossary`・`/help/:slug` ＋ apex ナビ、install wizard に HelpLink/InfoHint 配線。
+  PR1＝基盤＋install wizard（残り画面・英語本文は後続）。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
-- Gate state: PHPUnit **468** / vitest **72**, all green.
+- Gate state: PHPUnit **468** / vitest **81**, all green.
 
 Last updated: 2026-06-27

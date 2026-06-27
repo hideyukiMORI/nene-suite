@@ -22,5 +22,6 @@ export function useAppNav(): NavItem[] {
       path: '/admin/organizations',
     },
     { id: 'settings', label: t('suite.nav.settings'), icon: 'settings', path: '/settings' },
+    { id: 'help', label: t('suite.nav.help'), icon: 'help', path: '/help' },
   ]
 }

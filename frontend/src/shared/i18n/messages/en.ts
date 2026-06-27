@@ -361,6 +361,18 @@ export const en = {
   'suite.member.error.invariant': 'The organization must keep at least one admin.',
   'suite.member.error.validation': 'Check the operator and role.',
   'suite.member.error.notFound': 'That membership no longer exists.',
+
+  // ── Help center ──────────────────────────────────────────────────────────
+  'suite.nav.help': 'Help',
+  'suite.help.pageLink': 'How to use this page',
+  'suite.help.title': 'Help & guides',
+  'suite.help.subtitle': 'Learn how to use NeNe Suite, one step at a time.',
+  'suite.help.searchPlaceholder': 'Search help and glossary…',
+  'suite.help.tasksTitle': 'Find by what you want to do',
+  'suite.help.glossaryCta': 'Open the glossary',
+  'suite.help.resultsTitle': 'Search results',
+  'suite.help.noResults': 'No matches. Try a different word.',
+  'suite.help.infoHint': 'Show explanation',
 }
 
 export type MessageCatalog = typeof en

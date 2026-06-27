@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { Icon } from '@/shared/ui'
+import { HelpLink, Icon } from '@/shared/ui'
 import { useInstallWizard, type WizardStep } from '../hooks/use-install-wizard'
 import styles from './install-wizard.module.css'
 import { AppSelectionStep } from './steps/AppSelectionStep'
@@ -27,7 +27,10 @@ export function InstallWizard() {
     return (
       <div className={styles['root']}>
         <div className={styles['card']}>
-          <h2 className={styles['title']}>{t('suite.install.wizard.title')}</h2>
+          <div className={styles['cardHeader']}>
+            <h2 className={styles['title']}>{t('suite.install.wizard.title')}</h2>
+            <HelpLink topic="install-wizard" />
+          </div>
           <p className={styles['lead']}>{t('suite.install.apps.description')}</p>
           <div className={styles['startRow']}>
             <button
@@ -49,6 +52,9 @@ export function InstallWizard() {
   return (
     <div className={styles['root']}>
       <div className={styles['card']}>
+        <div className={styles['helpRow']}>
+          <HelpLink topic="install-wizard" />
+        </div>
         <ol className={styles['stepper']}>
           {STEP_ORDER.map((value, index) => {
             const state =

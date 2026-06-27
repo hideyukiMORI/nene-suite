@@ -4,7 +4,7 @@ import { I18nProvider } from '@/shared/i18n'
 import { useAppNav } from './use-app-nav'
 
 describe('useAppNav', () => {
-  it('returns the five primary destinations in order', () => {
+  it('returns the primary destinations in order', () => {
     const { result } = renderHook(() => useAppNav(), { wrapper: I18nProvider })
     expect(result.current.map((item) => item.id)).toEqual([
       'home',
@@ -12,6 +12,7 @@ describe('useAppNav', () => {
       'audit',
       'admin',
       'settings',
+      'help',
     ])
     expect(result.current.map((item) => item.path)).toEqual([
       '/',
@@ -19,6 +20,7 @@ describe('useAppNav', () => {
       '/admin/audit-events',
       '/admin/organizations',
       '/settings',
+      '/help',
     ])
   })
 })
