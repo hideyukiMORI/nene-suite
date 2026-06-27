@@ -24,7 +24,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **96**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **100**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320).
@@ -299,7 +299,14 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   step-up claim**、**standalone は sibling のローカル login が同じ TOTP を使う**。enroll=本人/enforce=管理者
   ポリシー（アプリ層）、break-glass は MFA 免除＋補償統制（recovery codes 必須・CLI）。**federation 待ちと
   decouple**（Clear は #195 を今進められる）。ADR 0012 を extend。#341 に Suite 回答を投稿済み。
+- **トップメニュー→左サイドバー型シェルへ刷新（#343・B3 #331 解消）**: レスポンシブ対応で水平ナビ＋
+  ボトムシートを撤去し、ClaudeDesign 返却（`nene-suite_sidemenu.zip`）の `[sidebar][main]` シェルを実装。
+  サイドバー = ダークティール（`--side-*`）グループ化 IA（運用 Home/Catalog/Install・ガバナンス
+  Organizations[superadmin]/Audit/Settings・サポート Help）。**≥1001px フルサイドバー / ≤1000px 74px
+  アイコンレール / ≤680px オフキャンバスドロワー＋top-bar ハンバーガー＋オーバーレイ**。top-bar は検索⌘K＋
+  ActiveOrg/通知/locale/theme/account。superadmin 専用 nav を非 superadmin に出さない（無言リダイレクト解消）。
+  新規 AppSidebar、use-app-nav は grouped 化。SuiteMark/`--side-*` は既存流用。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
-- Gate state: PHPUnit **468** / vitest **96**, all green.
+- Gate state: PHPUnit **468** / vitest **100**, all green.
 
 Last updated: 2026-06-27

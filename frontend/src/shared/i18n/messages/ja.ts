@@ -46,6 +46,9 @@ export const ja: Partial<MessageCatalog> = {
   'suite.nav.closeMenu': 'ナビゲーションメニューを閉じる',
   'suite.nav.appTitle': 'NeNe Suite',
   'suite.nav.organizations': '組織',
+  'suite.nav.group.operations': '運用',
+  'suite.nav.group.governance': 'ガバナンス',
+  'suite.nav.group.support': 'サポート',
 
   'suite.shell.navLabel': 'ナビゲーション',
   'suite.shell.search': '検索・移動…',
