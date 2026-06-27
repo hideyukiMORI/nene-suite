@@ -204,7 +204,7 @@ export const ja: Partial<MessageCatalog> = {
   'suite.install.apps.description':
     '各アプリは独立したデータベースを使用します。依存関係は正しい順序でインストールされます。',
   'suite.install.apps.selectedCount': '{{count}} 件のアプリを選択中',
-  'suite.install.apps.requiredBy': '{{appName}} に必要',
+  'suite.install.apps.requires': '{{appName}} が必要',
   'suite.install.apps.status.planned': '準備中',
   'suite.install.apps.status.installable': '利用可能',
   'suite.install.apps.status.deprecated': '非推奨',
@@ -227,6 +227,9 @@ export const ja: Partial<MessageCatalog> = {
   'suite.install.database.name.help': '空欄で Suite の命名規約に従います。',
   'suite.install.database.summary.provision': '新規作成 · Suite サーバー',
   'suite.install.database.summary.adopt': '既存を引き継ぐ',
+  'suite.install.database.modeHint':
+    'provision（新規作成）は Suite が新しいデータベースを作る方式です。adopt（既存採用）は、すでにあるデータベースをそのまま登録して使い、Suite は中身を作りも変えもしません。迷ったら provision のままで大丈夫です。',
+  'suite.install.database.modeHintLabel': 'データベースの割り当てとは',
 
   'suite.disclaimer.title': '重要なお知らせ',
   'suite.disclaimer.shortNotice':
@@ -246,7 +249,7 @@ export const ja: Partial<MessageCatalog> = {
     'Clear → Invoice（サービス API・明示的な有効化が必要）',
   'suite.install.review.integrations.none': '有効な連携なし',
   'suite.install.review.preCompleteSummary':
-    'セットアップを完了しようとしています。NeNe Suite は設定ファイルの書き込みとデータベースのプロビジョニングを行います。**これは**組織が税務・会計・業界規則を満たすことの**証明にはなりません**。',
+    'セットアップを完了しようとしています。NeNe Suite は設定ファイルの書き込みとデータベースのプロビジョニングを行います。これは組織が税務・会計・業界規則を満たすことの証明にはなりません。',
 
   'suite.install.complete.title': 'インストール完了',
   'suite.install.complete.description':
@@ -297,6 +300,7 @@ export const ja: Partial<MessageCatalog> = {
   'suite.org.rename.nameLabel': '新しい名前',
   'suite.org.rename.submitting': '改名中…',
   'suite.org.disable.action': '無効化',
+  'suite.org.disable.confirm': 'この組織を無効化しますか？',
   'suite.org.members': 'メンバー',
   'suite.org.error.slugConflict': 'このスラッグの組織は既に存在します。',
   'suite.org.error.validation': '組織の名前とスラッグを確認してください。',

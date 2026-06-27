@@ -39,8 +39,11 @@ export function OrganizationConsole() {
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const submitCreate = (fields: CreateOrganizationFields): void => {
-    createOrganization(fields)
-    reset()
+    createOrganization(fields, {
+      onSuccess: () => {
+        reset()
+      },
+    })
   }
 
   if (isLoading) return <LoadingState label={t('common.state.loading')} />
@@ -168,6 +171,8 @@ function OrganizationRow({
     defaultValues: { name: organization.name },
   })
 
+  const [confirmingDisable, setConfirmingDisable] = useState(false)
+
   const submitRename = (fields: { name: string }): void => {
     onRename({ id: organization.id, name: fields.name })
     onStopEdit()
@@ -243,7 +248,10 @@ function OrganizationRow({
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           aria-label={t('suite.org.column.actions')}
-          onClick={onToggleMenu}
+          onClick={() => {
+            if (!menuOpen) setConfirmingDisable(false)
+            onToggleMenu()
+          }}
         >
           <Icon name="more_horiz" size={18} />
         </button>
@@ -263,14 +271,39 @@ function OrganizationRow({
                 <Icon name="block" size={18} />
                 {t('suite.org.disable.action')}
               </span>
+            ) : confirmingDisable ? (
+              <div className={styles['menuConfirm']}>
+                <span className={styles['menuConfirmLabel']}>{t('suite.org.disable.confirm')}</span>
+                <div className={styles['menuConfirmActions']}>
+                  <button
+                    type="button"
+                    className={styles['menuConfirmYes']}
+                    role="menuitem"
+                    disabled={isDisabling}
+                    onClick={() => {
+                      onDisable(organization.id)
+                    }}
+                  >
+                    {t('suite.org.disable.action')}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles['menuConfirmNo']}
+                    onClick={() => {
+                      setConfirmingDisable(false)
+                    }}
+                  >
+                    {t('common.actions.cancel')}
+                  </button>
+                </div>
+              </div>
             ) : (
               <button
                 type="button"
                 className={styles['menuItemDanger']}
                 role="menuitem"
-                disabled={isDisabling}
                 onClick={() => {
-                  onDisable(organization.id)
+                  setConfirmingDisable(true)
                 }}
               >
                 <Icon name="block" size={18} />

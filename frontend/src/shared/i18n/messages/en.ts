@@ -226,7 +226,7 @@ export const en = {
   'suite.install.apps.description':
     'Each app uses its own database. Dependencies are installed in the correct order.',
   'suite.install.apps.selectedCount': '{{count}} app(s) selected',
-  'suite.install.apps.requiredBy': 'Required by {{appName}}',
+  'suite.install.apps.requires': 'Requires {{appName}}',
   'suite.install.apps.status.planned': 'Coming soon',
   'suite.install.apps.status.installable': 'Available',
   'suite.install.apps.status.deprecated': 'Deprecated',
@@ -250,11 +250,14 @@ export const en = {
   'suite.install.database.name.help': 'Blank follows the suite naming convention.',
   'suite.install.database.summary.provision': 'provision · suite server',
   'suite.install.database.summary.adopt': 'adopt existing',
+  'suite.install.database.modeHint':
+    'Provision creates a brand-new database for the app. Adopt registers an existing database as-is — the suite never creates or changes its contents. If unsure, leave it on provision.',
+  'suite.install.database.modeHintLabel': 'What does the database mode mean?',
 
   // ── Installer — disclaimer ───────────────────────────────────────────────
   'suite.disclaimer.title': 'Important notice',
   'suite.disclaimer.shortNotice':
-    'NeNe Suite helps you install and configure NeNe applications. It does **not** guarantee business results, legal compliance, or accounting correctness. You remain solely responsible for how installed apps are used and for obtaining professional advice when required.',
+    'NeNe Suite helps you install and configure NeNe applications. It does not guarantee business results, legal compliance, or accounting correctness. You remain solely responsible for how installed apps are used and for obtaining professional advice when required.',
   'suite.disclaimer.checkbox':
     'I understand that NeNe Suite provides technical installation only and does not certify tax, legal, or accounting compliance.',
   'suite.disclaimer.mustAccept': 'You must accept the disclaimer before continuing.',
@@ -271,7 +274,7 @@ export const en = {
     'Clear → Invoice (service API, explicit operator enable)',
   'suite.install.review.integrations.none': 'None enabled',
   'suite.install.review.preCompleteSummary':
-    'You are about to finish setup. NeNe Suite will write configuration files and provision databases. **This does not certify** that your organization meets any tax, accounting, or industry rule.',
+    'You are about to finish setup. NeNe Suite will write configuration files and provision databases. This does not certify that your organization meets any tax, accounting, or industry rule.',
 
   // ── Installer — complete ─────────────────────────────────────────────────
   'suite.install.complete.title': 'Installation complete',
@@ -325,6 +328,7 @@ export const en = {
   'suite.org.rename.nameLabel': 'New name',
   'suite.org.rename.submitting': 'Renaming…',
   'suite.org.disable.action': 'Disable',
+  'suite.org.disable.confirm': 'Disable this organization?',
   'suite.org.members': 'Members',
   'suite.org.error.slugConflict': 'An organization with this slug already exists.',
   'suite.org.error.validation': 'Check the organization name and slug.',

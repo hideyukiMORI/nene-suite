@@ -78,8 +78,8 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
       <h3 className={styles['stepTitle']}>
         {t('suite.install.database.title')}{' '}
         <InfoHint
-          text="provision（新規作成）は Suite が新しいデータベースを作る方式です。adopt（既存採用）は、すでにあるデータベースをそのまま登録して使い、Suite は中身を作りも変えもしません。迷ったら provision のままで大丈夫です。"
-          label="データベースの割り当てとは"
+          text={t('suite.install.database.modeHint')}
+          label={t('suite.install.database.modeHintLabel')}
         />
       </h3>
       <p className={styles['stepDesc']}>{t('suite.install.database.description')}</p>
