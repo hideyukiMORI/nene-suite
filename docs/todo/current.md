@@ -24,7 +24,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **85**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **86**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320).
@@ -280,7 +280,10 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   A(#328)/B(#329–#334) に記録。**A（クイックウィン5件）実装**: 免責/review の Markdown `**` 除去・
   DatabaseStep「?」の i18n 化・依存ヒントの向き修正＋friendly name・組織無効化に inline 確認・
   作成/付与 form の `reset()` を onSuccess へ。B（high 構造課題）は順次。
+- **B1（#329）install review の情報欠落を修正**: install-session entity/mapper に `databaseTargets`
+  を通し、ReviewStep を friendly name＋per-app DBターゲット（provision / adopt server·name）＋org 名＋
+  Clear→Invoice 連携の表示に刷新（未使用だった `review.*` キーを配線）。残り B（#330–#334）は順次。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
-- Gate state: PHPUnit **468** / vitest **85**, all green.
+- Gate state: PHPUnit **468** / vitest **86**, all green.
 
 Last updated: 2026-06-27

@@ -99,6 +99,7 @@ export function InstallWizard() {
         {wizard.step === 'review' ? (
           <ReviewStep
             session={wizard.session}
+            apps={wizard.catalogApps}
             isPending={wizard.isMutating}
             onComplete={wizard.complete}
           />

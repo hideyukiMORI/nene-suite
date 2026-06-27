@@ -445,6 +445,75 @@
   color: var(--fg-2);
 }
 
+.reviewRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+
+.reviewRowLabel {
+  color: var(--fg-3);
+}
+
+.reviewRowValue {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.reviewSubhead {
+  margin: 16px 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.reviewAppList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.reviewAppRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.reviewAppRow:last-child {
+  border-bottom: none;
+}
+
+.reviewAppName {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.reviewAppDb {
+  font-family: var(--font-num), monospace;
+  font-size: 12px;
+  color: var(--fg-2);
+  text-align: right;
+}
+
+.reviewIntegration {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
 .summaryBox {
   border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border));
   border-radius: var(--r);

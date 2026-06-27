@@ -1,4 +1,4 @@
-export type { InstallSession, InstallSessionStatus } from './model'
+export type { DatabaseTarget, InstallSession, InstallSessionStatus } from './model'
 export { useInstallSession } from './queries'
 export {
   useStartInstallSession,
