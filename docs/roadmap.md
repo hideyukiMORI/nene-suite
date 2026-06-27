@@ -39,7 +39,10 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Docker Compose orchestrator ✅ (multi-stage image incl. SPA; entrypoint
   auto-migrates — ADR 0014)
 - Select Invoice + Clear; provision DBs + env + service token ✅
-- Apex shell (login + app links + install wizard + audit viewer) ✅
+- Apex shell — **responsive left-sidebar** nav (full / icon-rail / off-canvas drawer) with login +
+  app links + install wizard + an **audit viewer (before/after diff detail + evidence CSV)** ✅
+- **In-app help** — glossary, per-screen guides, tutorials, and inline annotations for non-technical
+  operators, behind a Help nav entry ✅ (ADR 0024)
 - Staging on ConoHa VPS with automatic deploy from `main` ✅
 - Control DB + provisioning are PostgreSQL-capable as well as MySQL ✅ (ADR 0016)
 - ⏳ **App database topology** — generalize the implicit single model (same server, suite
@@ -91,6 +94,10 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   **accepted** as **ADR 0020** (extends ADR 0012; no cross-DB writes; NENE2 gets a generic
   framework feature, never Suite-named). A B2 follow-on (depends on B1 keys + B2 org resolution
   + the ADR 0012 §5 roster-pull surface).
+- ⏳ **MFA / step-up** — generic TOTP primitive in NENE2 (no new auth repo; NENE2#1427), enforced at
+  the Suite IdP when federated (the assertion carries a step-up claim) and available to standalone
+  siblings; **decoupled** from the federation roadmap. Contract **accepted** as **ADR 0025** (extends
+  ADR 0012). NeNe Clear's MFA question (#341 / nene-clear#195) is answered.
 - ⏳ Upgrade **orchestration** — dependency-ordered "update all", **deployment-driven** (Tier B:
   Suite recreates each sibling container at the new image in dependency order with min-version
   gating; the sibling migrates on boot — its own Tier A). **Suite drives deployment; the apply stays
@@ -119,4 +126,4 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Shared application database **across products** (each app keeps its own DB;
   hosted multi-tenancy is per-app `organization_id` scoping, not a shared app DB)
 
-Last updated: 2026-06-27
+Last updated: 2026-06-28

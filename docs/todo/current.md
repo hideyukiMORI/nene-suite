@@ -1,6 +1,6 @@
 # Current TODO
 
-**Status (2026-06-27).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
+**Status (2026-06-28).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
 (A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅ ·
 **Origin consumption client** (O0–O5b, epic #230) ✅. Control DB + provisioning are
 PostgreSQL-capable (ADR 0016); the Origin consumption contract (ADR 0017) is now
@@ -25,7 +25,12 @@ and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); t
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
 vitest **98**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
-re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
+re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
+layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
+CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
+step-up** decision (**ADR 0025** — generic TOTP in NENE2). **Near-term TODO: finish the persona-eval B
+group** (#332 a11y · #330 help-i18n · #333 org-reversibility · #334 locale), then B2 / O6 (#251).
+Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
 [`../handover/2026-06-28-ux-audit-shell-and-mfa-direction.md`](../handover/2026-06-28-ux-audit-shell-and-mfa-direction.md).
