@@ -24,7 +24,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **94**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **96**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320).
@@ -289,7 +289,11 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   再帰 diff エンジン（pure・単体テスト）、行クリック→詳細ドロワー（メタ2列＋metadata＋unified/split 差分・
   色非依存の符号＋ラベル＋カラーバー・REDACTED チップ・変更のみ/全件トグル）、一覧は種別アイコン＋和文
   グロス＋作成/変更/削除バッジ＋人/マシン actor＋検索/ソース/種類フィルタ。read-only・light/dark・en+ja。
+- **監査 CSV に before/after 同梱（#339）**: 税理士ペルソナ指摘（CSV が証跡にならない）に対応。
+  `buildAuditCsv` を time/change/action/entity/actor/source/**before/after/metadata**/request_id/
+  org_external_id/suite_id の証跡 CSV へ拡張（JSON は escapeCell で安全格納）。export が「ロード済み/
+  フィルタ後」のみな点は別件（全件 export は後続）。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
-- Gate state: PHPUnit **468** / vitest **94**, all green.
+- Gate state: PHPUnit **468** / vitest **96**, all green.
 
 Last updated: 2026-06-27

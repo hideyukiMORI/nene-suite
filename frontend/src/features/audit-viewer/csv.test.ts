@@ -24,18 +24,34 @@ function event(overrides: Partial<SuiteAuditEvent>): SuiteAuditEvent {
 }
 
 describe('buildAuditCsv', () => {
-  it('builds a header row and one row per event', () => {
+  it('emits the audit-evidence header with before/after/metadata columns', () => {
     const csv = buildAuditCsv([event({})])
-    const lines = csv.split('\n')
-    expect(lines[0]).toBe('time,actor,action,entity_type,entity_id')
-    expect(lines[1]).toBe(
-      '2026-01-01T00:00:00Z,op@example.com,organization.created,organization,org-1',
+    expect(csv.split('\n')[0]).toBe(
+      'time,change,action,entity_type,entity_id,actor,source,before,after,metadata,request_id,org_external_id,suite_id',
     )
   })
 
-  it('falls back to source when actorLabel is null and escapes commas', () => {
-    const csv = buildAuditCsv([event({ actorLabel: null, action: 'a,b' })])
-    expect(csv).toContain(',apex_ui,')
+  it('carries the before/after snapshots as JSON', () => {
+    const csv = buildAuditCsv([
+      event({
+        action: 'membership.role_changed',
+        before: { role: 'member' },
+        after: { role: 'admin' },
+      }),
+    ])
+    expect(csv).toContain('"{""role"":""member""}"')
+    expect(csv).toContain('"{""role"":""admin""}"')
+  })
+
+  it('derives the change kind and falls back to source for a null actor', () => {
+    const csv = buildAuditCsv([event({ actorLabel: null, before: null, after: { x: 1 } })])
+    const row = csv.split('\n')[1] ?? ''
+    expect(row).toContain(',create,')
+    expect(row).toContain(',apex_ui,')
+  })
+
+  it('escapes commas and quotes in values', () => {
+    const csv = buildAuditCsv([event({ action: 'a,b' })])
     expect(csv).toContain('"a,b"')
   })
 })
