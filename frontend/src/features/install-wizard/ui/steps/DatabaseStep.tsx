@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { DatabaseTargetInput } from '@/entities/install-session'
 import { useTranslation } from '@/shared/i18n'
-import { Icon } from '@/shared/ui'
+import { Icon, InfoHint } from '@/shared/ui'
 import styles from '../install-wizard.module.css'
 
 interface DatabaseStepApp {
@@ -75,7 +75,13 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
 
   return (
     <div>
-      <h3 className={styles['stepTitle']}>{t('suite.install.database.title')}</h3>
+      <h3 className={styles['stepTitle']}>
+        {t('suite.install.database.title')}{' '}
+        <InfoHint
+          text="provision（新規作成）は Suite が新しいデータベースを作る方式です。adopt（既存採用）は、すでにあるデータベースをそのまま登録して使い、Suite は中身を作りも変えもしません。迷ったら provision のままで大丈夫です。"
+          label="データベースの割り当てとは"
+        />
+      </h3>
       <p className={styles['stepDesc']}>{t('suite.install.database.description')}</p>
 
       {apps.length === 0 ? (

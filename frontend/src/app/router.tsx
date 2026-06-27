@@ -5,6 +5,9 @@ import { AuditEventsPage } from '@/pages/admin/audit-events/AuditEventsPage'
 import { MembershipsPage } from '@/pages/admin/organizations/MembershipsPage'
 import { OrganizationsPage } from '@/pages/admin/organizations/OrganizationsPage'
 import { CatalogPage } from '@/pages/catalog/CatalogPage'
+import { HelpGlossaryPage } from '@/pages/help/HelpGlossaryPage'
+import { HelpGuidePage } from '@/pages/help/HelpGuidePage'
+import { HelpHomePage } from '@/pages/help/HelpHomePage'
 import { HomePage } from '@/pages/home/HomePage'
 import { InstallPage } from '@/pages/install/InstallPage'
 import { LoginPage } from '@/pages/login/LoginPage'
@@ -28,6 +31,9 @@ const router = createBrowserRouter([
           { path: '/account', element: <AccountPage /> },
           { path: '/settings', element: <SettingsPage /> },
           { path: '/admin/audit-events', element: <AuditEventsPage /> },
+          { path: '/help', element: <HelpHomePage /> },
+          { path: '/help/glossary', element: <HelpGlossaryPage /> },
+          { path: '/help/:slug', element: <HelpGuidePage /> },
           {
             element: <RequireSuperadmin />,
             children: [

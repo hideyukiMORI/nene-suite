@@ -333,4 +333,16 @@ export const ja: Partial<MessageCatalog> = {
   'suite.member.error.invariant': '組織には少なくとも 1 人の管理者が必要です。',
   'suite.member.error.validation': 'オペレーターとロールを確認してください。',
   'suite.member.error.notFound': 'そのメンバーシップは既に存在しません。',
+
+  // ── ヘルプ ────────────────────────────────────────────────────────────────
+  'suite.nav.help': 'ヘルプ',
+  'suite.help.pageLink': 'このページの使い方',
+  'suite.help.title': 'ヘルプ・使い方',
+  'suite.help.subtitle': 'NeNe Suite の使い方を、順番にやさしく説明します。',
+  'suite.help.searchPlaceholder': 'ヘルプ・用語を検索…',
+  'suite.help.tasksTitle': 'やりたいことから探す',
+  'suite.help.glossaryCta': '用語集を開く',
+  'suite.help.resultsTitle': '検索結果',
+  'suite.help.noResults': '見つかりませんでした。別の言葉でお試しください。',
+  'suite.help.infoHint': '説明を表示',
 }
