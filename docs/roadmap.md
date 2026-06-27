@@ -31,6 +31,8 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Governance docs, ADR 0001–0005, catalog stub ✅
 - Orchestration compliance (士業 review pattern) ✅ Issue #8
 - 税理士 / 公認会計士 + 弁護士 sign-off on binding docs ✅ (2026-05-31)
+- Repository is **public**; professional (士業) review is **advisory** — consolidated before a public
+  release, not a per-change gate (ADR 0003 / 0005, amended 2026-06-27) ✅
 
 ## Phase 1: Tier B Installer MVP ✅
 
@@ -117,4 +119,4 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Shared application database **across products** (each app keeps its own DB;
   hosted multi-tenancy is per-app `organization_id` scoping, not a shared app DB)
 
-Last updated: 2026-06-26
+Last updated: 2026-06-27

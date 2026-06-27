@@ -56,9 +56,12 @@ install wizard + audit viewer) with the Phase 1 OpenAPI operations; organization
 roles + superadmin console; ES256 federation assertions + JWKS (edition-gated); and a profiled-TUF
 Origin update / announcement / house-ad client. The **O6 upgrade-orchestration prerequisites** have
 landed — installed-version tracking (via the sibling `/machine/health`), catalog version mirror, and
-the upgrade contract (ADR 0013 + ADR 0019, deployment-driven). CI and automatic staging deployment to
-ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0019**, and
-professional sign-offs are on record.
+the upgrade contract (ADR 0013 + ADR 0019, deployment-driven). **Per-app database topology** and
+**onboarding modes** (ADR 0021 / ADR 0022 — mode A suite-driven adopt shipped) plus **post-install
+database re-adoption** (ADR 0023, accepted) extend the installer. CI and automatic staging deployment
+to ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0023**, and the
+2026-05-31 professional sign-offs are on record. The repository is **public**; professional (legal /
+tax) review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003).
 
 ## License
 

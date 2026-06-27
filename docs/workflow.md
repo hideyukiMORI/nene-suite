@@ -69,6 +69,25 @@ Do not leave important decisions only in chat. If it changes how the project sho
 
 Use ADRs for decisions that affect architecture, installer contracts, dependency choices, or long-term maintenance. See `docs/development/adr.md`.
 
+## Daily reports and documentation freshness
+
+**Binding.** A daily report (`docs/daily-reports/YYYY-MM-DD.md`) is **not complete** until the same
+change **raises the freshness of the living status docs** to match the state the report describes.
+This is mandatory, not optional.
+
+When you write or update a daily report you **MUST**:
+
+1. Update `docs/todo/current.md` — status line/date, gate counts (PHPUnit / vitest), and a dated
+   entry for what shipped.
+2. Reconcile `README.md` "Repository status", `docs/roadmap.md`, and the relevant
+   `docs/milestones/` file with reality — ADR ranges and status, phase / ✅ markers, dates.
+3. Fix any doc whose stated **status, date, gate counts, or ADR status** no longer matches `main`.
+4. Bump `Last updated:` **only on docs you actually changed** — never date-stamp an unchanged doc
+   (freshness means accuracy, not cosmetic dates).
+
+A daily report that leaves stale status docs behind is an **incomplete change**. If a given doc needed
+no edit, say so in the PR rather than silently skipping the freshness check.
+
 ## AI Agent Responsibilities
 
 AI agents should manage the normal lifecycle when asked to complete work:
