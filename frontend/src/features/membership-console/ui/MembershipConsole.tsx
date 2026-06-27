@@ -6,7 +6,7 @@ import type {
   OrganizationMember,
 } from '@/entities/membership'
 import { useTranslation } from '@/shared/i18n'
-import { ErrorState, Icon, LoadingState, PlaceholderState } from '@/shared/ui'
+import { ErrorState, Icon, InfoHint, LoadingState, PlaceholderState } from '@/shared/ui'
 import { useMembershipConsole, type GrantMemberFields } from '../hooks/use-membership-console'
 import styles from './membership-console.module.css'
 
@@ -34,6 +34,8 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
     isChanging,
     isRevoking,
     grantErrorKey,
+    changeErrorKey,
+    revokeErrorKey,
   } = useMembershipConsole(organizationId)
 
   const { register, handleSubmit, reset } = useForm<GrantMemberFields>({
@@ -47,6 +49,9 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
 
   if (isLoading) return <LoadingState label={t('common.state.loading')} />
   if (isError) return <ErrorState label={t('common.state.error')} />
+
+  const adminCount = members.filter((member) => member.role === 'admin').length
+  const memberActionErrorKey = changeErrorKey ?? revokeErrorKey
 
   return (
     <div className={styles['stack']}>
@@ -125,6 +130,14 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
         ) : null}
       </section>
 
+      {/* Member action errors (role change / revoke) */}
+      {memberActionErrorKey !== null ? (
+        <p className={styles['errorText']} role="alert">
+          <Icon name="error" size={17} fill />
+          {t(memberActionErrorKey)}
+        </p>
+      ) : null}
+
       {/* Members list */}
       {members.length === 0 ? (
         <PlaceholderState icon="group" title={t('suite.member.empty')} />
@@ -143,6 +156,7 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
               onRevoke={revokeMember}
               isChanging={isChanging}
               isRevoking={isRevoking}
+              isLastAdmin={member.role === 'admin' && adminCount <= 1}
             />
           ))}
         </div>
@@ -157,9 +171,17 @@ interface MemberRowProps {
   onRevoke: (membershipId: string) => void
   isChanging: boolean
   isRevoking: boolean
+  isLastAdmin: boolean
 }
 
-function MemberRow({ member, onChangeRole, onRevoke, isChanging, isRevoking }: MemberRowProps) {
+function MemberRow({
+  member,
+  onChangeRole,
+  onRevoke,
+  isChanging,
+  isRevoking,
+  isLastAdmin,
+}: MemberRowProps) {
   const { t } = useTranslation()
   const [confirming, setConfirming] = useState(false)
 
@@ -185,27 +207,35 @@ function MemberRow({ member, onChangeRole, onRevoke, isChanging, isRevoking }: M
       </div>
 
       {/* role select */}
-      <span className={styles['roleWrap']}>
-        <select
-          className={styles['roleSelect']}
-          aria-label={t('suite.member.column.role')}
-          value={member.role}
-          disabled={isChanging}
-          onChange={(event) => {
-            const role = ROLES.find((candidate) => candidate === event.target.value)
-            if (role !== undefined) {
-              onChangeRole({ membershipId: member.membershipId, role })
-            }
-          }}
-        >
-          {ROLES.map((role) => (
-            <option key={role} value={role}>
-              {t(`suite.member.role.${role}`)}
-            </option>
-          ))}
-        </select>
-        <Icon name="expand_more" size={17} className={styles['roleChevron']} />
-      </span>
+      <div className={styles['roleCell']}>
+        <span className={styles['roleWrap']}>
+          <select
+            className={styles['roleSelect']}
+            aria-label={t('suite.member.column.role')}
+            value={member.role}
+            disabled={isChanging}
+            onChange={(event) => {
+              const role = ROLES.find((candidate) => candidate === event.target.value)
+              if (role !== undefined) {
+                onChangeRole({ membershipId: member.membershipId, role })
+              }
+            }}
+          >
+            {ROLES.map((role) => (
+              <option key={role} value={role} disabled={isLastAdmin && role !== 'admin'}>
+                {t(`suite.member.role.${role}`)}
+              </option>
+            ))}
+          </select>
+          <Icon name="expand_more" size={17} className={styles['roleChevron']} />
+        </span>
+        {isLastAdmin ? (
+          <InfoHint
+            text={t('suite.member.lastAdmin.hint')}
+            label={t('suite.member.lastAdmin.label')}
+          />
+        ) : null}
+      </div>
 
       {/* revoke with inline confirm */}
       <div className={styles['rowActions']}>
@@ -236,6 +266,7 @@ function MemberRow({ member, onChangeRole, onRevoke, isChanging, isRevoking }: M
           <button
             type="button"
             className={styles['revokeBtn']}
+            disabled={isLastAdmin}
             onClick={() => {
               setConfirming(true)
             }}

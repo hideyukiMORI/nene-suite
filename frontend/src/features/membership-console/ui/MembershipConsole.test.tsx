@@ -61,4 +61,67 @@ describe('MembershipConsole', () => {
     const cell = await screen.findByText(/Removed operator/)
     expect(cell).toHaveTextContent(staleOperatorId)
   })
+
+  it('protects the last admin: disables demote options and revoke, and shows a hint', async () => {
+    // The default handler returns a single admin — i.e. the org's last admin.
+    renderWithProviders(<MembershipConsole organizationId={ORG_ID} />)
+    await screen.findByText('operator@example.com')
+
+    expect(screen.getByRole('button', { name: "Why can't I change this?" })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled()
+
+    const memberOptions = screen.getAllByRole('option', { name: 'Member' })
+    expect(memberOptions.some((option) => option.hasAttribute('disabled'))).toBe(true)
+  })
+
+  it('surfaces the 409 invariant message when a demote is rejected by the server', async () => {
+    const user = userEvent.setup()
+    mswServer.use(
+      http.get('/api/v1/organizations/:id/memberships', () =>
+        HttpResponse.json({
+          members: [
+            {
+              membershipId: '01J8XRADMIN10000000000000A',
+              operatorId: '01J8XROP1000000000000000AA',
+              email: 'admin-a@example.com',
+              displayName: null,
+              role: 'admin',
+            },
+            {
+              membershipId: '01J8XRADMIN20000000000000B',
+              operatorId: '01J8XROP2000000000000000BB',
+              email: 'admin-b@example.com',
+              displayName: null,
+              role: 'admin',
+            },
+          ],
+        }),
+      ),
+      http.patch('/api/v1/memberships/:id', () =>
+        HttpResponse.json(
+          {
+            type: 'https://nene-suite.dev/problems/membership-invariant',
+            title: 'Membership invariant violated',
+            status: 409,
+            detail: 'Organization must retain at least one admin.',
+          },
+          { status: 409 },
+        ),
+      ),
+    )
+
+    renderWithProviders(<MembershipConsole organizationId={ORG_ID} />)
+    await screen.findByText('admin-a@example.com')
+
+    // With two admins a demote is allowed by the UI; the server still rejects it.
+    const adminSelect = screen
+      .getAllByRole('combobox')
+      .find((element) => element instanceof HTMLSelectElement && element.value === 'admin')
+    if (!(adminSelect instanceof HTMLSelectElement)) {
+      throw new Error('expected an admin role select')
+    }
+    await user.selectOptions(adminSelect, 'Member')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('at least one admin')
+  })
 })

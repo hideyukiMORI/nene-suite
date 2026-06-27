@@ -239,6 +239,12 @@
 }
 
 /* role select (tidy, pill) */
+.roleCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .roleWrap {
   position: relative;
   max-width: 140px;
@@ -296,7 +302,12 @@
   cursor: pointer;
 }
 
-.revokeBtn:hover {
+.revokeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.revokeBtn:not(:disabled):hover {
   color: var(--danger);
   border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
   background: color-mix(in srgb, var(--danger) 7%, var(--surface));

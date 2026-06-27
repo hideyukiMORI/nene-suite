@@ -27,6 +27,8 @@ export interface UseMembershipConsoleResult {
   isChanging: boolean
   isRevoking: boolean
   grantErrorKey: MessageKey | null
+  changeErrorKey: MessageKey | null
+  revokeErrorKey: MessageKey | null
 }
 
 /** Glue between the membership entity hooks and the console UI (no JSX). */
@@ -55,5 +57,7 @@ export function useMembershipConsole(organizationId: string): UseMembershipConso
     isChanging: change.isPending,
     isRevoking: revoke.isPending,
     grantErrorKey: grant.error !== null ? mapProblemDetailsToMessageKey(grant.error) : null,
+    changeErrorKey: change.error !== null ? mapProblemDetailsToMessageKey(change.error) : null,
+    revokeErrorKey: revoke.error !== null ? mapProblemDetailsToMessageKey(revoke.error) : null,
   }
 }
