@@ -28,11 +28,12 @@ See also: [`product-vision.md`](./product-vision.md),
 
 ## 2. Orchestration compliance (binding)
 
-> **Non-negotiable.** Governed by
+> **Non-negotiable engineering rules.** Governed by
 > [`orchestration-compliance.md`](./orchestration-compliance.md). A 税理士 /
 > 公認会計士 / 弁護士 reviewing the **suite boundary** must find zero deviations
 > from SSOT, DB separation, and federation rules. Any departure requires an ADR
-> with professional sign-off.
+> recording the decision; professional sign-off is advisory and consolidated into
+> the recommended pre-release review (orchestration-compliance §9).
 
 Key MUST items for professionals:
 
@@ -61,14 +62,16 @@ Each entry declares `requires`, `provides`, and database env prefix.
 
 ---
 
-## 5. Professional review gates
+## 5. Professional review (advisory)
 
-Before external operator release:
+Recommended (not a binding gate; amended 2026-06-27) — consolidated into a single pass
+before a public product release rather than per change:
 
-- Orchestration compliance sign-off (税理士 / 公認会計士) — SSOT + DB + federation
-- Legal sign-off (弁護士) — disclaimer and installer copy
+- Orchestration compliance review (税理士 / 公認会計士) — SSOT + DB + federation
+- Legal review (弁護士) — disclaimer and installer copy
 - Template: [`professional-sign-off-record.md`](./professional-sign-off-record.md)
 
-Public repo release additionally requires ADR 0003 professional review gate.
+The 2026-05-31 sign-offs are on record (orchestration-compliance §9 / ADR 0003 /
+ADR 0005). The repository is public; there is no separate private→public gate.
 
-Last updated: 2026-05-29
+Last updated: 2026-06-27

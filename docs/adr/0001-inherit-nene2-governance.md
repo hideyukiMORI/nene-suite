@@ -6,7 +6,7 @@ accepted
 
 ## Context
 
-NeNe Suite is a private meta repository that orchestrates multiple NENE2-based
+NeNe Suite is a public meta repository that orchestrates multiple NENE2-based
 sibling products. Operators and AI agents already follow Issue-driven workflow,
 Conventional Commits, ADRs, and PR merge policy across the portfolio.
 

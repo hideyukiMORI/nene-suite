@@ -6,7 +6,7 @@ Goal: establish NeNe Suite engineering discipline and **binding scope** before i
 
 ## Acceptance Criteria
 
-- [x] GitHub repository created (`hideyukiMORI/nene-suite`, private)
+- [x] GitHub repository created (`hideyukiMORI/nene-suite`, public)
 - [x] Scope contract (GOAL / DO / DON'T) — binding
 - [x] ADR 0001 (governance inheritance), ADR 0002 (orchestrator boundary)
 - [x] Workflow, CONTRIBUTING, commit conventions aligned with portfolio

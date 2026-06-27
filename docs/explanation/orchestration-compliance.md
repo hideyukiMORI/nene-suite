@@ -30,8 +30,9 @@ See also: [`scope-contract.md`](./scope-contract.md), [`terminology.md`](./termi
    with a sibling SSOT rule (Invoice figures, Clear evidence custody, Vault
    retention), **the sibling rule wins** — suite must not blur it.
 2. **No silent deviation.** Any departure from this document requires an **ADR**
-   and **explicit professional sign-off** recorded in that ADR (see §9). Code
-   may not merge a deviation without it.
+   recording the decision (see §9). **Professional sign-off is advisory** — it is
+   consolidated into the recommended pre-release review (§9), not required per change
+   to merge (amended 2026-06-27). The engineering MUST rules in §2–§7 remain binding.
 3. **Engineering is not the legal authority.** When a requirement touches tax,
    accounting, privacy, or collection law, **stop and consult 士業** — do not
    guess. Record the resolved interpretation here or in the relevant sibling doc.
@@ -199,28 +200,37 @@ Copy templates: [`installer-disclaimer-copy.md`](./installer-disclaimer-copy.md)
 | **Operator / 事業者** | Business use, configuration inside each app, backups, access control, engaging 士業 |
 | **NeNe Suite (software)** | Documented install steps, env contract, SSOT preservation per this doc |
 | **Sibling product (software)** | Domain rules per that product's compliance docs (e.g. Invoice `accounting-compliance.md`) |
-| **税理士 / 公認会計士** | Tax and accounting interpretation, sign-off on binding docs and material ADRs |
+| **税理士 / 公認会計士** | Tax and accounting interpretation; advisory review of binding docs and material ADRs (consolidated pre-release) |
 | **弁護士** | Privacy, terms, collection law, disclaimer and liability wording |
 | **Suite authors** | Engineering accuracy only — not professional advisory duty |
 
 ---
 
-## 9. Professional sign-off and change control
+## 9. Professional review and change control
 
-### Before installer MVP ships to external operators
+> **Amended 2026-06-27 (owner decision).** Professional review is **advisory**, not a
+> per-change binding gate. It is **consolidated into a single recommended pass before a
+> public product release** (and before materially expanding scope — e.g. hosted SaaS that
+> custodies third-party data, [ADR 0015](../adr/0015-suite-hosted-multi-tenant-mode.md)).
+> Per-change tax/legal sign-off is no longer required to merge. The engineering MUST
+> rules in §2–§7 remain binding regardless of review timing.
+
+### Completed reviews (on record)
 
 | Review | Reviewer | Status | Record |
 | --- | --- | --- | --- |
 | SSOT matrix (§2), DB separation (§3), federation (§4) | **公認会計士・税理士** | ✅ 2026-05-31 | [`sign-off-tax-accounting-2026-05-31.md`](./sign-off-tax-accounting-2026-05-31.md) |
 | Disclaimer + installer copy | **弁護士** (Japan law) | ✅ 2026-05-31 | [`sign-off-legal-2026-05-31.md`](./sign-off-legal-2026-05-31.md) |
 
-**Both sign-offs on record — Phase 1 installer cleared for external operator release.**
+These are the last completed reviews; refresh them in the consolidated pre-release pass.
 
 ### On every change touching install flow, catalog, env contract, or SSOT docs
 
 1. Review against this document and [`../review/compliance.md`](../review/compliance.md).
 2. State compliance impact in the PR.
-3. If deviating from any rule, carry an ADR with professional sign-off (§0.2).
+3. If deviating from any rule, carry an **ADR** recording the decision (§0.2).
+   Professional sign-off for the deviation is advisory and folded into the
+   pre-release review — it does **not** block the merge.
 
 If unsure whether a change has compliance impact, **assume it does**.
 
@@ -239,4 +249,4 @@ Installing via suite **does not** reduce the review effort inside each installed
 
 ---
 
-Last updated: 2026-05-29
+Last updated: 2026-06-27

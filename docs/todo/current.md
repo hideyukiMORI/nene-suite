@@ -131,7 +131,7 @@ Remaining (B2–B6 — see milestone §3):
 
 ## Handoff
 
-Private meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
+Public meta repo. Compliance model mirrors nene-invoice `accounting-compliance.md`.
 Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
 ### VPS staging status — 2026-06-20

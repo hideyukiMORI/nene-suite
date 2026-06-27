@@ -1,7 +1,7 @@
 # NeNe Suite
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![Private](https://img.shields.io/badge/status-private-lightgrey)]()
+[![Public](https://img.shields.io/badge/status-public-brightgreen)]()
 
 **Installer and orchestrator for multi-app NeNe deployments.**
 

@@ -2,7 +2,9 @@
 
 ## Status
 
-accepted
+accepted (amended 2026-06-27 — professional review downgraded from a binding gate to
+**advisory**, consolidated before a public product release; see "Professional review
+(advisory)" below. The MIT "AS IS" / no-warranty posture is unchanged.)
 
 ## Context
 
@@ -62,34 +64,34 @@ changes should be reviewed by qualified counsel when the product ships publicly.
 - Implement disclaimer checkbox in Tier B / Tier A installer (Issue TBD).
 - Cross-link from sibling product suite-integration docs when `NENE_SUITE_MODE` lands.
 
-## Professional review gate (before public release)
+## Professional review (advisory)
 
-Until this gate is satisfied, treat `disclaimer.md` and installer copy as an
-**engineering draft** — sufficient for private development, **not** a substitute
-for qualified review before external operators rely on it.
+> **Amended 2026-06-27 (owner decision).** Professional review is **advisory, not a
+> binding merge gate.** Requiring per-change tax/legal sign-off during development stalls
+> iteration, so review is **consolidated into a single recommended pass before a public
+> product release** (and before materially expanding scope — e.g. hosted SaaS that
+> custodies third-party data; see [ADR 0015](0015-suite-hosted-multi-tenant-mode.md)).
+> This replaces the former binding "review gate" and its private→public trigger — the
+> repository has always been public. The 2026-05-31 sign-offs remain on record as the
+> last completed review. The **MIT "AS IS" / no-warranty** posture in `disclaimer.md`
+> is **not** changed by this amendment; only the *review process* moves to advisory.
 
-**Trigger** — the gate is **required** before any of:
+Treat `disclaimer.md` and installer copy as **engineering's best-effort posture**,
+reviewed by qualified counsel on a **recommended, consolidated** basis — not as a
+precondition for each PR.
 
-- changing this repository from private to **public**;
-- publishing suite installer ZIPs or containers to unauthenticated download endpoints;
-- marketing NeNe Suite to paying customers or hosted SaaS operators;
-- materially weakening disclaimer language without replacement counsel review.
-
-**Minimum checklist**
+**Recommended (not required) before a public product release or marketing push:**
 
 | Step | Owner | Record |
 | --- | --- | --- |
 | Legal review of `disclaimer.md`, `DISCLAIMER.md`, and planned installer / Terms copy | Qualified **lawyer** (日本法に精通) | Date + summary in milestone or ADR amendment PR |
-| Optional: tax/accounting overclaim review if docs reference インボイス / 電帳法 / SMB back-office workflows | **税理士** or **公認会計士** | Date + "no overclaim" or required doc edits |
+| Tax/accounting overclaim review if docs reference インボイス / 電帳法 / SMB back-office workflows | **税理士** or **公認会計士** | Date + "no overclaim" or required doc edits |
 | Engineering sign-off that UI surfaces disclaimer before install completes | Maintainer | Linked Issue / PR |
 
-**Out of scope for the gate**
+**Out of scope**
 
 - Proving that installed sibling apps meet law — that remains each product's docs + operator + professionals.
 - Replacing operator duty to obtain ongoing advice.
-
-Updating this gate or disclaimer after public release requires the same review
-class as the triggering event (legal review at minimum).
 
 ## Related
 
