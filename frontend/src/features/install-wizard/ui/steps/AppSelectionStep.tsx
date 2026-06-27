@@ -41,7 +41,11 @@ export function AppSelectionStep({ apps, isPending, onSubmit }: AppSelectionStep
               <span className={styles['appName']}>{app.name}</span>
               {app.requires.length > 0 ? (
                 <span className={styles['requiresHint']}>
-                  {t('suite.install.apps.requiredBy', { appName: app.requires.join(', ') })}
+                  {t('suite.install.apps.requires', {
+                    appName: app.requires
+                      .map((id) => apps.find((candidate) => candidate.id === id)?.name ?? id)
+                      .join('、'),
+                  })}
                 </span>
               ) : null}
             </label>

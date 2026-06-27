@@ -43,8 +43,11 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
   })
 
   const submitGrant = (fields: GrantMemberFields): void => {
-    grantMember(fields)
-    reset()
+    grantMember(fields, {
+      onSuccess: () => {
+        reset()
+      },
+    })
   }
 
   if (isLoading) return <LoadingState label={t('common.state.loading')} />

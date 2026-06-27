@@ -17,7 +17,10 @@ export interface UseOrganizationConsoleResult {
   organizations: Organization[]
   isLoading: boolean
   isError: boolean
-  createOrganization: (fields: CreateOrganizationFields) => void
+  createOrganization: (
+    fields: CreateOrganizationFields,
+    options?: { onSuccess?: () => void },
+  ) => void
   renameOrganization: (input: RenameOrganizationInput) => void
   disableOrganization: (id: string) => void
   isCreating: boolean
@@ -37,8 +40,8 @@ export function useOrganizationConsole(): UseOrganizationConsoleResult {
     organizations: query.data ?? [],
     isLoading: query.isLoading,
     isError: query.isError,
-    createOrganization: (fields) => {
-      create.mutate(fields)
+    createOrganization: (fields, options) => {
+      create.mutate(fields, options)
     },
     renameOrganization: (input) => {
       rename.mutate(input)

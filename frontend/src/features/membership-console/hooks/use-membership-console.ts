@@ -20,7 +20,7 @@ export interface UseMembershipConsoleResult {
   operators: Operator[]
   isLoading: boolean
   isError: boolean
-  grantMember: (fields: GrantMemberFields) => void
+  grantMember: (fields: GrantMemberFields, options?: { onSuccess?: () => void }) => void
   changeRole: (input: ChangeMembershipRoleInput) => void
   revokeMember: (membershipId: string) => void
   isGranting: boolean
@@ -44,8 +44,8 @@ export function useMembershipConsole(organizationId: string): UseMembershipConso
     operators: operatorsQuery.data ?? [],
     isLoading: query.isLoading || operatorsQuery.isLoading,
     isError: query.isError || operatorsQuery.isError,
-    grantMember: (fields) => {
-      grant.mutate(fields)
+    grantMember: (fields, options) => {
+      grant.mutate(fields, options)
     },
     changeRole: (input) => {
       change.mutate(input)

@@ -124,4 +124,17 @@ describe('MembershipConsole', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('at least one admin')
   })
+
+  it('keeps the grant form input after a conflict so the user can retry', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<MembershipConsole organizationId={ORG_ID} />)
+    await screen.findByText('operator@example.com')
+
+    const picker = await screen.findByLabelText('Operator')
+    await user.selectOptions(picker, CONFLICT_OPERATOR)
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('already a member')
+    expect(picker).toHaveValue(CONFLICT_OPERATOR)
+  })
 })

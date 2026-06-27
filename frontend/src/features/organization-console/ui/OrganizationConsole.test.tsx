@@ -23,4 +23,19 @@ describe('OrganizationConsole', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('already exists')
   })
+
+  it('requires confirmation before disabling an organization (no longer one click)', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<OrganizationConsole />)
+    await screen.findByText('Acme KK')
+
+    await user.click(screen.getByRole('button', { name: 'Actions' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Disable' }))
+
+    // a confirmation step appears instead of disabling immediately
+    expect(screen.getByText('Disable this organization?')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByText('Disable this organization?')).not.toBeInTheDocument()
+  })
 })
