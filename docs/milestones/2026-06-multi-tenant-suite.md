@@ -248,4 +248,5 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   (A4 + A4.5 + A5) **must** land before **A6 / M4** (JWT carries `org_external_id`
   + role; behavior change — review).
 
-Last updated: 2026-06-22 (Phase A complete; §7 polish done; **B1 complete** — IdP key plane shipped; next B2 cross-repo)
+Last updated: 2026-06-22 (Phase A complete; §7 polish done; **B1 complete** — IdP key plane shipped; next B2 cross-repo).
+Still current as of **2026-06-27** — **B2** remains the next federation step; for everything landed since (Origin client epic #230, ADR 0020–0023, mode A) see [`../todo/current.md`](../todo/current.md).

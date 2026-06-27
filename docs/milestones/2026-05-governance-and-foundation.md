@@ -18,4 +18,4 @@ Goal: establish NeNe Suite engineering discipline and **binding scope** before i
 
 Phase 1 — Docker Compose installer MVP (Invoice + Clear).
 
-Last updated: 2026-05-29
+Last updated: 2026-06-27 (repo visibility corrected to **public** — #320; content otherwise as of 2026-05-29)

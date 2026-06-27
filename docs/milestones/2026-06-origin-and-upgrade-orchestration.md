@@ -75,4 +75,4 @@ ADR 0017 consumer. PRs #232–#250.
 - Handover: [`../handover/2026-06-26-origin-and-o6-prerequisites.md`](../handover/2026-06-26-origin-and-o6-prerequisites.md).
 - Prior milestone: [`2026-06-multi-tenant-suite.md`](./2026-06-multi-tenant-suite.md).
 
-Last updated: 2026-06-26.
+Last updated: 2026-06-26. Still current as of **2026-06-27** — ADR 0019 remains **proposed** (its open questions are the next gate); the O6 deployment-driven orchestrator + apex "update all" UI (epic #251) are the remaining work.

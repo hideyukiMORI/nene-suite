@@ -1,6 +1,6 @@
 # Current TODO
 
-**Status (2026-06-26).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
+**Status (2026-06-27).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
 (A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅ ·
 **Origin consumption client** (O0–O5b, epic #230) ✅. Control DB + provisioning are
 PostgreSQL-capable (ADR 0016); the Origin consumption contract (ADR 0017) is now
@@ -24,7 +24,10 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **72**, all green.
+vitest **72**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
+review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
+amended 2026-06-27, #320).
 
 ---
 
@@ -255,6 +258,13 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   → **A+B 着地**（#1422/#1423）→ as-shipped 契約反映。`recommendation` に `needs_review` 追加・marker 不在は
   fail-closed しない。**C(#1421) は apply と対で defer**（apply は deployment-driven＝boot 再検証、ADR 0019/
   NENE2#1416 整合）。sibling 採用: nene-invoice#497 / nene-clear#183 / nene-records#648。
+- **Governance — public repo ＋ 士業レビュー advisory 化（#319/#320）**: suite が当初から public である
+  事実を反映（private 誤記5箇所訂正）し、士業レビューを binding ゲート → **advisory（public リリース前に
+  まとめて推奨・per-change sign-off 廃止）** へ in-place amend（ADR 0003 / 0005 / orchestration-compliance /
+  requirements / disclaimer）。MIT AS-IS 無保証・§2–§7 工学 MUST ルール・2026-05-31 sign-off 記録は不変。
+- **Docs 鮮度パス＋ルール化（#321）**: README / roadmap / current / milestones を 2026-06-27 状態へ鮮度
+  更新し、**日報作成時にドキュメント鮮度を更新する**ことを `workflow.md` / `AGENTS.md` に binding ルール
+  として明記。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
 - Gate state: PHPUnit **468** / vitest **72**, all green.
 
