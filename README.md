@@ -61,7 +61,7 @@ the upgrade contract (ADR 0013 + ADR 0019, deployment-driven). **Per-app databas
 database re-adoption** (ADR 0023, accepted) extend the installer; an **in-app help system** —
 glossary, per-screen guides, and tutorials for non-technical operators — ships behind a Help nav
 entry (ADR 0024). CI and automatic staging deployment
-to ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0024**, and the
+to ConoHa VPS (`suite-stg.nene-suite.com`) are live. Phase 0 governance, **ADRs 0001–0025**, and the
 2026-05-31 professional sign-offs are on record. The
 repository is **public**; professional (legal /
 tax) review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003).

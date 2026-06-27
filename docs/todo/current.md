@@ -293,6 +293,12 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   `buildAuditCsv` を time/change/action/entity/actor/source/**before/after/metadata**/request_id/
   org_external_id/suite_id の証跡 CSV へ拡張（JSON は escapeCell で安全格納）。export が「ロード済み/
   フィルタ後」のみな点は別件（全件 export は後続）。
+- **MFA/step-up 方針確定（ADR 0025・cross-repo #341）**: NeNe Clear から「MFA をどこに置くか」の相談
+  （#341, Clear#195）。Suite=IdP・standalone 可（ADR 0014）・NENE2 共有層を踏まえ、**両モード対応**で確定:
+  generic TOTP は **NENE2**（新リポ作らず・NENE2#1427 起票）、**federated は Suite IdP が enforce＋assertion に
+  step-up claim**、**standalone は sibling のローカル login が同じ TOTP を使う**。enroll=本人/enforce=管理者
+  ポリシー（アプリ層）、break-glass は MFA 免除＋補償統制（recovery codes 必須・CLI）。**federation 待ちと
+  decouple**（Clear は #195 を今進められる）。ADR 0012 を extend。#341 に Suite 回答を投稿済み。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
 - Gate state: PHPUnit **468** / vitest **96**, all green.
 
