@@ -27,7 +27,8 @@ client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026
 vitest **98**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
-amended 2026-06-27, #320).
+amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
+[`../handover/2026-06-28-ux-audit-shell-and-mfa-direction.md`](../handover/2026-06-28-ux-audit-shell-and-mfa-direction.md).
 
 ---
 
