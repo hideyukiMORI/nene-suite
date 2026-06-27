@@ -361,6 +361,9 @@ export const en = {
   'suite.member.error.invariant': 'The organization must keep at least one admin.',
   'suite.member.error.validation': 'Check the operator and role.',
   'suite.member.error.notFound': 'That membership no longer exists.',
+  'suite.member.lastAdmin.hint':
+    "This is the organization's only admin. Add another admin before you change or remove this one.",
+  'suite.member.lastAdmin.label': "Why can't I change this?",
 
   // ── Help center ──────────────────────────────────────────────────────────
   'suite.nav.help': 'Help',

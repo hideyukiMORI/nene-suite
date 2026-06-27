@@ -24,7 +24,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **81**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **83**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320).
@@ -271,7 +271,11 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   （ヘルプ本文は構造化TS・ADR 0009 への scoped 例外）、ホバー型 tooltip 非依存の a11y 設計。
   `/help`・`/help/glossary`・`/help/:slug` ＋ apex ナビ、install wizard に HelpLink/InfoHint 配線。
   PR1＝基盤＋install wizard（残り画面・英語本文は後続）。
+- **membership console 修正（#325）**: ロール変更/削除の 409（last-admin invariant 等）が画面に
+  出ていなかった問題を修正。hook から `changeErrorKey`/`revokeErrorKey` を公開しコンソールに表示、
+  さらに**最後の admin** は降格オプション/削除を先回りで無効化＋InfoHint で理由提示（バックエンドは
+  正しく据え置き）。en+ja・vitest 追加。
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
-- Gate state: PHPUnit **468** / vitest **81**, all green.
+- Gate state: PHPUnit **468** / vitest **83**, all green.
 
 Last updated: 2026-06-27

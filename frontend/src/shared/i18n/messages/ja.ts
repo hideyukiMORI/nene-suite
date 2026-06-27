@@ -333,6 +333,9 @@ export const ja: Partial<MessageCatalog> = {
   'suite.member.error.invariant': '組織には少なくとも 1 人の管理者が必要です。',
   'suite.member.error.validation': 'オペレーターとロールを確認してください。',
   'suite.member.error.notFound': 'そのメンバーシップは既に存在しません。',
+  'suite.member.lastAdmin.hint':
+    '組織で唯一の管理者です。降格・削除する前に、別の管理者を追加してください。',
+  'suite.member.lastAdmin.label': 'なぜ変更できない？',
 
   // ── ヘルプ ────────────────────────────────────────────────────────────────
   'suite.nav.help': 'ヘルプ',
