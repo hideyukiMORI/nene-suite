@@ -135,8 +135,6 @@ export const ja: Partial<MessageCatalog> = {
   'suite.home.eyebrow': '運用コンソール',
   'suite.home.greeting': 'おかえりなさい、',
   'suite.home.subtitle': 'インストール済みアプリの起動、更新・組織・アクセスの管理。',
-  'suite.home.greetColor': '名前の色',
-  'suite.home.greetColor.custom': 'カスタム',
   'suite.home.appsTitle': '導入済みアプリ',
   'suite.home.open': '開く',
   'suite.home.status.active': '利用中',

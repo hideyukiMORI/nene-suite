@@ -153,8 +153,6 @@ export const en = {
   'suite.home.eyebrow': 'Operations console',
   'suite.home.greeting': 'Welcome back,',
   'suite.home.subtitle': 'Launch installed apps, and manage updates, organizations, and access.',
-  'suite.home.greetColor': 'Name color',
-  'suite.home.greetColor.custom': 'Custom',
   'suite.home.appsTitle': 'Your apps',
   'suite.home.open': 'Open',
   'suite.home.status.active': 'Active',
