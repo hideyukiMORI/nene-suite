@@ -5,17 +5,35 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 import { AuditViewer } from './AuditViewer'
 
 describe('AuditViewer', () => {
-  it('renders audit rows, an export button, and a working kind filter chip', async () => {
-    const user = userEvent.setup()
+  it('renders audit rows and an export button', async () => {
     renderWithProviders(<AuditViewer />)
 
-    expect(await screen.findByText('install_session.completed')).toBeInTheDocument()
-    expect(screen.getByText('disclaimer.accepted')).toBeInTheDocument()
+    expect(await screen.findByText('organization.renamed')).toBeInTheDocument()
+    expect(screen.getByText('membership.granted')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Export CSV/ })).toBeInTheDocument()
+  })
 
-    await user.click(screen.getByRole('button', { name: 'install_session' }))
+  it('filters the list by change type', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<AuditViewer />)
+    await screen.findByText('organization.renamed')
 
-    expect(screen.getByRole('button', { name: /Clear/ })).toBeInTheDocument()
-    expect(screen.getByText('install_session.completed')).toBeInTheDocument()
+    await user.click(screen.getByRole('tab', { name: /Created/ }))
+
+    // create events remain; the update event is filtered out
+    expect(screen.getByText('membership.granted')).toBeInTheDocument()
+    expect(screen.queryByText('organization.renamed')).not.toBeInTheDocument()
+  })
+
+  it('opens the detail drawer with a before/after diff on row click', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<AuditViewer />)
+    await screen.findByText('organization.renamed')
+
+    await user.click(screen.getByRole('button', { name: /organization\.renamed/ }))
+
+    // drawer meta + the changed value rendered in the diff
+    expect(screen.getByText('Suite id')).toBeInTheDocument()
+    expect(screen.getByText('"Acme Corporation KK"')).toBeInTheDocument()
   })
 })

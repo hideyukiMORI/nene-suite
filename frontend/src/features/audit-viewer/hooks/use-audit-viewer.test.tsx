@@ -12,8 +12,8 @@ describe('useAuditViewer', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.events).toHaveLength(2)
-    expect(result.current.events[0]?.action).toBe('install_session.completed')
+    expect(result.current.events).toHaveLength(4)
+    expect(result.current.events[0]?.action).toBe('organization.renamed')
     expect(result.current.hasMore).toBe(true)
 
     act(() => {
@@ -21,9 +21,9 @@ describe('useAuditViewer', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.events).toHaveLength(3)
+      expect(result.current.events).toHaveLength(5)
     })
     expect(result.current.hasMore).toBe(false)
-    expect(result.current.events[2]?.action).toBe('install_session.started')
+    expect(result.current.events[4]?.action).toBe('install_session.started')
   })
 })

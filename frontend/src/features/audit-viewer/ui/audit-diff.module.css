@@ -1,0 +1,174 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 2px 2px;
+}
+
+.containerKey {
+  font-family: var(--font-num), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-2);
+}
+
+.glyph {
+  font-family: var(--font-num), monospace;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.leaf {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 9px 11px;
+}
+
+.leaf[data-status='added'] {
+  border-left-color: var(--ok);
+}
+
+.leaf[data-status='removed'] {
+  border-left-color: var(--danger);
+}
+
+.leaf[data-status='changed'] {
+  border-left-color: var(--warn);
+}
+
+.leafHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.leafKey {
+  font-family: var(--font-num), monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+}
+
+.tag[data-status='added'] {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 15%, transparent);
+}
+
+.tag[data-status='removed'] {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
+.tag[data-status='changed'] {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 15%, transparent);
+}
+
+.cell {
+  display: block;
+  font-family: var(--font-num), monospace;
+  font-size: 11.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: var(--r-sm);
+  padding: 6px 9px;
+}
+
+.cell[data-tone='neutral'] {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg);
+}
+
+.cell[data-tone='add'] {
+  border: 1px solid color-mix(in srgb, var(--ok) 40%, var(--border));
+  background: color-mix(in srgb, var(--ok) 12%, var(--surface));
+  color: var(--fg);
+}
+
+.cell[data-tone='remove'] {
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border));
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  color: var(--fg);
+}
+
+.cell[data-tone='redacted'] {
+  border: 1px dashed color-mix(in srgb, var(--warn) 55%, var(--border));
+  background: color-mix(in srgb, var(--warn) 14%, var(--surface));
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.cell[data-tone='empty'] {
+  border: 1px dashed var(--border-2);
+  background: transparent;
+  color: var(--fg-3);
+  font-style: italic;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.unified {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.uniRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.uniRow .cell {
+  flex: 1;
+  min-width: 0;
+}
+
+.uniSign {
+  flex: none;
+  width: 13px;
+  text-align: center;
+  font-family: var(--font-num), monospace;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.uniSign[data-sign='removed'] {
+  color: var(--danger);
+}
+
+.uniSign[data-sign='added'] {
+  color: var(--ok);
+}
+
+.uniSign[data-sign='same'] {
+  color: var(--fg-3);
+}

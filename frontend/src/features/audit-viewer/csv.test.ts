@@ -5,13 +5,20 @@ import { buildAuditCsv } from './csv'
 function event(overrides: Partial<SuiteAuditEvent>): SuiteAuditEvent {
   return {
     id: '1',
+    suiteId: 'suite-1',
     action: 'organization.created',
     entityType: 'organization',
     entityId: 'org-1',
+    actorUserId: null,
     actorLabel: 'op@example.com',
     source: 'apex_ui',
-    createdAt: '2026-01-01T00:00:00Z',
+    orgExternalId: null,
+    requestId: null,
     installSessionId: null,
+    createdAt: '2026-01-01T00:00:00Z',
+    before: null,
+    after: null,
+    metadata: null,
     ...overrides,
   }
 }
