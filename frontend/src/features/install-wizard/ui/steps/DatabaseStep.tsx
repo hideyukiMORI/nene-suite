@@ -13,6 +13,7 @@ interface DatabaseStepProps {
   apps: DatabaseStepApp[]
   isPending: boolean
   onSubmit: (targets: DatabaseTargetInput[]) => void
+  onBack: () => void
 }
 
 type Mode = DatabaseTargetInput['mode']
@@ -36,7 +37,7 @@ function draftOf(drafts: Record<string, Draft>, id: string): Draft {
  * segmented Provision/Adopt toggle; the adopt sub-form is a revealed tinted panel;
  * each app shows a one-line summary.
  */
-export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
+export function DatabaseStep({ apps, isPending, onSubmit, onBack }: DatabaseStepProps) {
   const { t } = useTranslation()
   const [drafts, setDrafts] = useState<Record<string, Draft>>({})
 
@@ -74,7 +75,13 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
   const slugOf = (name: string): string => name.toLowerCase().replace(/\s+/g, '-')
 
   return (
-    <div>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        if (!isPending && apps.length > 0) submit()
+      }}
+      noValidate
+    >
       <h3 className={styles['stepTitle']}>
         {t('suite.install.database.title')}{' '}
         <InfoHint
@@ -195,16 +202,19 @@ export function DatabaseStep({ apps, isPending, onSubmit }: DatabaseStepProps) {
       )}
 
       <div className={styles['actions']}>
+        <button type="button" className={styles['backBtn']} disabled={isPending} onClick={onBack}>
+          <Icon name="arrow_back" size={18} />
+          {t('common.actions.back')}
+        </button>
         <button
-          type="button"
+          type="submit"
           className={styles['primaryBtn']}
           disabled={isPending || apps.length === 0}
-          onClick={submit}
         >
           {t('common.actions.next')}
           <Icon name="arrow_forward" size={18} />
         </button>
       </div>
-    </div>
+    </form>
   )
 }

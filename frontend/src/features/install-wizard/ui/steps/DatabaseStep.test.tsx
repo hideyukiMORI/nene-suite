@@ -13,7 +13,9 @@ describe('DatabaseStep', () => {
   it('submits provision for every app by default', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
-    renderWithProviders(<DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} />)
+    renderWithProviders(
+      <DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} onBack={() => {}} />,
+    )
 
     await user.click(screen.getByRole('button', { name: 'Next' }))
 
@@ -26,7 +28,9 @@ describe('DatabaseStep', () => {
   it('reveals adopt fields and submits server + name for the adopted app', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
-    renderWithProviders(<DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} />)
+    renderWithProviders(
+      <DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} onBack={() => {}} />,
+    )
 
     await user.click(
       within(screen.getByRole('radiogroup', { name: 'Database mode for NeNe Invoice' })).getByRole(
@@ -52,7 +56,9 @@ describe('DatabaseStep', () => {
   it('omits empty adopt server/name (suite-server / convention defaults)', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
-    renderWithProviders(<DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} />)
+    renderWithProviders(
+      <DatabaseStep apps={apps} isPending={false} onSubmit={onSubmit} onBack={() => {}} />,
+    )
 
     await user.click(
       within(screen.getByRole('radiogroup', { name: 'Database mode for NeNe Clear' })).getByRole(
@@ -69,7 +75,9 @@ describe('DatabaseStep', () => {
   })
 
   it('disables Next when there are no apps (e.g. the session is still loading)', () => {
-    renderWithProviders(<DatabaseStep apps={[]} isPending={false} onSubmit={vi.fn()} />)
+    renderWithProviders(
+      <DatabaseStep apps={[]} isPending={false} onSubmit={vi.fn()} onBack={() => {}} />,
+    )
 
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
   })
