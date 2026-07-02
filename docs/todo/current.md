@@ -8,7 +8,8 @@ implemented end to end — detached-JWS verification with conformance-corpus par
 per-product `gen` watermark, three read APIs, and dashboard wiring. The **O6 upgrade
 orchestration prerequisites are all landed** (installed-version tracking, catalog version mirror,
 ADR 0013 acceptance, and the upgrade-orchestration contract — **ADR 0019**, which supersedes the
-mis-specified ADR 0018; see below). The **federated user lifecycle** contract — prompt
+mis-specified ADR 0018 and is now **accepted** (2026-07-02 amendment: OQ1 = host-side deploy agent
+behind an opt-in capability flag, OQ2 = staged image provenance, OQ3 deferred); see below). The **federated user lifecycle** contract — prompt
 deprovisioning beyond JIT-on-login (pull lifecycle delta feed + best-effort back-channel logout) —
 is now **accepted as ADR 0020** (extends ADR 0012, OQ1–5 resolved; a B2 follow-on, no terminology
 change). The **MFA / step-up** contract (**ADR 0025**) has its NENE2 side **shipped** — the generic
@@ -374,5 +375,9 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - Gate state: PHPUnit **476** / vitest **134**, all green.
 - Detailed daily report: [`docs/daily-reports/2026-07-02.md`](../daily-reports/2026-07-02.md)
   （persona-eval B group 完了＋#327 medium sweep 完了＋鮮度更新の一日）.
+- **ADR 0019 accepted（2026-07-02 amendment・O6 前提の最終ピース）**: OQ1 = host-side deploy agent
+  （Suite に Docker socket を渡さない・allow-list 限定・監査必須・**opt-in capability flag（既定 off・
+  全 edition で利用可）**）、OQ2 = 段階 provenance（catalog digest pin ＋ `/machine/health` 事後検証 →
+  Origin 署名へ昇格）、OQ3（Tier A 共存）= toolkit 着地まで defer。O6（#251）実装スライスに着手可能。
 
 Last updated: 2026-07-02
