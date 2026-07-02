@@ -1,6 +1,6 @@
 # Current TODO
 
-**Status (2026-06-28).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
+**Status (2026-07-02).** Phase 1 (Tier B installer MVP) ✅ · Multi-tenant **Phase A**
 (A0–A8b) ✅ · **Phase B / B1** (federation IdP key plane + OSS auth hardening) ✅ ·
 **Origin consumption client** (O0–O5b, epic #230) ✅. Control DB + provisioning are
 PostgreSQL-capable (ADR 0016); the Origin consumption contract (ADR 0017) is now
@@ -33,7 +33,9 @@ layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after di
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
 step-up** decision (**ADR 0025** — generic TOTP in NENE2). **Near-term TODO: finish the persona-eval B
 group** (#332 a11y ✅ · #330 help-i18n ✅ · #333 org-reversibility ✅ · #334 locale ✅ — **B group
-complete**), then #327 sweep, B2 / O6 (#251).
+complete**) and the **#327 medium sweep ✅** (PR #354–#357; server-side org-list pagination is the one
+explicit defer). **Next: B2 / O6 (#251)** — see the
+[2026-07-02 daily report](../daily-reports/2026-07-02.md).
 Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
@@ -370,5 +372,7 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   自然に前進できる）。apps step へ戻った際は session の selectedApps をプリフィル。AppSelection /
   Database step を `<form>` 化し text field からの Enter 送信に対応。
 - Gate state: PHPUnit **476** / vitest **134**, all green.
+- Detailed daily report: [`docs/daily-reports/2026-07-02.md`](../daily-reports/2026-07-02.md)
+  （persona-eval B group 完了＋#327 medium sweep 完了＋鮮度更新の一日）.
 
 Last updated: 2026-07-02
