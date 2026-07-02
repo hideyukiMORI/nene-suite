@@ -32,13 +32,29 @@ export function OrganizationConsole() {
     createErrorKey,
   } = useOrganizationConsole()
 
-  const { register, handleSubmit, reset } = useForm<CreateOrganizationFields>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateOrganizationFields>({
     defaultValues: { name: '', slug: '' },
   })
 
   // presentation-only UI state
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [filter, setFilter] = useState('')
+
+  const needle = filter.trim().toLowerCase()
+  const visibleOrganizations =
+    needle === ''
+      ? organizations
+      : organizations.filter(
+          (organization) =>
+            organization.name.toLowerCase().includes(needle) ||
+            organization.slug.toLowerCase().includes(needle),
+        )
 
   const submitCreate = (fields: CreateOrganizationFields): void => {
     createOrganization(fields, {
@@ -77,8 +93,19 @@ export function OrganizationConsole() {
             <input
               className={styles['inputMono']}
               placeholder={t('suite.org.create.slugPlaceholder')}
-              {...register('slug', { required: true })}
+              aria-invalid={errors.slug !== undefined}
+              {...register('slug', {
+                required: true,
+                maxLength: 160,
+                // mirror of the backend rule (CreateOrganizationUseCase::SLUG_PATTERN)
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+              })}
             />
+            {errors.slug !== undefined ? (
+              <span className={styles['fieldError']} role="alert">
+                {t('suite.org.create.slugRule')}
+              </span>
+            ) : null}
           </label>
           <button type="submit" className={styles['primaryBtn']} disabled={isCreating}>
             <Icon name="add" size={18} />
@@ -97,38 +124,57 @@ export function OrganizationConsole() {
       {organizations.length === 0 ? (
         <PlaceholderState icon="corporate_fare" title={t('suite.org.empty')} />
       ) : (
-        <div className={styles['table']}>
-          <div className={styles['headRow']}>
-            <span>{t('suite.org.column.name')}</span>
-            <span>{t('suite.org.column.slug')}</span>
-            <span>{t('suite.org.column.status')}</span>
-            <span className={styles['headActions']}>{t('suite.org.column.actions')}</span>
-          </div>
-          {organizations.map((organization) => (
-            <OrganizationRow
-              key={organization.id}
-              organization={organization}
-              onRename={renameOrganization}
-              onDisable={disableOrganization}
-              onEnable={enableOrganization}
-              isRenaming={isRenaming}
-              isDisabling={isDisabling}
-              isEnabling={isEnabling}
-              menuOpen={menuOpenId === organization.id}
-              onToggleMenu={() => {
-                setMenuOpenId((id) => (id === organization.id ? null : organization.id))
-              }}
-              editing={editingId === organization.id}
-              onStartEdit={() => {
-                setEditingId(organization.id)
-                setMenuOpenId(null)
-              }}
-              onStopEdit={() => {
-                setEditingId(null)
+        <>
+          <div className={styles['filterWrap']}>
+            <Icon name="search" size={18} color="var(--fg-3)" />
+            <input
+              type="search"
+              className={styles['filterInput']}
+              placeholder={t('suite.org.search.placeholder')}
+              aria-label={t('suite.org.search.placeholder')}
+              value={filter}
+              onChange={(event) => {
+                setFilter(event.target.value)
               }}
             />
-          ))}
-        </div>
+          </div>
+          {visibleOrganizations.length === 0 ? (
+            <PlaceholderState icon="search_off" title={t('suite.org.search.noMatch')} />
+          ) : (
+            <div className={styles['table']}>
+              <div className={styles['headRow']}>
+                <span>{t('suite.org.column.name')}</span>
+                <span>{t('suite.org.column.slug')}</span>
+                <span>{t('suite.org.column.status')}</span>
+                <span className={styles['headActions']}>{t('suite.org.column.actions')}</span>
+              </div>
+              {visibleOrganizations.map((organization) => (
+                <OrganizationRow
+                  key={organization.id}
+                  organization={organization}
+                  onRename={renameOrganization}
+                  onDisable={disableOrganization}
+                  onEnable={enableOrganization}
+                  isRenaming={isRenaming}
+                  isDisabling={isDisabling}
+                  isEnabling={isEnabling}
+                  menuOpen={menuOpenId === organization.id}
+                  onToggleMenu={() => {
+                    setMenuOpenId((id) => (id === organization.id ? null : organization.id))
+                  }}
+                  editing={editingId === organization.id}
+                  onStartEdit={() => {
+                    setEditingId(organization.id)
+                    setMenuOpenId(null)
+                  }}
+                  onStopEdit={() => {
+                    setEditingId(null)
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {menuOpenId !== null ? (
