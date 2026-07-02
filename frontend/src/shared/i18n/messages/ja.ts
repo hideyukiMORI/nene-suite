@@ -360,6 +360,7 @@ export const ja: Partial<MessageCatalog> = {
   // ── メンバー（スーパー管理者コンソール） ──────────────────────────────────
   'suite.member.title': 'メンバー',
   'suite.member.description': 'この組織に所属するメンバーとそのロールを管理します。',
+  'suite.member.orgContext': '対象の組織',
   'suite.member.empty': 'メンバーはまだいません。',
   'suite.member.column.operator': 'オペレーター',
   'suite.member.column.role': 'ロール',

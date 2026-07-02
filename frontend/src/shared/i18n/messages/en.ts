@@ -388,6 +388,7 @@ export const en = {
   // ── Memberships (superadmin console) ─────────────────────────────────────
   'suite.member.title': 'Members',
   'suite.member.description': 'Manage who belongs to this organization and their role.',
+  'suite.member.orgContext': 'Target organization',
   'suite.member.empty': 'No members yet.',
   'suite.member.column.operator': 'Operator',
   'suite.member.column.role': 'Role',

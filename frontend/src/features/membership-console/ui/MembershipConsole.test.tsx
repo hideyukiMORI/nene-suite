@@ -16,6 +16,22 @@ describe('MembershipConsole', () => {
     expect(await screen.findByText('operator@example.com')).toBeInTheDocument()
   })
 
+  it('shows which organization is being edited (name + slug)', async () => {
+    renderWithProviders(<MembershipConsole organizationId="01J8XR0G7Q9V2H7K3N5M0B8TCA" />)
+
+    const banner = await screen.findByRole('region', { name: 'Target organization' })
+    expect(banner).toHaveTextContent('Acme KK')
+    expect(banner).toHaveTextContent('acme-kk')
+  })
+
+  it('flags a disabled organization in the context banner', async () => {
+    renderWithProviders(<MembershipConsole organizationId="01J8XR0G7Q9V2H7K3N5M0B8TCB" />)
+
+    const banner = await screen.findByRole('region', { name: 'Target organization' })
+    expect(banner).toHaveTextContent('Umbrella KK')
+    expect(banner).toHaveTextContent('Disabled')
+  })
+
   it('shows a conflict message when granting an existing member', async () => {
     const user = userEvent.setup()
     renderWithProviders(<MembershipConsole organizationId={ORG_ID} />)

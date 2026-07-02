@@ -5,6 +5,7 @@ import type {
   MembershipRole,
   OrganizationMember,
 } from '@/entities/membership'
+import { useOrganizations } from '@/entities/organization'
 import { useTranslation } from '@/shared/i18n'
 import { ErrorState, Icon, InfoHint, LoadingState, PlaceholderState } from '@/shared/ui'
 import { useMembershipConsole, type GrantMemberFields } from '../hooks/use-membership-console'
@@ -38,6 +39,11 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
     revokeErrorKey,
   } = useMembershipConsole(organizationId)
 
+  // Which tenant is being edited — the page URL only carries an opaque ULID,
+  // so surface name/slug/status from the (cached) superadmin org list.
+  const organizations = useOrganizations()
+  const organization = organizations.data?.find((candidate) => candidate.id === organizationId)
+
   const { register, handleSubmit, reset } = useForm<GrantMemberFields>({
     defaultValues: { operatorId: '', role: 'member' },
   })
@@ -58,6 +64,18 @@ export function MembershipConsole({ organizationId }: MembershipConsoleProps) {
 
   return (
     <div className={styles['stack']}>
+      {/* Which organization is being edited */}
+      {organization !== undefined ? (
+        <section className={styles['orgContext']} aria-label={t('suite.member.orgContext')}>
+          <span className={styles['orgContextLabel']}>{t('suite.member.orgContext')}</span>
+          <span className={styles['orgContextName']}>{organization.name}</span>
+          <span className={styles['orgContextSlug']}>{organization.slug}</span>
+          {organization.status === 'disabled' ? (
+            <span className={styles['orgContextDisabled']}>{t('suite.org.status.disabled')}</span>
+          ) : null}
+        </section>
+      ) : null}
+
       {/* Grant member */}
       <section className={styles['grantCard']}>
         <div className={styles['cardHead']}>
