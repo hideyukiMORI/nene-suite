@@ -2,14 +2,14 @@
 
 ## Status
 
-proposed (2026-06-26)
+accepted (2026-07-02; proposed 2026-06-26 — OQ1/OQ2 resolved below, OQ3 explicitly deferred)
 
 **Supersedes ADR 0018.** ADR 0018 specified the upgrade apply via a sibling **runtime HTTP endpoint**
 (`POST /machine/update` — the running app applies its own update). Review found this mis-locates the
 apply mechanism: a running web app cannot atomically redeploy and restart itself from within a
 request handler, and in Tier B the deployment swap is the orchestrator's job. This ADR replaces that
-mechanism with a **deployment-driven** model. The direction is settled; the mechanism details below
-carry open questions (resolved at acceptance).
+mechanism with a **deployment-driven** model. The direction is settled; the mechanism details that
+were open at proposal time are resolved in the 2026-07-02 amendment below.
 
 ## Context
 
@@ -65,25 +65,57 @@ Operator-initiated **"update all"**:
 Suite needs **deployment control** over sibling containers: the siblings must be part of Suite's
 compose project (Tier B), and Suite must drive `compose pull` + recreate per service. The current
 `docker-compose.yml` runs only `suite` + `db` (siblings are stubs), so unlocking sibling services and
-giving Suite a deploy path (see open questions) is the substance of the O6 orchestrator.
+giving Suite a deploy path (see the resolved questions below) is the substance of the O6 orchestrator.
 
 ### 5. Non-goals (retained)
 
 - Suite is **not** the apply authority for a sibling's data; the sibling migrates itself.
 - Standalone is unaffected — a sibling self-updates via its own Tier A / ops without Suite.
 
-## Open questions (resolve at acceptance)
+## Resolved questions (2026-07-02 amendment)
 
-- **OQ1 — deployment-control mechanism.** How Suite (itself a container) recreates sibling
-  containers: Docker socket mounted into the Suite container (powerful, a real security surface) vs a
-  host-side deploy agent / script Suite invokes (smaller blast radius, more moving parts). Security
-  posture matters for the hosted edition.
-- **OQ2 — image provenance vs Origin signature.** Origin signs version metadata (ADR 0017); a
-  container registry vouches for the image bytes. How the Origin-verified target version maps to a
-  trusted image tag/digest, and who verifies the image, is unresolved.
-- **OQ3 — Tier A (release-ZIP web installer) coexistence.** roadmap Phase 3's product web installer
-  is a non-container apply path; how it fits the deployment-driven model (or is a separate Tier-A
-  flow) needs a decision when Tier A lands.
+### OQ1 — deployment control is a host-side deploy agent (no Docker socket in Suite)
+
+Suite's container does **not** get the Docker socket. A socket mount is root-equivalent on the
+host — a compromised Suite could do anything to any container — which is unacceptable for the
+hosted-edition posture and outsized for the actual need (pull + recreate a known service list).
+
+Instead, a **host-side deploy agent** executes the deployment: a script/agent running on the
+compose host (the same trust domain that already runs `ops/staging/deploy-staging.sh`) performs
+`compose pull` + `up -d` **per service against an explicit allow-list** of sibling services, and
+reports the result. Suite requests a deployment through a narrow, explicit, audited seam and then
+**verifies the outcome independently** via the sibling's `/machine/health` version (§3). The
+concrete request transport (file/queue handshake, local invocation, or an equivalent) is an
+implementation detail of the first deploy-control slice, bounded by these invariants:
+
+- the agent only ever acts on the allow-listed compose services, and only `pull` + recreate;
+- every request and result is recorded in the suite audit trail (ADR 0007) with before/after;
+- the capability is explicit and edition-gated; absence of the agent degrades to
+  "updates visible, apply manual" (disabled-degrade, the same posture as the Origin client).
+
+Trade-off accepted: one more moving part (agent lifecycle on the host) in exchange for a much
+smaller blast radius than a socket mount, and continuity with the existing host-side deploy
+pattern.
+
+### OQ2 — image provenance is staged: digest pin + post-recreate verify now, Origin-signed later
+
+- **Stage 1 (now).** The catalog pins each app's target release to an **immutable image digest**
+  (not a mutable tag). The deploy agent recreates at that digest; Suite then confirms the sibling
+  is healthy and reports the target version via `GET /machine/health` (the existing probe,
+  ADR 0013 §4) before proceeding down the dependency chain. Trust chain: content-addressed digest
+  (registry) plus independent post-apply version verification (sibling).
+- **Stage 2 (when Origin production distribution resumes).** The Origin-signed metadata
+  (ADR 0017) carries the image digest per version, upgrading the pin from catalog-managed to
+  **Origin-verified end to end**. Origin today ships detached-JWS provenance for release ZIPs
+  only — it has no OCI-image provenance — so Stage 2 is sequenced behind Origin's own build-out
+  and **must not** block the O6 orchestrator (Suite already degrades with Origin disabled).
+
+### OQ3 — Tier A (release-ZIP web installer) coexistence: explicitly deferred
+
+The product family's Tier A installer toolkit is in progress in the sibling repos; how a
+non-container Tier A apply path coexists with the deployment-driven model is **deferred until
+that toolkit lands** and will be decided then (a new ADR or an amendment here). This deferral
+does not gate O6: the Tier B compose path above is self-contained.
 
 ## Consequences
 
@@ -91,8 +123,9 @@ giving Suite a deploy path (see open questions) is the substance of the O6 orche
 apply atomic and sibling-owned while making Suite's role honest deployment orchestration; no fragile
 runtime self-apply; no new sibling endpoint to build or secure.
 
-**Costs / follow-up.** Suite must gain a deployment-control capability (OQ1) and sibling services must
-join its compose project. The image-provenance story (OQ2) must be settled before live upgrades.
+**Costs / follow-up.** Suite must gain the host-side deploy agent + seam (OQ1 resolution) and sibling
+services must join its compose project. Image provenance starts as a catalog digest pin verified via
+`/machine/health` (OQ2 Stage 1); the Origin-signed upgrade (Stage 2) follows Origin's own build-out.
 
 **Risks.** Deployment control is a powerful capability — a compromised Suite could recreate sibling
 containers; OQ1's mechanism choice bounds that blast radius. Mitigated by treating it as an explicit,
