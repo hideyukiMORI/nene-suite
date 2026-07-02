@@ -22,6 +22,34 @@ describe('OrganizationConsole', () => {
     expect(screen.getByText('Umbrella KK')).toBeInTheDocument()
   })
 
+  it('rejects an invalid slug client-side with the concrete rule', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<OrganizationConsole />)
+    await screen.findByText('Acme KK')
+
+    await user.type(screen.getByPlaceholderText('Acme KK'), 'Bad Org')
+    await user.type(screen.getByPlaceholderText('acme-kk'), 'Bad Slug!')
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/hyphen-separated segments/)
+  })
+
+  it('filters the organization list by name or slug', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<OrganizationConsole />)
+    await screen.findByText('Acme KK')
+
+    await user.type(screen.getByRole('searchbox', { name: /Filter by name or slug/ }), 'umbrella')
+
+    expect(screen.getByText('Umbrella KK')).toBeInTheDocument()
+    expect(screen.queryByText('Acme KK')).not.toBeInTheDocument()
+
+    await user.clear(screen.getByRole('searchbox', { name: /Filter by name or slug/ }))
+    await user.type(screen.getByRole('searchbox', { name: /Filter by name or slug/ }), 'zzz')
+
+    expect(screen.getByText('No organizations match your filter.')).toBeInTheDocument()
+  })
+
   it('surfaces a slug-conflict message when create fails', async () => {
     const user = userEvent.setup()
     renderWithProviders(<OrganizationConsole />)

@@ -335,6 +335,10 @@ export const ja: Partial<MessageCatalog> = {
   'suite.org.create.slugPlaceholder': 'acme-kk',
   'suite.org.create.submit': '作成',
   'suite.org.create.submitting': '作成中…',
+  'suite.org.create.slugRule':
+    '小文字英数字をハイフンで区切った形式で入力してください（例: "acme-kk"・最大160文字）。',
+  'suite.org.search.placeholder': '名前またはスラッグで絞り込み…',
+  'suite.org.search.noMatch': '絞り込みに一致する組織がありません。',
   'suite.org.rename.action': '改名',
   'suite.org.rename.nameLabel': '新しい名前',
   'suite.org.rename.submitting': '改名中…',

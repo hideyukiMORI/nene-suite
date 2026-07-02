@@ -363,6 +363,10 @@ export const en = {
   'suite.org.create.slugPlaceholder': 'acme-kk',
   'suite.org.create.submit': 'Create',
   'suite.org.create.submitting': 'Creating…',
+  'suite.org.create.slugRule':
+    'Use lowercase letters and numbers in hyphen-separated segments (e.g. "acme-kk", max 160 characters).',
+  'suite.org.search.placeholder': 'Filter by name or slug…',
+  'suite.org.search.noMatch': 'No organizations match your filter.',
   'suite.org.rename.action': 'Rename',
   'suite.org.rename.nameLabel': 'New name',
   'suite.org.rename.submitting': 'Renaming…',
