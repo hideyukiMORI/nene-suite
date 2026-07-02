@@ -5,9 +5,10 @@ import styles from '../install-wizard.module.css'
 interface DisclaimerStepProps {
   isPending: boolean
   onAccept: () => void
+  onBack: () => void
 }
 
-export function DisclaimerStep({ isPending, onAccept }: DisclaimerStepProps) {
+export function DisclaimerStep({ isPending, onAccept, onBack }: DisclaimerStepProps) {
   const { t } = useTranslation()
   const [agreed, setAgreed] = useState(false)
 
@@ -30,6 +31,9 @@ export function DisclaimerStep({ isPending, onAccept }: DisclaimerStepProps) {
       {!agreed ? <p className={styles['mustAccept']}>{t('suite.disclaimer.mustAccept')}</p> : null}
 
       <div className={styles['actions']}>
+        <button type="button" className={styles['backBtn']} disabled={isPending} onClick={onBack}>
+          {t('common.actions.back')}
+        </button>
         <button
           type="button"
           className={styles['primaryBtn']}

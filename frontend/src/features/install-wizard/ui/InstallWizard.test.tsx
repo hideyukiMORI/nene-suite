@@ -30,4 +30,38 @@ describe('InstallWizard', () => {
     expect(databaseStep.closest('li')).toHaveAttribute('aria-current', 'step')
     expect(screen.getByText('Select apps').closest('li')).not.toHaveAttribute('aria-current')
   })
+
+  it('navigates back from the database step with the selection prefilled', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<InstallWizard />)
+    await user.click(screen.getByRole('button', { name: 'Start installer' }))
+    await user.click(await screen.findByRole('checkbox', { name: 'NeNe Invoice' }))
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('Step 2 of 5')
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Step 1 of 5: Select apps')
+    expect(screen.getByRole('checkbox', { name: 'NeNe Invoice' })).toBeChecked()
+  })
+
+  it('submits the database step with Enter from a text field', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<InstallWizard />)
+    await user.click(screen.getByRole('button', { name: 'Start installer' }))
+    await user.click(await screen.findByRole('checkbox', { name: 'NeNe Invoice' }))
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('Step 2 of 5')
+    })
+
+    await user.click(screen.getByRole('radio', { name: 'Adopt existing' }))
+    await user.type(screen.getByLabelText(/Server/), 'db.internal{Enter}')
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('Step 3 of 5')
+    })
+  })
 })

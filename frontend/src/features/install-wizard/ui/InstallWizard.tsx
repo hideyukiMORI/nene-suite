@@ -84,6 +84,7 @@ export function InstallWizard() {
         {wizard.step === 'apps' ? (
           <AppSelectionStep
             apps={wizard.catalogApps}
+            initialSelected={wizard.session?.selectedApps ?? []}
             isPending={wizard.isMutating}
             onSubmit={wizard.selectApps}
           />
@@ -97,11 +98,20 @@ export function InstallWizard() {
             }))}
             isPending={wizard.isMutating}
             onSubmit={wizard.setDatabaseTargets}
+            onBack={() => {
+              wizard.goToStep('apps')
+            }}
           />
         ) : null}
 
         {wizard.step === 'disclaimer' ? (
-          <DisclaimerStep isPending={wizard.isMutating} onAccept={wizard.acceptDisclaimer} />
+          <DisclaimerStep
+            isPending={wizard.isMutating}
+            onAccept={wizard.acceptDisclaimer}
+            onBack={() => {
+              wizard.goToStep('database')
+            }}
+          />
         ) : null}
 
         {wizard.step === 'review' ? (
@@ -110,6 +120,9 @@ export function InstallWizard() {
             apps={wizard.catalogApps}
             isPending={wizard.isMutating}
             onComplete={wizard.complete}
+            onBack={() => {
+              wizard.goToStep('disclaimer')
+            }}
           />
         ) : null}
 

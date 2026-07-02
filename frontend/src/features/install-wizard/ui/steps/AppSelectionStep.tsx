@@ -7,12 +7,19 @@ interface AppSelectionStepProps {
   apps: CatalogApp[]
   isPending: boolean
   onSubmit: (ids: string[]) => void
+  /** Prefill when navigating back to this step — the session already has a selection. */
+  initialSelected?: string[]
 }
 
-export function AppSelectionStep({ apps, isPending, onSubmit }: AppSelectionStepProps) {
+export function AppSelectionStep({
+  apps,
+  isPending,
+  onSubmit,
+  initialSelected,
+}: AppSelectionStepProps) {
   const { t } = useTranslation()
   const installable = apps.filter((app) => app.status === 'installable')
-  const [selected, setSelected] = useState<string[]>([])
+  const [selected, setSelected] = useState<string[]>(initialSelected ?? [])
 
   const toggle = (id: string): void => {
     setSelected((prev) =>
@@ -21,7 +28,13 @@ export function AppSelectionStep({ apps, isPending, onSubmit }: AppSelectionStep
   }
 
   return (
-    <div>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        if (!isPending && selected.length > 0) onSubmit(selected)
+      }}
+      noValidate
+    >
       <h3 className={styles['stepTitle']}>{t('suite.install.apps.title')}</h3>
       <p className={styles['stepDesc']}>{t('suite.install.apps.description')}</p>
 
@@ -58,16 +71,13 @@ export function AppSelectionStep({ apps, isPending, onSubmit }: AppSelectionStep
       </p>
       <div className={styles['actions']}>
         <button
-          type="button"
+          type="submit"
           className={styles['primaryBtn']}
           disabled={isPending || selected.length === 0}
-          onClick={() => {
-            onSubmit(selected)
-          }}
         >
           {t('common.actions.next')}
         </button>
       </div>
-    </div>
+    </form>
   )
 }

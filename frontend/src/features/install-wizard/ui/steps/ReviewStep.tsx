@@ -8,9 +8,10 @@ interface ReviewStepProps {
   apps: CatalogApp[]
   isPending: boolean
   onComplete: () => void
+  onBack: () => void
 }
 
-export function ReviewStep({ session, apps, isPending, onComplete }: ReviewStepProps) {
+export function ReviewStep({ session, apps, isPending, onComplete, onBack }: ReviewStepProps) {
   const { t } = useTranslation()
   const selectedApps = session?.selectedApps ?? []
   const targets = session?.databaseTargets ?? []
@@ -68,6 +69,9 @@ export function ReviewStep({ session, apps, isPending, onComplete }: ReviewStepP
       <div className={styles['summaryBox']}>{t('suite.install.review.preCompleteSummary')}</div>
 
       <div className={styles['actions']}>
+        <button type="button" className={styles['backBtn']} disabled={isPending} onClick={onBack}>
+          {t('common.actions.back')}
+        </button>
         <button
           type="button"
           className={styles['primaryBtn']}

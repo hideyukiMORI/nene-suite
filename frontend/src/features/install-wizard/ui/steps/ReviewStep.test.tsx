@@ -54,6 +54,7 @@ describe('ReviewStep', () => {
         apps={[app('nene-invoice', 'NeNe Invoice'), app('nene-clear', 'NeNe Clear')]}
         isPending={false}
         onComplete={vi.fn()}
+        onBack={() => {}}
       />,
     )
 
