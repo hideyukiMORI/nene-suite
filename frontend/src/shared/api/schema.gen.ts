@@ -478,6 +478,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{id}/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Re-enable a soft-disabled tenant organization.
+         * @description Reverses a soft-disable — flips the organization back to `active`
+         *     (idempotent — already-active returns the active organization). Disable
+         *     is a reversible freeze, so no data is created or restored beyond the
+         *     status flip. Platform-superadmin only. Emits `organization.enabled` in
+         *     the suite audit trail.
+         */
+        post: operations["enableOrganization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/{id}/memberships": {
         parameters: {
             query?: never;
@@ -2294,6 +2318,41 @@ export interface operations {
                      *       "name": "Acme KK",
                      *       "slug": "acme-kk",
                      *       "status": "disabled"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Organization"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["OrganizationNotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    enableOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization re-enabled. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01J8XR0G7Q9V2H7K3N5M0B8TCA",
+                     *       "externalId": "01J8XRDEXT0000000000000ZAB",
+                     *       "name": "Acme KK",
+                     *       "slug": "acme-kk",
+                     *       "status": "active"
                      *     }
                      */
                     "application/json": components["schemas"]["Organization"];

@@ -3,6 +3,7 @@ import {
   useCreateOrganization,
   useRenameOrganization,
   useDisableOrganization,
+  useEnableOrganization,
   type Organization,
   type RenameOrganizationInput,
 } from '@/entities/organization'
@@ -23,9 +24,11 @@ export interface UseOrganizationConsoleResult {
   ) => void
   renameOrganization: (input: RenameOrganizationInput) => void
   disableOrganization: (id: string) => void
+  enableOrganization: (id: string) => void
   isCreating: boolean
   isRenaming: boolean
   isDisabling: boolean
+  isEnabling: boolean
   createErrorKey: MessageKey | null
 }
 
@@ -35,6 +38,7 @@ export function useOrganizationConsole(): UseOrganizationConsoleResult {
   const create = useCreateOrganization()
   const rename = useRenameOrganization()
   const disable = useDisableOrganization()
+  const enable = useEnableOrganization()
 
   return {
     organizations: query.data ?? [],
@@ -49,9 +53,13 @@ export function useOrganizationConsole(): UseOrganizationConsoleResult {
     disableOrganization: (id) => {
       disable.mutate(id)
     },
+    enableOrganization: (id) => {
+      enable.mutate(id)
+    },
     isCreating: create.isPending,
     isRenaming: rename.isPending,
     isDisabling: disable.isPending,
+    isEnabling: enable.isPending,
     createErrorKey: create.error !== null ? mapProblemDetailsToMessageKey(create.error) : null,
   }
 }

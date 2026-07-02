@@ -11,8 +11,10 @@ describe('useOrganizationConsole', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.organizations).toHaveLength(1)
+    expect(result.current.organizations).toHaveLength(2)
     expect(result.current.organizations[0]?.name).toBe('Acme KK')
     expect(result.current.organizations[0]?.status).toBe('active')
+    expect(result.current.organizations[1]?.name).toBe('Umbrella KK')
+    expect(result.current.organizations[1]?.status).toBe('disabled')
   })
 })

@@ -67,6 +67,15 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
                 ),
             )
             ->set(
+                EnableOrganizationUseCaseInterface::class,
+                static fn (ContainerInterface $container): EnableOrganizationUseCaseInterface => new EnableOrganizationUseCase(
+                    self::transactionManager($container),
+                    self::organizationRepositoryFactory($container),
+                    self::auditRecorderFactory($container),
+                    self::suiteId($container),
+                ),
+            )
+            ->set(
                 MembershipRepositoryFactoryInterface::class,
                 static fn (ContainerInterface $container): MembershipRepositoryFactoryInterface => new PdoMembershipRepositoryFactory(),
             )
@@ -145,12 +154,22 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
                 ),
             )
             ->set(
+                EnableOrganizationHandler::class,
+                static fn (ContainerInterface $container): EnableOrganizationHandler => new EnableOrganizationHandler(
+                    self::superadminGuard($container),
+                    self::enableOrganizationUseCase($container),
+                    self::responseFactory($container),
+                    self::requestIdHolder($container),
+                ),
+            )
+            ->set(
                 'nene-suite.route_registrar.tenancy',
                 static fn (ContainerInterface $container): OrganizationRouteRegistrar => new OrganizationRouteRegistrar(
                     self::createOrganizationHandler($container),
                     self::listOrganizationsHandler($container),
                     self::renameOrganizationHandler($container),
                     self::disableOrganizationHandler($container),
+                    self::enableOrganizationHandler($container),
                 ),
             )
             ->set(
@@ -433,6 +452,17 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
         return $useCase;
     }
 
+    private static function enableOrganizationUseCase(ContainerInterface $container): EnableOrganizationUseCaseInterface
+    {
+        $useCase = $container->get(EnableOrganizationUseCaseInterface::class);
+
+        if (!$useCase instanceof EnableOrganizationUseCaseInterface) {
+            throw new LogicException('Enable organization use case service is invalid.');
+        }
+
+        return $useCase;
+    }
+
     private static function createOrganizationHandler(ContainerInterface $container): CreateOrganizationHandler
     {
         $handler = $container->get(CreateOrganizationHandler::class);
@@ -472,6 +502,17 @@ final readonly class TenancyServiceProvider implements ServiceProviderInterface
 
         if (!$handler instanceof DisableOrganizationHandler) {
             throw new LogicException('Disable organization handler service is invalid.');
+        }
+
+        return $handler;
+    }
+
+    private static function enableOrganizationHandler(ContainerInterface $container): EnableOrganizationHandler
+    {
+        $handler = $container->get(EnableOrganizationHandler::class);
+
+        if (!$handler instanceof EnableOrganizationHandler) {
+            throw new LogicException('Enable organization handler service is invalid.');
         }
 
         return $handler;

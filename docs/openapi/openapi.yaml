@@ -993,6 +993,45 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/organizations/{id}/enable:
+    post:
+      tags: [Organizations]
+      operationId: enableOrganization
+      summary: Re-enable a soft-disabled tenant organization.
+      description: |
+        Reverses a soft-disable — flips the organization back to `active`
+        (idempotent — already-active returns the active organization). Disable
+        is a reversible freeze, so no data is created or restored beyond the
+        status flip. Platform-superadmin only. Emits `organization.enabled` in
+        the suite audit trail.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      responses:
+        '200':
+          description: Organization re-enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              example:
+                id: 01J8XR0G7Q9V2H7K3N5M0B8TCA
+                externalId: 01J8XRDEXT0000000000000ZAB
+                name: Acme KK
+                slug: acme-kk
+                status: active
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/organizations/{id}/memberships:
     get:
       tags: [Memberships]
