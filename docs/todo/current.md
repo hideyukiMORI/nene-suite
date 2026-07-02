@@ -11,7 +11,10 @@ ADR 0013 acceptance, and the upgrade-orchestration contract — **ADR 0019**, wh
 mis-specified ADR 0018; see below). The **federated user lifecycle** contract — prompt
 deprovisioning beyond JIT-on-login (pull lifecycle delta feed + best-effort back-channel logout) —
 is now **accepted as ADR 0020** (extends ADR 0012, OQ1–5 resolved; a B2 follow-on, no terminology
-change). The **app database topology** contract is **accepted as ADR 0021** — a per-app database
+change). The **MFA / step-up** contract (**ADR 0025**) has its NENE2 side **shipped** — the generic
+TOTP primitive + recovery codes (NENE2#1427) landed in **NENE2 v1.5.333** (2026-07-02 verified);
+the Suite-side IdP enforce + step-up claim remains future work. The **app database topology**
+contract is **accepted as ADR 0021** — a per-app database
 target (`provision` | `adopt` + configurable server); the default reproduces today's behavior, the
 MVP adds external-server **adopt** (register an existing DB, no DDL) as the data-plane companion to
 ADR 0012 §8, with the §3 one-DB-per-app invariant held. **Next: B2** — sibling-side org resolution +
@@ -302,7 +305,8 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   フィルタ後」のみな点は別件（全件 export は後続）。
 - **MFA/step-up 方針確定（ADR 0025・cross-repo #341）**: NeNe Clear から「MFA をどこに置くか」の相談
   （#341, Clear#195）。Suite=IdP・standalone 可（ADR 0014）・NENE2 共有層を踏まえ、**両モード対応**で確定:
-  generic TOTP は **NENE2**（新リポ作らず・NENE2#1427 起票）、**federated は Suite IdP が enforce＋assertion に
+  generic TOTP は **NENE2**（新リポ作らず・NENE2#1427 起票 → **v1.5.333 で出荷済み**・2026-07-02 実測）、
+  **federated は Suite IdP が enforce＋assertion に
   step-up claim**、**standalone は sibling のローカル login が同じ TOTP を使う**。enroll=本人/enforce=管理者
   ポリシー（アプリ層）、break-glass は MFA 免除＋補償統制（recovery codes 必須・CLI）。**federation 待ちと
   decouple**（Clear は #195 を今進められる）。ADR 0012 を extend。#341 に Suite 回答を投稿済み。
