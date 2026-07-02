@@ -90,7 +90,8 @@ implementation detail of the first deploy-control slice, bounded by these invari
 
 - the agent only ever acts on the allow-listed compose services, and only `pull` + recreate;
 - every request and result is recorded in the suite audit trail (ADR 0007) with before/after;
-- the capability is explicit and edition-gated; absence of the agent degrades to
+- the capability is an explicit **opt-in capability flag (default off)** — available to every
+  edition, OSS self-host included; absence of the agent (or the flag) degrades to
   "updates visible, apply manual" (disabled-degrade, the same posture as the Origin client).
 
 Trade-off accepted: one more moving part (agent lifecycle on the host) in exchange for a much
@@ -129,7 +130,7 @@ services must join its compose project. Image provenance starts as a catalog dig
 
 **Risks.** Deployment control is a powerful capability — a compromised Suite could recreate sibling
 containers; OQ1's mechanism choice bounds that blast radius. Mitigated by treating it as an explicit,
-audited, edition-gated capability.
+audited, opt-in capability (default off).
 
 ## Related
 
