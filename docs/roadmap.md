@@ -85,8 +85,10 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - ✅ Installed-version tracking + **catalog version mirror** — the sibling auth-gated
   `/machine/health` `version` probe (NENE2 v1.5.330) feeds the update diff, and the catalog API
   mirrors `installedVersion` / `availableVersion` per app (ADR 0013 §4, **accepted**). Sibling
-  adoption is cross-repo (nene-invoice#496 / nene-clear#182 / nene-records#586 — all still open
-  as of 2026-07-02, so live installations report `unknown` until the siblings wire the probe).
+  adoption is cross-repo: **nene-clear adopted the probe (clear#182, 2026-07-03)** — its
+  `/machine/health` now reports the installed version once `NENE2_MACHINE_API_KEY` /
+  `NENE_SUITE_APP_NENE_CLEAR_MACHINE_KEY` are paired; nene-invoice#496 / nene-records#586 remain
+  open, so those apps still report `unknown`.
 - ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
 - ⏳ **Federated user lifecycle** — prompt deprovisioning beyond JIT-on-login: a pull
