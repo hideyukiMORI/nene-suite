@@ -27,7 +27,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **476** /
-vitest **124**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **126**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
 layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
@@ -349,5 +349,10 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   `docs/development/i18n.md` に明文化。`resolveLocale` に zh-CN/zh-SG/zh → zh-Hans alias を追加
   （zh-TW/zh-Hant は en fallback のまま）。
 - Gate state: PHPUnit **476** / vitest **124**, all green.
+- **memberships 画面に編集対象 org のコンテキストバナーを追加（#327 medium sweep）**: URL の
+  ULID だけでは編集中テナントが判らない問題に対し、console 上部に org 名＋slug＋（無効時）
+  Disabled バッジを表示（superadmin org 一覧のキャッシュを再利用・`suite.member.orgContext`
+  en/ja 追加）。
+- Gate state: PHPUnit **476** / vitest **126**, all green.
 
 Last updated: 2026-07-02
