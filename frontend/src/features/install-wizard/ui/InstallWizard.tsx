@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { HelpLink, Icon } from '@/shared/ui'
 import { useInstallWizard, type WizardStep } from '../hooks/use-install-wizard'
@@ -55,23 +54,32 @@ export function InstallWizard() {
         <div className={styles['helpRow']}>
           <HelpLink topic="install-wizard" />
         </div>
-        <ol className={styles['stepper']}>
+        <ol className={styles['stepper']} aria-label={t('suite.install.wizard.title')}>
           {STEP_ORDER.map((value, index) => {
             const state =
               index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'todo'
             return (
-              <Fragment key={value}>
-                {index > 0 ? <span className={styles['connector']} /> : null}
-                <li className={styles['step']} data-state={state}>
-                  <span className={styles['stepDot']}>
-                    {state === 'done' ? <Icon name="check" size={15} /> : index + 1}
-                  </span>
-                  <span className={styles['stepLabel']}>{t(STEP_LABEL[value])}</span>
-                </li>
-              </Fragment>
+              <li
+                key={value}
+                className={styles['step']}
+                data-state={state}
+                aria-current={state === 'current' ? 'step' : undefined}
+              >
+                <span className={styles['stepDot']}>
+                  {state === 'done' ? <Icon name="check" size={15} /> : index + 1}
+                </span>
+                <span className={styles['stepLabel']}>{t(STEP_LABEL[value])}</span>
+              </li>
             )
           })}
         </ol>
+        <p className={styles['srAnnounce']} role="status">
+          {t('suite.install.wizard.step.announce', {
+            current: currentIndex + 1,
+            total: STEP_ORDER.length,
+            label: t(STEP_LABEL[wizard.step]),
+          })}
+        </p>
 
         {wizard.step === 'apps' ? (
           <AppSelectionStep

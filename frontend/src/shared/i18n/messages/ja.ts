@@ -200,6 +200,7 @@ export const ja: Partial<MessageCatalog> = {
   'suite.install.wizard.step.disclaimer': '免責事項',
   'suite.install.wizard.step.review': '確認',
   'suite.install.wizard.step.complete': '完了',
+  'suite.install.wizard.step.announce': 'ステップ {{current}} / {{total}}: {{label}}',
 
   'suite.install.apps.title': 'インストールするアプリを選択',
   'suite.install.apps.description':
