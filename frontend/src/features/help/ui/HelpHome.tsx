@@ -1,16 +1,16 @@
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from '@/shared/i18n'
+import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { Icon } from '@/shared/ui'
-import { GUIDE_GROUP_ORDER, GUIDE_GROUPS, GUIDES, searchHelp } from '../content'
+import { GUIDE_GROUP_LABEL_KEY, GUIDE_GROUP_ORDER, GUIDES, searchHelp } from '../content'
 import styles from './help-home.module.css'
 
 /** "Find by what you want to do" shortcuts for beginners. */
-const TASKS: readonly { readonly label: string; readonly to: string }[] = [
-  { label: 'アプリをインストールする', to: '/help/install-wizard' },
-  { label: '権限（役割）を理解する', to: '/help/roles' },
-  { label: '安全に使うコツを知る', to: '/help/safety' },
-  { label: '困ったとき（FAQ）', to: '/help/faq' },
+const TASKS: readonly { readonly labelKey: MessageKey; readonly to: string }[] = [
+  { labelKey: 'suite.help.task.install', to: '/help/install-wizard' },
+  { labelKey: 'suite.help.task.roles', to: '/help/roles' },
+  { labelKey: 'suite.help.task.safety', to: '/help/safety' },
+  { labelKey: 'suite.help.task.faq', to: '/help/faq' },
 ]
 
 export function HelpHome(): ReactNode {
@@ -74,7 +74,7 @@ export function HelpHome(): ReactNode {
               {TASKS.map((task) => (
                 <Link key={task.to} to={task.to} className={styles['task']}>
                   <Icon name="arrow_forward" size={18} color="var(--brand)" />
-                  {task.label}
+                  {t(task.labelKey)}
                 </Link>
               ))}
             </div>
@@ -85,7 +85,7 @@ export function HelpHome(): ReactNode {
             if (groupGuides.length === 0) return null
             return (
               <section key={group} className={styles['section']}>
-                <h2 className={styles['sectionTitle']}>{GUIDE_GROUPS[group]}</h2>
+                <h2 className={styles['sectionTitle']}>{t(GUIDE_GROUP_LABEL_KEY[group])}</h2>
                 <div className={styles['grid']}>
                   {groupGuides.map((guide) => (
                     <Link key={guide.slug} to={`/help/${guide.slug}`} className={styles['card']}>

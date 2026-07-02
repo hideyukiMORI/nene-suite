@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from '@/shared/i18n'
 import { Icon } from '@/shared/ui'
-import { GLOSSARY, GLOSSARY_CATEGORIES, searchHelp } from '../content'
+import { GLOSSARY, GLOSSARY_CATEGORY_LABEL_KEY, searchHelp } from '../content'
 import type { GlossaryCategory } from '../content'
 import styles from './help-glossary.module.css'
 
@@ -16,6 +17,7 @@ const CATEGORY_ORDER: readonly GlossaryCategory[] = [
 ]
 
 export function HelpGlossary(): ReactNode {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const { hash } = useLocation()
   const { terms } = searchHelp(query)
@@ -29,31 +31,33 @@ export function HelpGlossary(): ReactNode {
 
   return (
     <div className={styles['root']}>
-      <h1 className={styles['title']}>用語集</h1>
-      <p className={styles['subtitle']}>むずかしい言葉を、できるだけやさしく言いかえています。</p>
+      <h1 className={styles['title']}>{t('suite.help.glossary.title')}</h1>
+      <p className={styles['subtitle']}>{t('suite.help.glossary.subtitle')}</p>
 
       <div className={styles['searchWrap']}>
         <Icon name="search" size={19} color="var(--fg-3)" className={styles['searchIcon'] ?? ''} />
         <input
           type="search"
           className={styles['search']}
-          placeholder="用語を検索…"
+          placeholder={t('suite.help.glossary.searchPlaceholder')}
           value={query}
           onChange={(event) => {
             setQuery(event.target.value)
           }}
-          aria-label="用語を検索"
+          aria-label={t('suite.help.glossary.searchLabel')}
         />
       </div>
 
-      {terms.length === 0 ? <p className={styles['muted']}>該当する用語がありません。</p> : null}
+      {terms.length === 0 ? (
+        <p className={styles['muted']}>{t('suite.help.glossary.noResults')}</p>
+      ) : null}
 
       {CATEGORY_ORDER.map((category) => {
         const inCategory = terms.filter((term) => term.category === category)
         if (inCategory.length === 0) return null
         return (
           <section key={category} className={styles['group']}>
-            <h2 className={styles['groupTitle']}>{GLOSSARY_CATEGORIES[category]}</h2>
+            <h2 className={styles['groupTitle']}>{t(GLOSSARY_CATEGORY_LABEL_KEY[category])}</h2>
             {inCategory.map((term) => (
               <article key={term.id} id={`gt-${term.id}`} className={styles['term']}>
                 <h3 className={styles['termName']}>{term.term}</h3>
@@ -65,7 +69,7 @@ export function HelpGlossary(): ReactNode {
                 ))}
                 {term.see && term.see.length > 0 ? (
                   <p className={styles['see']}>
-                    関連:{' '}
+                    {t('suite.help.related')}:{' '}
                     {term.see.map((id, position) => {
                       const ref = termsById.get(id)
                       if (ref === undefined) return null

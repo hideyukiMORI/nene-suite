@@ -24,12 +24,12 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **110**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **116**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
 layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
 step-up** decision (**ADR 0025** — generic TOTP in NENE2). **Near-term TODO: finish the persona-eval B
-group** (#332 a11y ✅ · #330 help-i18n · #333 org-reversibility · #334 locale), then B2 / O6 (#251).
+group** (#332 a11y ✅ · #330 help-i18n ✅ · #333 org-reversibility · #334 locale), then B2 / O6 (#251).
 Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
@@ -323,5 +323,12 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   popover も trap＋復帰。install wizard stepper は `aria-current="step"`＋visually-hidden live region
   （`suite.install.wizard.step.announce`、en/ja）で SR に前進を通知し、`<ol>` 直下の装飾 span を擬似要素化。
 - Gate state: PHPUnit **468** / vitest **110**, all green（focus/a11y テスト12件追加）.
+- **help i18n: 英語ロケールでの日本語本文の不在シグナル＋シェル文言 i18n 化（#330・B2 解消）**:
+  非 ja ロケールの全 /help ルートに「本文は日本語のみ・英語版準備中」の Callout 通知（ADR 0024 の
+  日本語先行方針は維持・chrome は ADR 0009 どおり en+ja）。HelpLayout sidebar・HelpHome タスク配列・
+  HelpGlossary chrome・HelpGuide not-found・guide group / glossary category 見出し・Callout SR プレフィックス
+  （重要:/注意:）をメッセージカタログへ移行（`suite.help.*` 32 キー追加、en/ja parity）。en/ja 両ロケールの
+  chrome テスト 6 件追加。
+- Gate state: PHPUnit **468** / vitest **116**, all green.
 
 Last updated: 2026-07-02
