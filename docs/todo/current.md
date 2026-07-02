@@ -27,7 +27,7 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **476** /
-vitest **126**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **130**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
 layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
@@ -354,5 +354,10 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   Disabled バッジを表示（superadmin org 一覧のキャッシュを再利用・`suite.member.orgContext`
   en/ja 追加）。
 - Gate state: PHPUnit **476** / vitest **126**, all green.
+- **zh-Hans フォントスタック修正（#327 medium sweep）**: 全 locale で Noto Sans JP 先行だったため
+  簡体字ユーザに漢字が日本語字形で描画されていた問題を修正 — zh-Hans のみ SC フォント
+  （Noto Sans SC / PingFang SC / Microsoft YaHei）先行に変更（JP フォントはスタック後方に残置）。
+  Google Fonts link に Noto Sans SC を追加（css2 は使用時のみ遅延 DL）。
+- Gate state: PHPUnit **476** / vitest **130**, all green.
 
 Last updated: 2026-07-02
