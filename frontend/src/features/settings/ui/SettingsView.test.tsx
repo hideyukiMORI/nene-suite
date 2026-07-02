@@ -16,4 +16,21 @@ describe('SettingsView', () => {
     await user.click(screen.getByRole('button', { name: 'View disclaimer' }))
     expect(screen.getByRole('dialog', { name: 'Important notice' })).toBeInTheDocument()
   })
+
+  it('mounts the full six-locale switcher so every locale is reachable and escapable', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<SettingsView />)
+
+    const select = screen.getByRole('combobox', { name: 'Select language' })
+    expect(select).toBeInTheDocument()
+
+    // enter a stub locale, then leave it again — no trap
+    await user.selectOptions(select, 'fr')
+    expect(select).toHaveValue('fr')
+    expect(screen.getByText('Langue')).toBeInTheDocument()
+
+    await user.selectOptions(select, 'en')
+    expect(select).toHaveValue('en')
+    expect(screen.getByText('Language')).toBeInTheDocument()
+  })
 })

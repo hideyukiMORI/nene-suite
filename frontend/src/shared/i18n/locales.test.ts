@@ -11,6 +11,19 @@ describe('resolveLocale', () => {
 
   it('resolves language-region tags', () => {
     expect(resolveLocale('ja-JP')).toBe('ja')
+    expect(resolveLocale('fr-FR')).toBe('fr')
+    expect(resolveLocale('de-AT')).toBe('de')
+  })
+
+  it('aliases simplified-Chinese region tags to zh-Hans', () => {
+    expect(resolveLocale('zh')).toBe('zh-Hans')
+    expect(resolveLocale('zh-CN')).toBe('zh-Hans')
+    expect(resolveLocale('zh-SG')).toBe('zh-Hans')
+  })
+
+  it('keeps the en fallback for traditional-Chinese tags (no zh-Hant catalog)', () => {
+    expect(resolveLocale('zh-TW')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('zh-Hant')).toBe(DEFAULT_LOCALE)
   })
 
   it('falls back to default for unknown locales', () => {

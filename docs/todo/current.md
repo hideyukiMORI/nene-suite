@@ -24,12 +24,13 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **476** /
-vitest **118**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **124**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
 layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
 step-up** decision (**ADR 0025** — generic TOTP in NENE2). **Near-term TODO: finish the persona-eval B
-group** (#332 a11y ✅ · #330 help-i18n ✅ · #333 org-reversibility ✅ · #334 locale), then B2 / O6 (#251).
+group** (#332 a11y ✅ · #330 help-i18n ✅ · #333 org-reversibility ✅ · #334 locale ✅ — **B group
+complete**), then #327 sweep, B2 / O6 (#251).
 Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
@@ -337,5 +338,12 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   コピーを追加し、disabled 行の死んでいた Disable 項目を **Re-enable 導線（確認ステップ付き）** に置換。
   OpenAPI 31 → 32 operations・codegen 済・en/ja 6 キー追加。
 - Gate state: PHPUnit **476** / vitest **118**, all green（enable use case/handler 8 件・console/entity 2 件追加）.
+- **header LocaleToggle の非 en/ja 閉じ込め解消＋LocaleSwitcher マウント（#334・B6 解消 — persona-eval B
+  group 完了）**: toggle を維持ペア（en+ja）へのクランプに変更 — ja→en / en→ja / **stub locale→en**
+  （読んでいる fallback 言語へ・暗黙に ja へ落とさない）。デッドコードだった 6 言語 `LocaleSwitcher` を
+  Settings → General → Language にマウント（全 locale が到達・脱出可能な唯一の picker）。クランプ仕様を
+  `docs/development/i18n.md` に明文化。`resolveLocale` に zh-CN/zh-SG/zh → zh-Hans alias を追加
+  （zh-TW/zh-Hant は en fallback のまま）。
+- Gate state: PHPUnit **476** / vitest **124**, all green.
 
 Last updated: 2026-07-02

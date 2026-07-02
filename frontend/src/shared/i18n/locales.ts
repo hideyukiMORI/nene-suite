@@ -25,6 +25,17 @@ export const SUPPORTED_LOCALE_IDS = Object.keys(LOCALES) as SupportedLocale[]
 
 export const LOCALE_STORAGE_KEY = 'nene-suite-locale'
 
+/**
+ * BCP 47 tags that do not prefix-match a supported ID but still have a clear
+ * home: simplified-Chinese region tags map to `zh-Hans`. (zh-TW / zh-Hant are
+ * traditional — no catalog, so they keep the `en` fallback.)
+ */
+const LOCALE_ALIASES: Readonly<Record<string, SupportedLocale>> = {
+  zh: 'zh-Hans',
+  'zh-CN': 'zh-Hans',
+  'zh-SG': 'zh-Hans',
+}
+
 export function resolveLocale(raw: string): SupportedLocale {
   if (SUPPORTED_LOCALE_IDS.includes(raw as SupportedLocale)) {
     return raw as SupportedLocale
@@ -33,9 +44,15 @@ export function resolveLocale(raw: string): SupportedLocale {
   if (SUPPORTED_LOCALE_IDS.includes(prefix as SupportedLocale)) {
     return prefix as SupportedLocale
   }
-  const singlePrefix = raw.split('-')[0]
+  const singlePrefix = raw.split('-')[0] ?? ''
   if (SUPPORTED_LOCALE_IDS.includes(singlePrefix as SupportedLocale)) {
     return singlePrefix as SupportedLocale
+  }
+  // Alias only on the exact tag or its two-part prefix — a bare language
+  // fallback here would wrongly pull zh-TW / zh-Hant into zh-Hans.
+  const alias = LOCALE_ALIASES[raw] ?? LOCALE_ALIASES[prefix]
+  if (alias !== undefined) {
+    return alias
   }
   return DEFAULT_LOCALE
 }
