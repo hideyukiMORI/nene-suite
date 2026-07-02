@@ -221,6 +221,7 @@ export const en = {
   'suite.install.wizard.step.disclaimer': 'Disclaimer',
   'suite.install.wizard.step.review': 'Review',
   'suite.install.wizard.step.complete': 'Complete',
+  'suite.install.wizard.step.announce': 'Step {{current}} of {{total}}: {{label}}',
 
   // ── Installer — app selection ────────────────────────────────────────────
   'suite.install.apps.title': 'Choose applications to install',

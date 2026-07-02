@@ -1,0 +1,33 @@
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { resetInstallSessionState } from '@tests/msw/handlers/install-session'
+import { renderWithProviders } from '@tests/render/render-with-providers'
+import { InstallWizard } from './InstallWizard'
+
+describe('InstallWizard', () => {
+  beforeEach(() => {
+    resetInstallSessionState()
+  })
+
+  it('marks the current step with aria-current and announces progress', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<InstallWizard />)
+
+    await user.click(screen.getByRole('button', { name: 'Start installer' }))
+
+    const currentStep = await screen.findByText('Select apps')
+    expect(currentStep.closest('li')).toHaveAttribute('aria-current', 'step')
+    expect(screen.getByRole('status')).toHaveTextContent('Step 1 of 5: Select apps')
+
+    await user.click(screen.getByRole('checkbox', { name: 'NeNe Invoice' }))
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('Step 2 of 5: Databases')
+    })
+    const databaseStep = screen.getByText('Databases', { selector: 'li span' })
+    expect(databaseStep.closest('li')).toHaveAttribute('aria-current', 'step')
+    expect(screen.getByText('Select apps').closest('li')).not.toHaveAttribute('aria-current')
+  })
+})

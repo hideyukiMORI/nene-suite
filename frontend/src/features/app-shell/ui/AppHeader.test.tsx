@@ -50,4 +50,50 @@ describe('AppHeader', () => {
     expect(screen.getByText('superadmin@nene.dev')).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /Log out/ })).toBeInTheDocument()
   })
+
+  it('moves focus into the account menu and cycles items with arrow keys', async () => {
+    const user = userEvent.setup()
+    seedSession()
+    renderWithProviders(<AppHeader onOpenPalette={() => {}} onOpenMenu={() => {}} />)
+
+    await user.click(screen.getByRole('button', { name: 'Account menu' }))
+
+    const items = screen.getAllByRole('menuitem')
+    expect(items[0]).toHaveFocus()
+
+    await user.keyboard('{ArrowDown}')
+    expect(items[1]).toHaveFocus()
+
+    await user.keyboard('{ArrowUp}{ArrowUp}')
+    expect(items[items.length - 1]).toHaveFocus()
+  })
+
+  it('closes the account menu on Escape and restores trigger focus', async () => {
+    const user = userEvent.setup()
+    seedSession()
+    renderWithProviders(<AppHeader onOpenPalette={() => {}} onOpenMenu={() => {}} />)
+    const trigger = screen.getByRole('button', { name: 'Account menu' })
+
+    await user.click(trigger)
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+  })
+
+  it('closes the notifications popover on Escape and restores trigger focus', async () => {
+    const user = userEvent.setup()
+    seedSession()
+    renderWithProviders(<AppHeader onOpenPalette={() => {}} onOpenMenu={() => {}} />)
+    const trigger = screen.getByRole('button', { name: 'Notifications' })
+
+    await user.click(trigger)
+    const popover = screen.getByRole('dialog', { name: 'Notifications' })
+    expect(popover).toHaveFocus()
+
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('dialog', { name: 'Notifications' })).not.toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+  })
 })

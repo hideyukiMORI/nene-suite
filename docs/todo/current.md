@@ -24,12 +24,12 @@ The Phase A / B1 build-out is tracked in
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
 client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
 `main`'s git log is the authoritative shipped record. Gate state: PHPUnit **468** /
-vitest **98**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+vitest **110**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
 layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
 step-up** decision (**ADR 0025** — generic TOTP in NENE2). **Near-term TODO: finish the persona-eval B
-group** (#332 a11y · #330 help-i18n · #333 org-reversibility · #334 locale), then B2 / O6 (#251).
+group** (#332 a11y ✅ · #330 help-i18n · #333 org-reversibility · #334 locale), then B2 / O6 (#251).
 Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
@@ -315,5 +315,13 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
 - ホーム挨拶の名前カラーピッカー（ClaudeDesign プレビュー用 UI）を撤去（#345）。名前は既定色 `--accent` 維持。
 - Gate state: PHPUnit **468** / vitest **98**, all green（greet-color テスト2件撤去）.
+- **a11y: command palette / Modal の focus trap・SR アナウンス（#332・B4 解消）**: 共有 `useFocusTrap`
+  （mount で panel 内へフォーカス移動・Tab/Shift+Tab を trap・unmount で trigger へ復帰）を Modal/Drawer/
+  CommandPalette に適用。palette は WAI-ARIA APG combobox 化（`role="combobox"`＋`aria-activedescendant`＋
+  `aria-expanded`/`aria-controls`、option は managed-focus 化、empty は `role="status"`）。Account menu は
+  menu-button パターン（open で先頭 menuitem へ・矢印巡回・Escape/Tab で trigger 復帰）、Notifications
+  popover も trap＋復帰。install wizard stepper は `aria-current="step"`＋visually-hidden live region
+  （`suite.install.wizard.step.announce`、en/ja）で SR に前進を通知し、`<ol>` 直下の装飾 span を擬似要素化。
+- Gate state: PHPUnit **468** / vitest **110**, all green（focus/a11y テスト12件追加）.
 
-Last updated: 2026-06-27
+Last updated: 2026-07-02
