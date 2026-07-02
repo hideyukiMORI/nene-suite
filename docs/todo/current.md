@@ -40,7 +40,7 @@ explicit defer). **Next: B2 / O6 (#251)** — see the
 Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
-[`../handover/2026-06-28-ux-audit-shell-and-mfa-direction.md`](../handover/2026-06-28-ux-audit-shell-and-mfa-direction.md).
+[`../handover/2026-07-03-ux-remediation-adr0019-o6-ready.md`](../handover/2026-07-03-ux-remediation-adr0019-o6-ready.md).
 
 ---
 
@@ -379,9 +379,16 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   clear 相手に結線可能に。invoice（#496/#497）・records（#586/#648）は未採用。
 - Detailed daily report: [`docs/daily-reports/2026-07-02.md`](../daily-reports/2026-07-02.md)
   （persona-eval B group 完了＋#327 medium sweep 完了＋鮮度更新の一日）.
+- **#341 close（回答済み・ADR 0025 で確定・NENE2#1427 は v1.5.333 出荷済み）**。
+- **O6 実装スライス起票（epic #251・ADR 0019 accepted 後）**: **#361**（S2-1a deploy-control seam＋
+  監査・opt-in capability flag 既定 off）→ **#362**（S2-1b 依存順 plan＋min-version gating）→
+  **#363**（S2-1c halt-don't-unwind 実行）→ **#364**（S2-1d apex「update all」UI）。Origin live 不要。
+- Detailed daily report: [`docs/daily-reports/2026-07-03.md`](../daily-reports/2026-07-03.md)
+  （ADR 0019 受理＋#341 close＋clear 採用＋O6 スライス起票）。Session handover:
+  [`docs/handover/2026-07-03-ux-remediation-adr0019-o6-ready.md`](../handover/2026-07-03-ux-remediation-adr0019-o6-ready.md)（#365）.
 - **ADR 0019 accepted（2026-07-02 amendment・O6 前提の最終ピース）**: OQ1 = host-side deploy agent
   （Suite に Docker socket を渡さない・allow-list 限定・監査必須・**opt-in capability flag（既定 off・
   全 edition で利用可）**）、OQ2 = 段階 provenance（catalog digest pin ＋ `/machine/health` 事後検証 →
   Origin 署名へ昇格）、OQ3（Tier A 共存）= toolkit 着地まで defer。O6（#251）実装スライスに着手可能。
 
-Last updated: 2026-07-02
+Last updated: 2026-07-03
