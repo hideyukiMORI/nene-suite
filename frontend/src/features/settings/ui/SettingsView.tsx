@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { env } from '@/shared/config/env'
 import { useTranslation } from '@/shared/i18n'
+import { LocaleSwitcher } from '@/shared/ui'
 import { DisclaimerModal } from './DisclaimerModal'
 import styles from './settings.module.css'
 
@@ -27,6 +28,12 @@ export function SettingsView() {
             <span className={styles['rowLabel']}>{t('suite.settings.edition')}</span>
             <span className={styles['mono']}>{env.edition.toUpperCase()}</span>
           </div>
+          {/* Full six-locale picker — the header toggle only clamps within en+ja. */}
+          <LocaleSwitcher
+            className={styles['localeRow'] ?? ''}
+            labelClassName={styles['rowLabel'] ?? ''}
+            selectClassName={styles['localeSelect'] ?? ''}
+          />
           <div className={styles['row']}>
             <span className={styles['rowLabel']}>{t('suite.settings.federationKeys')}</span>
             <Link className={styles['rowLink']} to="/admin/organizations?tab=keys">

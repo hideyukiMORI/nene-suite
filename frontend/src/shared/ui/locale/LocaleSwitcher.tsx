@@ -1,13 +1,32 @@
 import { LOCALES, resolveLocale, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 
-/** Language selector backed by the i18n context; persists via the i18n provider. */
-export function LocaleSwitcher() {
+interface LocaleSwitcherProps {
+  /** Class for the wrapping <label> (layout is owned by the mount point). */
+  readonly className?: string
+  /** Class for the label text. */
+  readonly labelClassName?: string
+  /** Class for the <select>. */
+  readonly selectClassName?: string
+}
+
+/**
+ * Full six-locale selector backed by the i18n context; persists via the i18n
+ * provider. This is the only picker where every locale — including the four
+ * English-fallback stubs — is reachable; the header LocaleToggle only clamps
+ * within the maintained en+ja pair (docs/development/i18n.md).
+ */
+export function LocaleSwitcher({
+  className,
+  labelClassName,
+  selectClassName,
+}: LocaleSwitcherProps = {}) {
   const { t, locale, setLocale } = useTranslation()
 
   return (
-    <label>
-      {t('suite.locale.label')}
+    <label className={className}>
+      <span className={labelClassName}>{t('suite.locale.label')}</span>
       <select
+        className={selectClassName}
         value={locale}
         aria-label={t('suite.locale.select')}
         onChange={(event) => {
