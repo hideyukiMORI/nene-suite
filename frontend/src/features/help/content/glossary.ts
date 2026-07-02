@@ -1,14 +1,19 @@
+import type { MessageKey } from '@/shared/i18n'
 import type { GlossaryCategory, GlossaryTerm } from './types'
 
-/** Display labels for glossary categories (rendered as section headings). */
-export const GLOSSARY_CATEGORIES: Readonly<Record<GlossaryCategory, string>> = {
-  basics: '基本',
-  tenancy: '組織とメンバー',
-  install: 'インストール',
-  database: 'データベース',
-  federation: '連携（フェデレーション）',
-  origin: '更新・お知らせ',
-  operation: '運用・安全',
+/**
+ * Message keys for glossary-category labels (rendered as section headings).
+ * Category labels are UI chrome, so they live in the i18n catalogs
+ * (ADR 0024 §3) — only the term prose below is the Japanese-first exception.
+ */
+export const GLOSSARY_CATEGORY_LABEL_KEY: Readonly<Record<GlossaryCategory, MessageKey>> = {
+  basics: 'suite.help.category.basics',
+  tenancy: 'suite.help.category.tenancy',
+  install: 'suite.help.category.install',
+  database: 'suite.help.category.database',
+  federation: 'suite.help.category.federation',
+  origin: 'suite.help.category.origin',
+  operation: 'suite.help.category.operation',
 }
 
 /**

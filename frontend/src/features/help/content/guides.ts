@@ -1,10 +1,15 @@
+import type { MessageKey } from '@/shared/i18n'
 import type { Guide, GuideGroup } from './types'
 
-/** Display labels for guide groups (rendered as sidebar / index headings). */
-export const GUIDE_GROUPS: Readonly<Record<GuideGroup, string>> = {
-  start: 'はじめに',
-  screens: '画面ごとの使い方',
-  tutorial: 'チュートリアル',
+/**
+ * Message keys for guide-group labels (rendered as sidebar / index headings).
+ * Group labels are UI chrome, so they live in the i18n catalogs (ADR 0024 §3)
+ * — only the guide body below is the Japanese-first exception.
+ */
+export const GUIDE_GROUP_LABEL_KEY: Readonly<Record<GuideGroup, MessageKey>> = {
+  start: 'suite.help.group.start',
+  screens: 'suite.help.group.screens',
+  tutorial: 'suite.help.group.tutorial',
 }
 
 /** Order in which groups are listed. */

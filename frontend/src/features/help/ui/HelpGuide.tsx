@@ -1,21 +1,23 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from '@/shared/i18n'
 import { getGuide } from '../content'
 import { Callout } from './Callout'
 import { HelpText } from './HelpText'
 import styles from './help-guide.module.css'
 
 export function HelpGuide({ slug }: { readonly slug: string }): ReactNode {
+  const { t } = useTranslation()
   const guide = getGuide(slug)
 
   if (guide === undefined) {
     return (
       <div className={styles['root']}>
-        <h1 className={styles['title']}>ページが見つかりません</h1>
+        <h1 className={styles['title']}>{t('suite.help.notFound.title')}</h1>
         <p className={styles['muted']}>
-          このヘルプは存在しないか、移動した可能性があります。{' '}
+          {t('suite.help.notFound.body')}{' '}
           <Link to="/help" className={styles['inlineLink']}>
-            ヘルプの入口へ戻る
+            {t('suite.help.notFound.back')}
           </Link>
         </p>
       </div>
@@ -90,7 +92,7 @@ export function HelpGuide({ slug }: { readonly slug: string }): ReactNode {
 
       {guide.related && guide.related.length > 0 ? (
         <footer className={styles['related']}>
-          <span className={styles['relatedLabel']}>関連</span>
+          <span className={styles['relatedLabel']}>{t('suite.help.related')}</span>
           <div className={styles['relatedLinks']}>
             {guide.related.map((slugRef) => {
               const ref = getGuide(slugRef)
