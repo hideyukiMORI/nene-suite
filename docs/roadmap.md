@@ -85,7 +85,8 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - ✅ Installed-version tracking + **catalog version mirror** — the sibling auth-gated
   `/machine/health` `version` probe (NENE2 v1.5.330) feeds the update diff, and the catalog API
   mirrors `installedVersion` / `availableVersion` per app (ADR 0013 §4, **accepted**). Sibling
-  adoption is cross-repo (nene-invoice#496 / nene-clear#182 / nene-records#586).
+  adoption is cross-repo (nene-invoice#496 / nene-clear#182 / nene-records#586 — all still open
+  as of 2026-07-02, so live installations report `unknown` until the siblings wire the probe).
 - ⏳ Shared JWT issuer / org UUID **propagation into siblings** — org resolution +
   authorization-code assertion flow, tracked via cross-repo Issues (B2).
 - ⏳ **Federated user lifecycle** — prompt deprovisioning beyond JIT-on-login: a pull
@@ -94,10 +95,11 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
   **accepted** as **ADR 0020** (extends ADR 0012; no cross-DB writes; NENE2 gets a generic
   framework feature, never Suite-named). A B2 follow-on (depends on B1 keys + B2 org resolution
   + the ADR 0012 §5 roster-pull surface).
-- ⏳ **MFA / step-up** — generic TOTP primitive in NENE2 (no new auth repo; NENE2#1427), enforced at
-  the Suite IdP when federated (the assertion carries a step-up claim) and available to standalone
-  siblings; **decoupled** from the federation roadmap. Contract **accepted** as **ADR 0025** (extends
-  ADR 0012). NeNe Clear's MFA question (#341 / nene-clear#195) is answered.
+- ⏳ **MFA / step-up** — generic TOTP primitive in NENE2 (no new auth repo; NENE2#1427 —
+  **shipped in NENE2 v1.5.333**), enforced at the Suite IdP when federated (the assertion carries a
+  step-up claim) and available to standalone siblings; **decoupled** from the federation roadmap.
+  Contract **accepted** as **ADR 0025** (extends ADR 0012). The remaining work is Suite-side
+  (IdP enforce + step-up claim). NeNe Clear's MFA question (#341 / nene-clear#195) is answered.
 - ⏳ Upgrade **orchestration** — dependency-ordered "update all", **deployment-driven** (Tier B:
   Suite recreates each sibling container at the new image in dependency order with min-version
   gating; the sibling migrates on boot — its own Tier A). **Suite drives deployment; the apply stays
@@ -126,4 +128,4 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - Shared application database **across products** (each app keeps its own DB;
   hosted multi-tenancy is per-app `organization_id` scoping, not a shared app DB)
 
-Last updated: 2026-06-28
+Last updated: 2026-07-02
