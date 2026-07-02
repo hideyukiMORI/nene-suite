@@ -14,6 +14,7 @@ final readonly class OrganizationRouteRegistrar
         private ListOrganizationsHandler $listHandler,
         private RenameOrganizationHandler $renameHandler,
         private DisableOrganizationHandler $disableHandler,
+        private EnableOrganizationHandler $enableHandler,
     ) {
     }
 
@@ -23,11 +24,13 @@ final readonly class OrganizationRouteRegistrar
         $list = $this->listHandler;
         $rename = $this->renameHandler;
         $disable = $this->disableHandler;
+        $enable = $this->enableHandler;
 
         $router
             ->post('/api/v1/organizations', static fn (ServerRequestInterface $request) => $create->handle($request))
             ->get('/api/v1/organizations', static fn (ServerRequestInterface $request) => $list->handle($request))
             ->patch('/api/v1/organizations/{id}', static fn (ServerRequestInterface $request) => $rename->handle($request))
-            ->post('/api/v1/organizations/{id}/disable', static fn (ServerRequestInterface $request) => $disable->handle($request));
+            ->post('/api/v1/organizations/{id}/disable', static fn (ServerRequestInterface $request) => $disable->handle($request))
+            ->post('/api/v1/organizations/{id}/enable', static fn (ServerRequestInterface $request) => $enable->handle($request));
     }
 }

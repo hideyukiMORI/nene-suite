@@ -368,6 +368,12 @@ export const en = {
   'suite.org.rename.submitting': 'Renaming…',
   'suite.org.disable.action': 'Disable',
   'suite.org.disable.confirm': 'Disable this organization?',
+  'suite.org.disable.impact':
+    'Disabling is a reversible freeze, not deletion. Members can no longer sign in to this organization, and its app data stays stored untouched. You can re-enable it here at any time; the action is recorded in the audit log.',
+  'suite.org.enable.action': 'Re-enable',
+  'suite.org.enable.confirm': 'Re-enable this organization?',
+  'suite.org.enable.impact':
+    'Members can sign in again and the frozen data becomes available exactly as before. The action is recorded in the audit log.',
   'suite.org.members': 'Members',
   'suite.org.error.slugConflict': 'An organization with this slug already exists.',
   'suite.org.error.validation': 'Check the organization name and slug.',

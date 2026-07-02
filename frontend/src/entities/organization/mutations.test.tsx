@@ -2,7 +2,12 @@ import { act } from 'react'
 import { waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderHookWithProviders } from '@tests/render/render-with-providers'
-import { useCreateOrganization, useDisableOrganization, useRenameOrganization } from './mutations'
+import {
+  useCreateOrganization,
+  useDisableOrganization,
+  useEnableOrganization,
+  useRenameOrganization,
+} from './mutations'
 
 const ORG_ID = '01J8XR0G7Q9V2H7K3N5M0B8TCA'
 
@@ -59,5 +64,18 @@ describe('organization mutations', () => {
       expect(result.current.isSuccess).toBe(true)
     })
     expect(result.current.data?.status).toBe('disabled')
+  })
+
+  it('re-enables an organization', async () => {
+    const { result } = renderHookWithProviders(() => useEnableOrganization())
+
+    act(() => {
+      result.current.mutate(ORG_ID)
+    })
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+    expect(result.current.data?.status).toBe('active')
   })
 })

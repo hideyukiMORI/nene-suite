@@ -340,6 +340,12 @@ export const ja: Partial<MessageCatalog> = {
   'suite.org.rename.submitting': '改名中…',
   'suite.org.disable.action': '無効化',
   'suite.org.disable.confirm': 'この組織を無効化しますか？',
+  'suite.org.disable.impact':
+    '無効化は削除ではなく、元に戻せる凍結です。メンバーはこの組織にサインインできなくなりますが、アプリのデータはそのまま保存されます。ここからいつでも再有効化でき、操作は監査ログに記録されます。',
+  'suite.org.enable.action': '再有効化',
+  'suite.org.enable.confirm': 'この組織を再有効化しますか？',
+  'suite.org.enable.impact':
+    'メンバーは再びサインインできるようになり、凍結されていたデータは元どおり利用できます。操作は監査ログに記録されます。',
   'suite.org.members': 'メンバー',
   'suite.org.error.slugConflict': 'このスラッグの組織は既に存在します。',
   'suite.org.error.validation': '組織の名前とスラッグを確認してください。',

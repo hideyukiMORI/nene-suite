@@ -51,3 +51,10 @@ export function useDisableOrganization(): UseMutationResult<Organization, AppErr
     apiClient.post<OrganizationDto>(`/api/v1/organizations/${id}/disable`, {}),
   )
 }
+
+/** POST /api/v1/organizations/{id}/enable — reverses a soft-disable. */
+export function useEnableOrganization(): UseMutationResult<Organization, AppError, string> {
+  return useOrganizationWriter((id: string) =>
+    apiClient.post<OrganizationDto>(`/api/v1/organizations/${id}/enable`, {}),
+  )
+}

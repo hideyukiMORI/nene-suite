@@ -21,7 +21,10 @@ function organization(
 export const organizationHandlers = [
   http.get('/api/v1/organizations', () =>
     HttpResponse.json({
-      organizations: [organization('01J8XR0G7Q9V2H7K3N5M0B8TCA', 'Acme KK', 'acme-kk')],
+      organizations: [
+        organization('01J8XR0G7Q9V2H7K3N5M0B8TCA', 'Acme KK', 'acme-kk'),
+        organization('01J8XR0G7Q9V2H7K3N5M0B8TCB', 'Umbrella KK', 'umbrella-kk', 'disabled'),
+      ],
     }),
   ),
   http.post('/api/v1/organizations', async ({ request }) => {
@@ -55,5 +58,8 @@ export const organizationHandlers = [
   }),
   http.post('/api/v1/organizations/:id/disable', ({ params }) =>
     HttpResponse.json(organization(String(params.id), 'Acme KK', 'acme-kk', 'disabled')),
+  ),
+  http.post('/api/v1/organizations/:id/enable', ({ params }) =>
+    HttpResponse.json(organization(String(params.id), 'Umbrella KK', 'umbrella-kk', 'active')),
   ),
 ]
