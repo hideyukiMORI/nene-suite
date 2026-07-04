@@ -249,6 +249,21 @@ op (`PUT …/install-sessions/{id}/database-targets`). The choice is carried on 
 (`databaseTargets`) and resolved with the env value as fallback (session override → env → default).
 Same canonical `mode` values; the request fields are `catalogId` / `mode` / `server` / `name`.
 
+### 4.5 Deploy agent capability ([ADR 0019](../adr/0019-tier-b-deployment-driven-upgrade.md) OQ1)
+
+| Variable | Canonical | Never |
+| --- | --- | --- |
+| Capability flag (opt-in, default off) | `NENE_SUITE_DEPLOY_AGENT_ENABLED` | `DEPLOY_ENABLED`, `NENE_SUITE_DEPLOY_ENABLED` |
+| Agent pairing key (≥32 bytes) | `NENE_SUITE_DEPLOY_AGENT_KEY` | `DEPLOY_KEY`, `NENE_SUITE_AGENT_KEY` |
+
+The **host-side deploy agent** is the process on the compose host that executes
+`compose pull` + recreate against the allow-list; the suite requests deployments through
+the machine seam (`/api/v1/machine/deploy/*`, header **`X-NENE-SUITE-DEPLOY-KEY`**) and
+never holds the Docker socket. The control-DB queue table is **`deploy_requests`**
+(never `deployments`, `deploy_queue`). Fail-closed: the flag must be the exact string `1`
+**and** the key must be ≥32 bytes, or the capability resolves disabled (disabled-degrade —
+"updates visible, apply manual").
+
 ---
 
 ## 5. JWT claims (suite mode)

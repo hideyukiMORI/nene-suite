@@ -34,6 +34,10 @@ product database, not here.
 
 - [`federation_signing_keys`](#federation_signing_keys) — Federation IdP signing keys: public JWK only (private key never stored). Exactly one row is active; status drives JWKS publication.
 
+### Deploy
+
+- [`deploy_requests`](#deploy_requests) — Deploy-control seam queue (ADR 0019 OQ1, S2-1a / #361): one row per "recreate service X at image digest D" request handed to the host-side deploy agent. The suite writes pending rows and records the agent-reported terminal result; the compose pull + recreate itself runs on the host, never in the suite container. Disabled-degrade: no rows are ever created while the capability flag is off.
+
 ### Origin
 
 - [`installed_app_versions`](#installed_app_versions) — Last-known installed version per suite-managed product, learned from the sibling /health probe (#255, epic #251 prerequisite). Supplies the installed version to the Origin update aggregator so a verified latest version can be diffed (unknown -> up_to_date / update_available / forced) instead of surfaced latest-only. Last-write-wins; absence of a row means the version is unknown.
@@ -52,6 +56,28 @@ erDiagram
   operators ||--o{ suite_audit_events : "actor_user_id"
   install_sessions ||--o{ suite_audit_events : "install_session_id"
 ```
+
+## `deploy_requests`
+
+_Group: Deploy_
+
+Deploy-control seam queue (ADR 0019 OQ1, S2-1a / #361): one row per "recreate service X at image digest D" request handed to the host-side deploy agent. The suite writes pending rows and records the agent-reported terminal result; the compose pull + recreate itself runs on the host, never in the suite container. Disabled-degrade: no rows are ever created while the capability flag is off.
+
+| Column | Type | Null | Key | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `CHAR(26)` | NO | PK | ULID primary key. |
+| `service` | `VARCHAR(100)` | NO |  | Catalog app id (explicit allow-list; matches catalog/apps.json id). |
+| `image_digest` | `VARCHAR(96)` | NO |  | Immutable image pin, sha256:<64 hex> (ADR 0019 OQ2 stage 1). Never a mutable tag. |
+| `status` | `VARCHAR(16)` | NO |  | Lifecycle: pending \| succeeded \| failed. Terminal states are agent-reported. |
+| `requested_by` | `CHAR(26)` | YES |  | Requesting operator ULID. Requests are operator-initiated (superadmin surface). |
+| `detail` | `TEXT` | YES |  | Agent-reported outcome detail (failure reason etc.). NULL until terminal. |
+| `created_at` | `VARCHAR(32)` | NO |  | Request time, ISO-8601 UTC string. |
+| `updated_at` | `VARCHAR(32)` | NO |  | Last transition time, ISO-8601 UTC string. |
+| `completed_at` | `VARCHAR(32)` | YES |  | Terminal report time, ISO-8601 UTC string. NULL while pending. |
+
+### Indexes
+
+- `idx_deploy_requests_status_created_at` (index) on `status, created_at`
 
 ## `federation_signing_keys`
 

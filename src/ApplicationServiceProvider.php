@@ -23,6 +23,13 @@ use NeNeSuite\Auth\UnauthorizedExceptionHandler;
 use NeNeSuite\DatabaseProvision\DatabaseProvisionServiceProvider;
 use NeNeSuite\DatabaseTargets\DatabaseTargetsRouteRegistrar;
 use NeNeSuite\DatabaseTargets\DatabaseTargetsServiceProvider;
+use NeNeSuite\Deploy\DeployAgentUnauthorizedExceptionHandler;
+use NeNeSuite\Deploy\DeployCapabilityDisabledExceptionHandler;
+use NeNeSuite\Deploy\DeployRequestConflictExceptionHandler;
+use NeNeSuite\Deploy\DeployRequestNotFoundExceptionHandler;
+use NeNeSuite\Deploy\DeployRouteRegistrar;
+use NeNeSuite\Deploy\DeployServiceProvider;
+use NeNeSuite\Deploy\DeployValidationExceptionHandler;
 use NeNeSuite\Http\Edition;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\InstalledApps\InstalledAppsRouteRegistrar;
@@ -80,7 +87,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new InstallerServiceProvider())
             ->addProvider(new TenancyServiceProvider())
             ->addProvider(new SiblingHealthServiceProvider())
-            ->addProvider(new OriginServiceProvider());
+            ->addProvider(new OriginServiceProvider())
+            ->addProvider(new DeployServiceProvider());
 
         $builder
             ->set(
@@ -96,6 +104,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $tenancy = $container->get('nene-suite.route_registrar.tenancy');
                     $memberships = $container->get('nene-suite.route_registrar.memberships');
                     $origin = $container->get('nene-suite.route_registrar.origin');
+                    $deploy = $container->get('nene-suite.route_registrar.deploy');
 
                     if (!$appCatalog instanceof AppCatalogRouteRegistrar) {
                         throw new LogicException('App catalog route registrar service is invalid.');
@@ -137,6 +146,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Origin route registrar service is invalid.');
                     }
 
+                    if (!$deploy instanceof DeployRouteRegistrar) {
+                        throw new LogicException('Deploy route registrar service is invalid.');
+                    }
+
                     $registrars = [
                         $appCatalog,
                         $installSession,
@@ -148,6 +161,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $tenancy,
                         $memberships,
                         $origin,
+                        $deploy,
                     ];
 
                     // Edition-gated: the federation surface (JWKS) is registered only in the hosted
@@ -186,6 +200,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $membershipConflict = $container->get(MembershipConflictExceptionHandler::class);
                     $membershipInvariant = $container->get(MembershipInvariantExceptionHandler::class);
                     $membershipNotFound = $container->get(MembershipNotFoundExceptionHandler::class);
+                    $deployCapabilityDisabled = $container->get(DeployCapabilityDisabledExceptionHandler::class);
+                    $deployAgentUnauthorized = $container->get(DeployAgentUnauthorizedExceptionHandler::class);
+                    $deployRequestNotFound = $container->get(DeployRequestNotFoundExceptionHandler::class);
+                    $deployRequestConflict = $container->get(DeployRequestConflictExceptionHandler::class);
+                    $deployValidation = $container->get(DeployValidationExceptionHandler::class);
 
                     if (!$installSessionNotFound instanceof DomainExceptionHandlerInterface) {
                         throw new LogicException('Install session not found exception handler service is invalid.');
@@ -251,6 +270,26 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Membership not found exception handler service is invalid.');
                     }
 
+                    if (!$deployCapabilityDisabled instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Deploy capability disabled exception handler service is invalid.');
+                    }
+
+                    if (!$deployAgentUnauthorized instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Deploy agent unauthorized exception handler service is invalid.');
+                    }
+
+                    if (!$deployRequestNotFound instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Deploy request not found exception handler service is invalid.');
+                    }
+
+                    if (!$deployRequestConflict instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Deploy request conflict exception handler service is invalid.');
+                    }
+
+                    if (!$deployValidation instanceof DomainExceptionHandlerInterface) {
+                        throw new LogicException('Deploy validation exception handler service is invalid.');
+                    }
+
                     return [
                         $installSessionNotFound,
                         $installSessionConflict,
@@ -268,6 +307,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $membershipConflict,
                         $membershipInvariant,
                         $membershipNotFound,
+                        $deployCapabilityDisabled,
+                        $deployAgentUnauthorized,
+                        $deployRequestNotFound,
+                        $deployRequestConflict,
+                        $deployValidation,
                     ];
                 },
             );

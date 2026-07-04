@@ -659,6 +659,90 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/deploy/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List deploy requests (newest first).
+         * @description Read model for the apex update surface (S2-1d). Always 200 — `enabled`
+         *     mirrors the capability flag so the UI can degrade to manual-apply guidance
+         *     without a second probe. Platform-superadmin only.
+         */
+        get: operations["listDeployRequests"];
+        put?: never;
+        /**
+         * Queue a sibling container recreate at a pinned image digest.
+         * @description First slice of the deployment-driven upgrade orchestrator (ADR 0019, S2-1a).
+         *     Persists a deploy request for the **host-side deploy agent** to consume —
+         *     the suite never holds the Docker socket (OQ1). The target `service` must be
+         *     a catalog app id (explicit allow-list) and the image is pinned by immutable
+         *     digest (OQ2 stage 1). Platform-superadmin only. Emits `deploy_request.created`
+         *     (before `null`) in the suite audit trail. Returns 409 while the deploy-agent
+         *     capability flag is off (the default): updates stay visible, apply stays
+         *     manual — the same disabled-degrade posture as the Origin client.
+         */
+        post: operations["createDeployRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/machine/deploy/requests/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Deploy agent: fetch pending requests (oldest first).
+         * @description Machine seam consumed by the host-side deploy agent
+         *     (`docs/ops/deploy-agent.md`): poll this list, execute `compose pull` +
+         *     recreate **only for allow-listed services**, then report through
+         *     `reportDeployRequestResult`. Exactly one agent per compose host (no claim
+         *     step in S2-1a — the seam assumes a single consumer). 401 on a missing or
+         *     mismatched agent key; 409 while the capability flag is off.
+         */
+        get: operations["listPendingDeployRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/machine/deploy/requests/{id}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Deploy agent: report the outcome of one deploy request.
+         * @description Terminal transition `pending → succeeded | failed`, reported by the
+         *     host-side deploy agent after `compose pull` + recreate. Emits
+         *     `deploy_request.completed` with before/after snapshots and a machine
+         *     actor label in the suite audit trail. A request that is already terminal
+         *     returns 409 (the agent must not re-execute it). The suite additionally
+         *     verifies the outcome independently via the sibling `/machine/health`
+         *     version probe (ADR 0019 §3) — that verification is S2-1c scope.
+         */
+        put: operations["reportDeployRequestResult"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1103,6 +1187,52 @@ export interface components {
                 detail?: string;
             }[];
         };
+        /**
+         * @description Deploy request lifecycle — pending until the host-side agent reports a terminal result.
+         * @enum {string}
+         */
+        DeployRequestStatus: "pending" | "succeeded" | "failed";
+        DeployRequest: {
+            id: components["schemas"]["Ulid"];
+            /**
+             * @description Catalog app id (the explicit allow-list — never an arbitrary compose service).
+             * @example nene-invoice
+             */
+            service: string;
+            /**
+             * @description Immutable image digest pin (ADR 0019 OQ2 stage 1 — never a mutable tag).
+             * @example sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+             */
+            imageDigest: string;
+            status: components["schemas"]["DeployRequestStatus"];
+            /** @description Agent-reported result detail (failure reason, compose output digest); null until terminal. */
+            detail: string | null;
+            /** @description Requesting operator ULID (null only for pre-A6 rows; requests are operator-initiated). */
+            requestedBy: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Set when the agent reports a terminal result.
+             */
+            completedAt: string | null;
+        };
+        DeployRequestList: {
+            /** @description Capability flag state — false means disabled-degrade (apply stays manual). */
+            enabled: boolean;
+            requests: components["schemas"]["DeployRequest"][];
+        };
+        CreateDeployRequestInput: {
+            /** @description Catalog app id; validated against the catalog allow-list. */
+            service: string;
+            imageDigest: string;
+        };
+        DeployResultInput: {
+            /** @enum {string} */
+            status: "succeeded" | "failed";
+            /** @description Optional human-readable outcome detail; stored verbatim (no secrets — audit-sanitized). */
+            detail?: string | null;
+        };
     };
     responses: {
         /** @description Authentication required or token invalid. */
@@ -1118,6 +1248,78 @@ export interface components {
                  *       "status": 401,
                  *       "detail": "A valid apex operator token is required.",
                  *       "instance": "/api/v1/installed-apps"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description Deploy agent key missing or mismatched. */
+        DeployAgentUnauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/deploy-agent-unauthorized",
+                 *       "title": "Deploy agent unauthorized",
+                 *       "status": 401,
+                 *       "detail": "A valid X-NENE-SUITE-DEPLOY-KEY header is required.",
+                 *       "instance": "/api/v1/machine/deploy/requests/pending"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The deploy-agent capability flag is off (the default) — apply stays manual. */
+        DeployCapabilityDisabled: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/deploy-capability-disabled",
+                 *       "title": "Deploy capability disabled",
+                 *       "status": 409,
+                 *       "detail": "The host-side deploy agent capability is not enabled on this suite (NENE_SUITE_DEPLOY_AGENT_ENABLED).",
+                 *       "instance": "/api/v1/deploy/requests"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description No deploy request with that id. */
+        DeployRequestNotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/deploy-request-not-found",
+                 *       "title": "Deploy request not found",
+                 *       "status": 404,
+                 *       "detail": "No deploy request exists for id 01J8XR4ZS6Q9V2H7K3N5M0B8TC.",
+                 *       "instance": "/api/v1/machine/deploy/requests/01J8XR4ZS6Q9V2H7K3N5M0B8TC/result"
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The deploy request is already terminal (succeeded or failed). */
+        DeployRequestConflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-suite.dev/problems/deploy-request-conflict",
+                 *       "title": "Deploy request conflict",
+                 *       "status": 409,
+                 *       "detail": "This deploy request already has a terminal result and cannot be reported again.",
+                 *       "instance": "/api/v1/machine/deploy/requests/01J8XR4ZS6Q9V2H7K3N5M0B8TC/result"
                  *     }
                  */
                 "application/problem+json": components["schemas"]["ProblemDetails"];
@@ -2759,6 +2961,119 @@ export interface operations {
                 };
                 content?: never;
             };
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listDeployRequests: {
+        parameters: {
+            query?: {
+                /** @description Filter by request state. */
+                status?: components["schemas"]["DeployRequestStatus"];
+                /** @description Page size (newest first; no cursor in S2-1a). */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deploy capability state and the most recent requests. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeployRequestList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    createDeployRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDeployRequestInput"];
+            };
+        };
+        responses: {
+            /** @description Deploy request persisted and queued for the host-side agent. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeployRequest"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["DeployCapabilityDisabled"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listPendingDeployRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending deploy requests, oldest first. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: components["schemas"]["DeployRequest"][];
+                    };
+                };
+            };
+            401: components["responses"]["DeployAgentUnauthorized"];
+            409: components["responses"]["DeployCapabilityDisabled"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    reportDeployRequestResult: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["Ulid"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeployResultInput"];
+            };
+        };
+        responses: {
+            /** @description Result recorded; the request is now terminal. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeployRequest"];
+                };
+            };
+            401: components["responses"]["DeployAgentUnauthorized"];
+            404: components["responses"]["DeployRequestNotFound"];
+            409: components["responses"]["DeployRequestConflict"];
+            422: components["responses"]["ValidationFailed"];
             500: components["responses"]["ServerError"];
         };
     };
