@@ -78,6 +78,14 @@ final readonly class OriginUpdateAggregator
         $changelogUrl = is_string($latest['changelog_url'] ?? null) ? $latest['changelog_url'] : null;
         $releasedAt = is_string($latest['released_at'] ?? null) ? $latest['released_at'] : null;
 
+        $requires = [];
+        $rawRequires = is_array($latest['requires'] ?? null) ? $latest['requires'] : [];
+        foreach ($rawRequires as $requiredProduct => $constraint) {
+            if (is_string($requiredProduct) && is_string($constraint) && $constraint !== '') {
+                $requires[$requiredProduct] = $constraint;
+            }
+        }
+
         return new OriginUpdateSignal(
             product: $query->product,
             channel: $query->channel,
@@ -89,6 +97,7 @@ final readonly class OriginUpdateAggregator
             releasedAt: $releasedAt,
             freshness: $outcome->freshness,
             warnings: $outcome->warnings,
+            requires: $requires,
         );
     }
 

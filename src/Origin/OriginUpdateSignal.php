@@ -13,7 +13,10 @@ namespace NeNeSuite\Origin;
 final readonly class OriginUpdateSignal
 {
     /**
-     * @param list<string> $warnings
+     * @param list<string>          $warnings
+     * @param array<string, string> $requires min-compatible sibling versions from the verified
+     *                                        manifest (`latest.requires`, e.g. `nene-invoice => >=1.3.0`) —
+     *                                        consumed by the deploy planner (ADR 0019 §3), not the wire view
      */
     public function __construct(
         public string $product,
@@ -27,6 +30,7 @@ final readonly class OriginUpdateSignal
         public ?OriginFreshnessState $freshness = null,
         public ?string $reason = null,
         public array $warnings = [],
+        public array $requires = [],
     ) {
     }
 

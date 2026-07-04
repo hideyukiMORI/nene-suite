@@ -146,6 +146,17 @@ for i, app in enumerate(apps):
             elif prefix.startswith("NENE_SUITE_"):
                 err(f"{label}: 'database.env_prefix' must not use the suite NENE_SUITE_ prefix (got {prefix!r})")
 
+    deploy = app.get("deploy")
+    if deploy is not None:
+        if not isinstance(deploy, dict):
+            err(f"{label}: 'deploy' must be an object")
+        else:
+            digest = deploy.get("image_digest")
+            if digest is None:
+                err(f"{label}: 'deploy.image_digest' is required when 'deploy' is present")
+            elif not isinstance(digest, str) or not re.match(r"^sha256:[0-9a-f]{64}$", digest):
+                err(f"{label}: 'deploy.image_digest' must be an immutable sha256:<64 hex> digest, never a mutable tag (got {digest!r})")
+
 # ── Semantic rules (beyond JSON Schema) ──────────────────────────────────────
 ids: list[str] = [a["id"] for a in apps if isinstance(a, dict) and isinstance(a.get("id"), str)]
 id_set = set(ids)

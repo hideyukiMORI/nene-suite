@@ -13,6 +13,7 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\AppCatalog\CatalogAppRepositoryInterface;
 use NeNeSuite\Http\RuntimeServiceProvider;
+use NeNeSuite\Origin\GetOriginUpdatesUseCaseInterface;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderFactoryInterface;
 use NeNeSuite\Tenancy\SuperadminGuard;
 use Psr\Container\ContainerInterface;
@@ -73,6 +74,22 @@ final readonly class DeployServiceProvider implements ServiceProviderInterface
                     self::repositoryFactory($container),
                     self::auditRecorderFactory($container),
                     self::suiteId($container),
+                ),
+            )
+            ->set(
+                ComputeDeployPlanUseCaseInterface::class,
+                static fn (ContainerInterface $container): ComputeDeployPlanUseCaseInterface => new ComputeDeployPlanUseCase(
+                    self::config($container),
+                    self::originUpdates($container),
+                    self::catalog($container),
+                ),
+            )
+            ->set(
+                GetDeployPlanHandler::class,
+                static fn (ContainerInterface $container): GetDeployPlanHandler => new GetDeployPlanHandler(
+                    self::superadminGuard($container),
+                    self::planUseCase($container),
+                    self::jsonResponse($container),
                 ),
             )
             ->set(
@@ -144,6 +161,7 @@ final readonly class DeployServiceProvider implements ServiceProviderInterface
                 static fn (ContainerInterface $container): DeployRouteRegistrar => new DeployRouteRegistrar(
                     self::get($container, CreateDeployRequestHandler::class),
                     self::get($container, ListDeployRequestsHandler::class),
+                    self::get($container, GetDeployPlanHandler::class),
                     self::get($container, ListPendingDeployRequestsHandler::class),
                     self::get($container, ReportDeployRequestResultHandler::class),
                 ),
@@ -170,6 +188,28 @@ final readonly class DeployServiceProvider implements ServiceProviderInterface
         }
 
         return $authenticator;
+    }
+
+    private static function originUpdates(ContainerInterface $container): GetOriginUpdatesUseCaseInterface
+    {
+        $useCase = $container->get(GetOriginUpdatesUseCaseInterface::class);
+
+        if (!$useCase instanceof GetOriginUpdatesUseCaseInterface) {
+            throw new LogicException('Origin updates use case service is invalid.');
+        }
+
+        return $useCase;
+    }
+
+    private static function planUseCase(ContainerInterface $container): ComputeDeployPlanUseCaseInterface
+    {
+        $useCase = $container->get(ComputeDeployPlanUseCaseInterface::class);
+
+        if (!$useCase instanceof ComputeDeployPlanUseCaseInterface) {
+            throw new LogicException('Compute deploy plan use case service is invalid.');
+        }
+
+        return $useCase;
     }
 
     private static function catalog(ContainerInterface $container): CatalogAppRepositoryInterface

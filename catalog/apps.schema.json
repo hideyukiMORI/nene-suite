@@ -26,6 +26,14 @@
             "properties": {
               "env_prefix": { "type": "string" }
             }
+          },
+          "deploy": {
+            "type": "object",
+            "description": "Deployment-driven upgrade pin (ADR 0019 OQ2 stage 1): the immutable image digest the deploy agent recreates this app at. Optional until the app ships container releases.",
+            "required": ["image_digest"],
+            "properties": {
+              "image_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+            }
           }
         }
       }
