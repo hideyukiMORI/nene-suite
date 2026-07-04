@@ -121,6 +121,8 @@ code merge.
 | `federation_signing_key.generated` | `federation_signing_key` | NULL | `{kid, alg, status}` | Public key material only — the **private key never enters the suite DB or audit** (hosted edition, ADR 0012 / milestone B1.5) |
 | `federation_signing_key.rotated` | `federation_signing_key` | prior active `{kid, status}` | new active `{kid, status}` | Time-driven rotation (B1.8); old key kept in JWKS ≥ max assertion TTL before retiring |
 | `federation_signing_key.revoked` | `federation_signing_key` | active/retiring snapshot | revoked snapshot | Emergency revoke (B1.8); drops the kid from JWKS immediately |
+| `deploy_request.created` | `deploy_request` | NULL | `{id, service, imageDigest, status: pending, …}` | Operator queues a container recreate for the host-side agent (ADR 0019 OQ1, S2-1a); `source: apex_admin`, actor = operator. Never emitted while the capability flag is off |
+| `deploy_request.completed` | `deploy_request` | pending snapshot | terminal snapshot (`succeeded`/`failed` + detail) | Agent-reported result; machine actor (`actor_user_id` NULL, `actor_label: deploy-agent`, `source: api`). Independent `/machine/health` verification is S2-1c |
 
 The `federation_signing_key` entity type was registered 2026-06-22 (milestone B1.5)
 for the hosted-edition federation IdP key lifecycle; the `.generated` emitter lands

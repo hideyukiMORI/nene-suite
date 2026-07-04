@@ -58,7 +58,8 @@
         "apex_operator",
         "organization",
         "membership",
-        "federation_signing_key"
+        "federation_signing_key",
+        "deploy_request"
       ]
     },
     "entity_id": {

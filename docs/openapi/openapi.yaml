@@ -1397,6 +1397,161 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/deploy/requests:
+    post:
+      tags: [Deploy]
+      operationId: createDeployRequest
+      summary: Queue a sibling container recreate at a pinned image digest.
+      description: |
+        First slice of the deployment-driven upgrade orchestrator (ADR 0019, S2-1a).
+        Persists a deploy request for the **host-side deploy agent** to consume —
+        the suite never holds the Docker socket (OQ1). The target `service` must be
+        a catalog app id (explicit allow-list) and the image is pinned by immutable
+        digest (OQ2 stage 1). Platform-superadmin only. Emits `deploy_request.created`
+        (before `null`) in the suite audit trail. Returns 409 while the deploy-agent
+        capability flag is off (the default): updates stay visible, apply stays
+        manual — the same disabled-degrade posture as the Origin client.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeployRequestInput'
+      responses:
+        '201':
+          description: Deploy request persisted and queued for the host-side agent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/DeployCapabilityDisabled'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags: [Deploy]
+      operationId: listDeployRequests
+      summary: List deploy requests (newest first).
+      description: |
+        Read model for the apex update surface (S2-1d). Always 200 — `enabled`
+        mirrors the capability flag so the UI can degrade to manual-apply guidance
+        without a second probe. Platform-superadmin only.
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filter by request state.
+          schema:
+            $ref: '#/components/schemas/DeployRequestStatus'
+        - name: limit
+          in: query
+          required: false
+          description: Page size (newest first; no cursor in S2-1a).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Deploy capability state and the most recent requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployRequestList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/machine/deploy/requests/pending:
+    get:
+      tags: [Deploy]
+      operationId: listPendingDeployRequests
+      security:
+        - deployAgentKey: []
+      summary: 'Deploy agent: fetch pending requests (oldest first).'
+      description: |
+        Machine seam consumed by the host-side deploy agent
+        (`docs/ops/deploy-agent.md`): poll this list, execute `compose pull` +
+        recreate **only for allow-listed services**, then report through
+        `reportDeployRequestResult`. Exactly one agent per compose host (no claim
+        step in S2-1a — the seam assumes a single consumer). 401 on a missing or
+        mismatched agent key; 409 while the capability flag is off.
+      responses:
+        '200':
+          description: Pending deploy requests, oldest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [requests]
+                properties:
+                  requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DeployRequest'
+        '401':
+          $ref: '#/components/responses/DeployAgentUnauthorized'
+        '409':
+          $ref: '#/components/responses/DeployCapabilityDisabled'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/machine/deploy/requests/{id}/result:
+    put:
+      tags: [Deploy]
+      operationId: reportDeployRequestResult
+      security:
+        - deployAgentKey: []
+      summary: 'Deploy agent: report the outcome of one deploy request.'
+      description: |
+        Terminal transition `pending → succeeded | failed`, reported by the
+        host-side deploy agent after `compose pull` + recreate. Emits
+        `deploy_request.completed` with before/after snapshots and a machine
+        actor label in the suite audit trail. A request that is already terminal
+        returns 409 (the agent must not re-execute it). The suite additionally
+        verifies the outcome independently via the sibling `/machine/health`
+        version probe (ADR 0019 §3) — that verification is S2-1c scope.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Ulid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployResultInput'
+      responses:
+        '200':
+          description: Result recorded; the request is now terminal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployRequest'
+        '401':
+          $ref: '#/components/responses/DeployAgentUnauthorized'
+        '404':
+          $ref: '#/components/responses/DeployRequestNotFound'
+        '409':
+          $ref: '#/components/responses/DeployRequestConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1408,6 +1563,15 @@ components:
         Required for authenticated apex endpoints. Installer wizard steps run
         pre-auth on the host during setup, so they are unauthenticated and record
         `actor_user_id: null` with an `actor_label` fallback (audit-trail §3).
+    deployAgentKey:
+      type: apiKey
+      in: header
+      name: X-NENE-SUITE-DEPLOY-KEY
+      description: |
+        Shared secret pairing the host-side deploy agent with this suite
+        (`NENE_SUITE_DEPLOY_AGENT_KEY`, ADR 0019 OQ1). Constant-time compared;
+        only the `/api/v1/machine/deploy/*` seam accepts it. Distinct from the
+        apex operator JWT — the agent is a machine actor, not an operator.
 
   parameters:
     InstallSessionId:
@@ -1441,6 +1605,54 @@ components:
             status: 401
             detail: A valid apex operator token is required.
             instance: /api/v1/installed-apps
+    DeployAgentUnauthorized:
+      description: Deploy agent key missing or mismatched.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/deploy-agent-unauthorized
+            title: Deploy agent unauthorized
+            status: 401
+            detail: A valid X-NENE-SUITE-DEPLOY-KEY header is required.
+            instance: /api/v1/machine/deploy/requests/pending
+    DeployCapabilityDisabled:
+      description: The deploy-agent capability flag is off (the default) — apply stays manual.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/deploy-capability-disabled
+            title: Deploy capability disabled
+            status: 409
+            detail: The host-side deploy agent capability is not enabled on this suite (NENE_SUITE_DEPLOY_AGENT_ENABLED).
+            instance: /api/v1/deploy/requests
+    DeployRequestNotFound:
+      description: No deploy request with that id.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/deploy-request-not-found
+            title: Deploy request not found
+            status: 404
+            detail: 'No deploy request exists for id 01J8XR4ZS6Q9V2H7K3N5M0B8TC.'
+            instance: /api/v1/machine/deploy/requests/01J8XR4ZS6Q9V2H7K3N5M0B8TC/result
+    DeployRequestConflict:
+      description: The deploy request is already terminal (succeeded or failed).
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-suite.dev/problems/deploy-request-conflict
+            title: Deploy request conflict
+            status: 409
+            detail: This deploy request already has a terminal result and cannot be reported again.
+            instance: /api/v1/machine/deploy/requests/01J8XR4ZS6Q9V2H7K3N5M0B8TC/result
     InstallSessionNotFound:
       description: No install session with that id.
       content:
@@ -2439,3 +2651,75 @@ components:
                     example: dependency_unmet
                   detail:
                     type: string
+    DeployRequestStatus:
+      type: string
+      enum: [pending, succeeded, failed]
+      description: Deploy request lifecycle — pending until the host-side agent reports a terminal result.
+    DeployRequest:
+      type: object
+      additionalProperties: false
+      required: [id, service, imageDigest, status, detail, requestedBy, createdAt, completedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        service:
+          type: string
+          description: Catalog app id (the explicit allow-list — never an arbitrary compose service).
+          example: nene-invoice
+        imageDigest:
+          type: string
+          pattern: '^sha256:[0-9a-f]{64}$'
+          description: Immutable image digest pin (ADR 0019 OQ2 stage 1 — never a mutable tag).
+          example: 'sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
+        status:
+          $ref: '#/components/schemas/DeployRequestStatus'
+        detail:
+          type: [string, "null"]
+          description: Agent-reported result detail (failure reason, compose output digest); null until terminal.
+        requestedBy:
+          type: [string, "null"]
+          description: Requesting operator ULID (null only for pre-A6 rows; requests are operator-initiated).
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: [string, "null"]
+          format: date-time
+          description: Set when the agent reports a terminal result.
+    DeployRequestList:
+      type: object
+      additionalProperties: false
+      required: [enabled, requests]
+      properties:
+        enabled:
+          type: boolean
+          description: Capability flag state — false means disabled-degrade (apply stays manual).
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeployRequest'
+    CreateDeployRequestInput:
+      type: object
+      additionalProperties: false
+      required: [service, imageDigest]
+      properties:
+        service:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Catalog app id; validated against the catalog allow-list.
+        imageDigest:
+          type: string
+          pattern: '^sha256:[0-9a-f]{64}$'
+    DeployResultInput:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [succeeded, failed]
+        detail:
+          type: [string, "null"]
+          maxLength: 4000
+          description: Optional human-readable outcome detail; stored verbatim (no secrets — audit-sanitized).
