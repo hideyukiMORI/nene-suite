@@ -33,6 +33,7 @@ final class OriginUpdateAggregatorTest extends TestCase
         self::assertNotNull($signal->changelogUrl);
         self::assertSame('2026-06-19T00:00:00Z', $signal->releasedAt);
         self::assertNull($signal->reason);
+        self::assertSame(['nene-invoice' => '>=1.3.0'], $signal->requires);
     }
 
     public function testForcedWhenBelowSecurityFloor(): void

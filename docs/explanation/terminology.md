@@ -104,6 +104,8 @@ Never: `billing_api`, `invoice-api`, `clear-api`.
 | Web installer path | `install_entry` | `install_path`, `installer_url` |
 | DB config object | `database` | `db` |
 | DB env prefix | `database.env_prefix` | `db_prefix` |
+| Deploy pin object ([ADR 0019](../adr/0019-tier-b-deployment-driven-upgrade.md) OQ2 stage 1) | `deploy` | `deployment`, `upgrade` |
+| Image digest pin | `deploy.image_digest` | `image`, `digest`, `image_tag` (mutable tags are forbidden) |
 
 ### 2.5 Catalog version fields (read-model mirror)
 

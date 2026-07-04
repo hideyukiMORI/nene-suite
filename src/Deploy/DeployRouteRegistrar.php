@@ -12,6 +12,7 @@ final readonly class DeployRouteRegistrar
     public function __construct(
         private CreateDeployRequestHandler $createHandler,
         private ListDeployRequestsHandler $listHandler,
+        private GetDeployPlanHandler $planHandler,
         private ListPendingDeployRequestsHandler $listPendingHandler,
         private ReportDeployRequestResultHandler $reportResultHandler,
     ) {
@@ -21,6 +22,7 @@ final readonly class DeployRouteRegistrar
     {
         $createHandler = $this->createHandler;
         $listHandler = $this->listHandler;
+        $planHandler = $this->planHandler;
         $listPendingHandler = $this->listPendingHandler;
         $reportResultHandler = $this->reportResultHandler;
 
@@ -32,6 +34,11 @@ final readonly class DeployRouteRegistrar
         $router->get(
             '/api/v1/deploy/requests',
             static fn (ServerRequestInterface $request) => $listHandler->handle($request),
+        );
+
+        $router->get(
+            '/api/v1/deploy/plan',
+            static fn (ServerRequestInterface $request) => $planHandler->handle($request),
         );
 
         $router->get(

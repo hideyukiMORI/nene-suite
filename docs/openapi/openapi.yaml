@@ -1472,6 +1472,36 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/v1/deploy/plan:
+    get:
+      tags: [Deploy]
+      operationId: getDeployPlan
+      summary: Compute the dependency-ordered "update all" plan (read-only).
+      description: |
+        S2-1b (ADR 0019 §3): derives the update plan from the installed-app roster,
+        the verified Origin update signals (ADR 0013 §4 mirror), the catalog `requires`
+        DAG (dependencies before dependents), and the catalog's immutable image-digest
+        pins (OQ2 stage 1). Pure read model — nothing is queued or executed (that is
+        S2-1c via `createDeployRequest`). Always 200: `available: false` when the
+        Origin client is disabled (no verified targets — never fabricated), `enabled`
+        mirrors the deploy-agent capability flag. Apps whose installed version is
+        unknown are **defensively skipped**, and any min-version violation, missing
+        digest pin, missing/cyclic dependency, or unverifiable constraint is surfaced
+        as a conflict that makes the plan non-executable. Platform-superadmin only.
+      responses:
+        '200':
+          description: The computed plan (possibly empty or non-executable — see flags).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployPlan'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/v1/machine/deploy/requests/pending:
     get:
       tags: [Deploy]
@@ -2723,3 +2753,90 @@ components:
           type: [string, "null"]
           maxLength: 4000
           description: Optional human-readable outcome detail; stored verbatim (no secrets — audit-sanitized).
+    DeployPlanStep:
+      type: object
+      additionalProperties: false
+      required: [order, service, installedVersion, targetVersion, imageDigest, forced]
+      properties:
+        order:
+          type: integer
+          minimum: 1
+          description: 1-based position in the dependency-ordered chain (dependencies first).
+        service:
+          type: string
+          description: Catalog app id.
+        installedVersion:
+          type: [string, "null"]
+          description: Verified installed version at planning time (never fabricated).
+        targetVersion:
+          type: string
+          description: Origin-verified target version (the manifest `latest.version`).
+        imageDigest:
+          type: string
+          pattern: '^sha256:[0-9a-f]{64}$'
+          description: Catalog image-digest pin the recreate will use (ADR 0019 OQ2 stage 1).
+        forced:
+          type: boolean
+          description: True when the installed version is below the manifest min_supported_version.
+    DeployPlanSkip:
+      type: object
+      additionalProperties: false
+      required: [service, reason, detail]
+      properties:
+        service:
+          type: string
+        reason:
+          type: string
+          enum: [up_to_date, installed_version_unknown, unavailable]
+          description: Why the app is not part of the plan. `installed_version_unknown` is the defensive posture — an unverifiable app is never updated blindly.
+        detail:
+          type: [string, "null"]
+          description: Extra context (e.g. the Origin verification reason for `unavailable`).
+    DeployPlanConflict:
+      type: object
+      additionalProperties: false
+      required: [service, type, detail]
+      properties:
+        service:
+          type: string
+          description: The app the conflict is attributed to.
+        type:
+          type: string
+          enum:
+            - missing_digest_pin
+            - missing_dependency
+            - dependency_cycle
+            - unknown_dependency_version
+            - unsupported_constraint
+            - min_version_violation
+        detail:
+          type: string
+    DeployPlan:
+      type: object
+      additionalProperties: false
+      required: [enabled, available, reason, executable, steps, skipped, conflicts]
+      properties:
+        enabled:
+          type: boolean
+          description: Deploy-agent capability flag — false means the plan can be viewed but applying stays manual.
+        available:
+          type: boolean
+          description: False when the Origin client is disabled (no verified targets to plan from).
+        reason:
+          type: [string, "null"]
+          description: Set when `available` is false (e.g. origin_disabled).
+        executable:
+          type: boolean
+          description: True only when the plan has at least one step and no conflicts.
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeployPlanStep'
+        skipped:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeployPlanSkip'
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeployPlanConflict'

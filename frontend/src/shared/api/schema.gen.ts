@@ -692,6 +692,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/deploy/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compute the dependency-ordered "update all" plan (read-only).
+         * @description S2-1b (ADR 0019 §3): derives the update plan from the installed-app roster,
+         *     the verified Origin update signals (ADR 0013 §4 mirror), the catalog `requires`
+         *     DAG (dependencies before dependents), and the catalog's immutable image-digest
+         *     pins (OQ2 stage 1). Pure read model — nothing is queued or executed (that is
+         *     S2-1c via `createDeployRequest`). Always 200: `available: false` when the
+         *     Origin client is disabled (no verified targets — never fabricated), `enabled`
+         *     mirrors the deploy-agent capability flag. Apps whose installed version is
+         *     unknown are **defensively skipped**, and any min-version violation, missing
+         *     digest pin, missing/cyclic dependency, or unverifiable constraint is surfaced
+         *     as a conflict that makes the plan non-executable. Platform-superadmin only.
+         */
+        get: operations["getDeployPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/machine/deploy/requests/pending": {
         parameters: {
             query?: never;
@@ -1232,6 +1261,50 @@ export interface components {
             status: "succeeded" | "failed";
             /** @description Optional human-readable outcome detail; stored verbatim (no secrets — audit-sanitized). */
             detail?: string | null;
+        };
+        DeployPlanStep: {
+            /** @description 1-based position in the dependency-ordered chain (dependencies first). */
+            order: number;
+            /** @description Catalog app id. */
+            service: string;
+            /** @description Verified installed version at planning time (never fabricated). */
+            installedVersion: string | null;
+            /** @description Origin-verified target version (the manifest `latest.version`). */
+            targetVersion: string;
+            /** @description Catalog image-digest pin the recreate will use (ADR 0019 OQ2 stage 1). */
+            imageDigest: string;
+            /** @description True when the installed version is below the manifest min_supported_version. */
+            forced: boolean;
+        };
+        DeployPlanSkip: {
+            service: string;
+            /**
+             * @description Why the app is not part of the plan. `installed_version_unknown` is the defensive posture — an unverifiable app is never updated blindly.
+             * @enum {string}
+             */
+            reason: "up_to_date" | "installed_version_unknown" | "unavailable";
+            /** @description Extra context (e.g. the Origin verification reason for `unavailable`). */
+            detail: string | null;
+        };
+        DeployPlanConflict: {
+            /** @description The app the conflict is attributed to. */
+            service: string;
+            /** @enum {string} */
+            type: "missing_digest_pin" | "missing_dependency" | "dependency_cycle" | "unknown_dependency_version" | "unsupported_constraint" | "min_version_violation";
+            detail: string;
+        };
+        DeployPlan: {
+            /** @description Deploy-agent capability flag — false means the plan can be viewed but applying stays manual. */
+            enabled: boolean;
+            /** @description False when the Origin client is disabled (no verified targets to plan from). */
+            available: boolean;
+            /** @description Set when `available` is false (e.g. origin_disabled). */
+            reason: string | null;
+            /** @description True only when the plan has at least one step and no conflicts. */
+            executable: boolean;
+            steps: components["schemas"]["DeployPlanStep"][];
+            skipped: components["schemas"]["DeployPlanSkip"][];
+            conflicts: components["schemas"]["DeployPlanConflict"][];
         };
     };
     responses: {
@@ -3018,6 +3091,29 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             409: components["responses"]["DeployCapabilityDisabled"];
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getDeployPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The computed plan (possibly empty or non-executable — see flags). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeployPlan"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["ServerError"];
         };
     };

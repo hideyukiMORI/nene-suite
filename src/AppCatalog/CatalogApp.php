@@ -37,6 +37,7 @@ final readonly class CatalogApp
         public array $provides,
         public ?string $installEntry,
         public ?string $databaseEnvPrefix,
+        public ?string $imageDigest = null,
     ) {
     }
 }

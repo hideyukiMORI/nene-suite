@@ -83,7 +83,24 @@ final readonly class JsonFileCatalogAppRepository implements CatalogAppRepositor
             provides: $this->stringList($app, 'provides', $index),
             installEntry: $this->optionalString($app, 'install_entry', $index),
             databaseEnvPrefix: $this->optionalDatabaseEnvPrefix($app, $index),
+            imageDigest: $this->optionalImageDigest($app),
         );
+    }
+
+    /**
+     * @param array<array-key, mixed> $app
+     */
+    private function optionalImageDigest(array $app): ?string
+    {
+        $deploy = $app['deploy'] ?? null;
+
+        if (!is_array($deploy)) {
+            return null;
+        }
+
+        $digest = $deploy['image_digest'] ?? null;
+
+        return is_string($digest) && $digest !== '' ? $digest : null;
     }
 
     /**
