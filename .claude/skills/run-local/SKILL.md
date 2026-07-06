@@ -17,7 +17,7 @@ bash .claude/skills/run-local/run-local.sh
 `run-local.sh` がやること（すべて冪等）:
 
 1. `docker compose --env-file .env.suite up -d` で backend を起動
-   （apex `8800` / MySQL `3389`）。`--env-file .env.suite` は必須 —
+   （apex `8800` / MySQL `3390`）。`--env-file .env.suite` は必須 —
    compose 冒頭の `${VAR:?...}` 補間は `.env` ではなく `.env.suite` から解決する
    設計のため（`docs/ops/staging-deploy.md` 参照）。
 2. apex(`8800`) の HTTP 応答を待機（コンテナ entrypoint が `phinx migrate` を
@@ -72,7 +72,7 @@ pkill -f vite                               # frontend
 | Service | Port |
 |---|---|
 | Apex HTTP | **8800** |
-| MySQL (control DB) | **3389** |
+| MySQL (control DB) | **3390** |
 | Vite dev server | **5188** |
 </content>
 </invoke>

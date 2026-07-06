@@ -13,7 +13,7 @@ All NeNe apps share a single Docker host. Ports are fixed to avoid collisions.
 | Service | Local port | Notes |
 | --- | --- | --- |
 | Apex HTTP | **8800** | `docker compose up suite` |
-| MySQL (control DB) | **3389** | exposed for local inspection only |
+| MySQL (control DB) | **3390** | exposed for local inspection only |
 | Vite dev server | **5188** | `npm run dev` inside `frontend/` |
 
 ### Portfolio-wide port registry (do not reuse)
@@ -27,7 +27,7 @@ All NeNe apps share a single Docker host. Ports are fixed to avoid collisions.
 | NeNe Vault | 86\*\* | 5186 |
 | NeNe Concierge | 87\*\* | 3790 |
 | NeNe Records | 180\*\* | — |
-| **NeNe Suite** | **88\*\*** | **3389 / 5188** |
+| **NeNe Suite** | **88\*\*** | **3390 / 5188** |
 
 When adding new services to `docker-compose.yml` (e.g., unlocking sibling service stubs),
 always use the ports from this table. Never hardcode `80`, `3306`, or other defaults.
