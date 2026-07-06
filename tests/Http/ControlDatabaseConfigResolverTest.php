@@ -126,6 +126,7 @@ final class ControlDatabaseConfigResolverTest extends TestCase
             'APP_NAME' => 'test',
             'NENE2_MACHINE_API_KEY' => '',
             'NENE2_LOCAL_JWT_SECRET' => '',
+            'NENE2_ALLOW_DEV_SECRET' => '',
             'PROBLEM_DETAILS_BASE_URL' => 'https://nene-suite.dev/problems/',
             'DATABASE_URL' => '',
             'DB_ENV' => 'testing',
