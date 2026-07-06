@@ -2,7 +2,7 @@
 # run-local.sh — NeNe Suite のローカル開発スタックを冪等に起動する「単一の真実」。
 #
 # Docker ランタイム（CLAUDE.md クイックスタート準拠）:
-#   backend  = docker compose --env-file .env.suite up -d   (apex 8800 / MySQL 3389)
+#   backend  = docker compose --env-file .env.suite up -d   (apex 8800 / MySQL 3390)
 #   frontend = npm run dev                                   (Vite 5188)
 #
 # このスクリプトを唯一の起動経路にすることで二重管理を避ける:
@@ -10,7 +10,7 @@
 #     検出して丸ごと委譲する（~/.claude/skills/dev-up）。
 #   - プロジェクトスキル run-local（SKILL.md）も本スクリプトを実行するだけ。
 #
-# ポートは CLAUDE.md のポート表に固定（8800 / 3389 / 5188）。ハードコード禁止のデフォルトは使わない。
+# ポートは CLAUDE.md のポート表に固定（8800 / 3390 / 5188）。ハードコード禁止のデフォルトは使わない。
 #
 # 重要: compose 冒頭の ${VAR:?...} 補間は .env ではなく .env.suite から解決する設計のため
 #       --env-file .env.suite が必須（docs/ops/staging-deploy.md 参照）。
@@ -105,7 +105,7 @@ fi
 # ============================================================================
 say ""
 say "──────────── run-local サマリ ────────────"
-say "  backend  : [${backend}]  ${APEX_URL}  (MySQL :3389)"
+say "  backend  : [${backend}]  ${APEX_URL}  (MySQL :3390)"
 say "  frontend : [${frontend}]  ${VITE_URL}"
 say "──────────────────────────────────────────"
 say "停止: docker compose --env-file ${ENVFILE} down  /  フロントは pkill -f vite"

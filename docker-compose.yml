@@ -3,7 +3,7 @@ services:
   # ---------------------------------------------------------------
   # Suite control database
   # Hosts: nene_suite (control) + one database per installed app
-  # Local port: 3389 (see CLAUDE.md — portfolio port registry)
+  # Local port: 3390 (see CLAUDE.md — portfolio port registry)
   # ---------------------------------------------------------------
   db:
     image: mysql:8.0
@@ -13,7 +13,7 @@ services:
       MYSQL_USER: nene_suite
       MYSQL_PASSWORD: ${NENE_SUITE_CONTROL_DB_PASSWORD:?NENE_SUITE_CONTROL_DB_PASSWORD is required}
     ports:
-      - "${SUITE_DB_PORT:-3389}:3306"
+      - "${SUITE_DB_PORT:-3390}:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
