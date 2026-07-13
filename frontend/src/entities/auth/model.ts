@@ -28,12 +28,14 @@ export interface AuthSession {
 const STORAGE_KEY = 'nene-suite-session'
 
 /**
- * Apex operator session, persisted in localStorage. The bearer token is read by
- * shared/api/client on every request; an expired session is treated as logged out.
+ * Apex operator session, persisted in sessionStorage (tab-scoped; cleared when the tab
+ * closes, unlike localStorage, to shrink the bearer token's exposure window — fleet
+ * decision 2026-07-14, vault #148 type). The bearer token is read by shared/api/client on
+ * every request; an expired session is treated as logged out.
  */
 export const authStore = {
   getSession(): AuthSession | null {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = sessionStorage.getItem(STORAGE_KEY)
     if (raw === null) {
       return null
     }
@@ -41,18 +43,18 @@ export const authStore = {
       return JSON.parse(raw) as AuthSession
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.warn('[authStore] Failed to parse session from localStorage:', error)
+        console.warn('[authStore] Failed to parse session from sessionStorage:', error)
       }
       return null
     }
   },
 
   setSession(session: AuthSession): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session))
   },
 
   clearSession(): void {
-    localStorage.removeItem(STORAGE_KEY)
+    sessionStorage.removeItem(STORAGE_KEY)
   },
 
   getToken(): string | null {
