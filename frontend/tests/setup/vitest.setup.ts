@@ -11,6 +11,7 @@ afterEach(() => {
   mswServer.resetHandlers()
   cleanup()
   localStorage.clear()
+  sessionStorage.clear()
 })
 
 afterAll(() => {
