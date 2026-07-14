@@ -5,9 +5,9 @@
 .avatar {
   width: 38px;
   height: 38px;
-  border-radius: var(--r);
-  border: 2px solid var(--border-2);
-  background: var(--brand-deep);
+  border-radius: var(--r-x-base);
+  border: 2px solid var(--color-border-strong);
+  background: var(--color-x-brand-deep);
   color: #fff;
   font-weight: 700;
   font-size: 13px;
@@ -32,11 +32,11 @@
   right: 0;
   z-index: 60;
   width: 248px;
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  background: color-mix(in srgb, var(--color-surface-raised) 82%, transparent);
   -webkit-backdrop-filter: blur(18px) saturate(1.5);
   backdrop-filter: blur(18px) saturate(1.5);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   box-shadow: var(--shadow-lg);
   padding: 7px;
   animation: popIn 0.14s ease;
@@ -52,8 +52,8 @@
 .avatarLg {
   width: 40px;
   height: 40px;
-  border-radius: var(--r);
-  background: var(--brand-deep);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand-deep);
   color: #fff;
   font-weight: 700;
   font-size: 14px;
@@ -71,7 +71,7 @@
   display: block;
   font-weight: 700;
   font-size: 13.5px;
-  color: var(--fg);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -79,13 +79,13 @@
 .role {
   display: block;
   font-size: 11.5px;
-  color: var(--accent);
+  color: var(--color-accent);
   font-weight: 600;
 }
 
 .sep {
   height: 1px;
-  background: var(--border);
+  background: var(--color-border);
   margin: 2px 0 6px;
 }
 
@@ -98,7 +98,7 @@
   padding: 9px 10px;
   border: none;
   background: transparent;
-  border-radius: var(--r);
+  border-radius: var(--r-x-base);
   cursor: pointer;
   font-family: inherit;
   font-size: 13.5px;
@@ -107,16 +107,16 @@
 }
 
 .item {
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .itemDanger {
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 .item:hover,
 .itemDanger:hover {
-  background: var(--surface-2);
+  background: var(--color-surface-overlay);
 }
 
 .itemDanger:disabled {

@@ -20,7 +20,7 @@
 .subtitle {
   margin: 0;
   font-size: 14.5px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .searchWrap {
@@ -38,16 +38,16 @@
 .search {
   width: 100%;
   padding: 13px 16px 13px 44px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
   font-family: inherit;
   font-size: 15px;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .search:focus {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--color-x-brand);
   outline-offset: 1px;
 }
 
@@ -63,7 +63,7 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .tasks {
@@ -77,18 +77,18 @@
   align-items: center;
   gap: 9px;
   padding: 13px 15px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
-  color: var(--fg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
 }
 
 .task:hover {
-  background: var(--brand-softer);
-  border-color: var(--brand-soft);
+  background: var(--color-x-brand-softer);
+  border-color: var(--color-x-brand-soft);
 }
 
 .grid {
@@ -102,27 +102,27 @@
   flex-direction: column;
   gap: 5px;
   padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
   text-decoration: none;
 }
 
 .card:hover {
-  border-color: var(--border-2);
+  border-color: var(--color-border-strong);
 }
 
 .cardTitle {
   font-size: 15px;
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .cardSummary {
   font-size: 13px;
   line-height: 1.6;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .glossaryCta {
@@ -131,10 +131,10 @@
   gap: 9px;
   align-self: flex-start;
   padding: 12px 18px;
-  border: 1px solid var(--brand-soft);
-  border-radius: var(--r);
-  background: var(--brand-softer);
-  color: var(--brand-strong);
+  border: 1px solid var(--color-x-brand-soft);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand-softer);
+  color: var(--color-x-brand-strong);
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;
@@ -143,10 +143,10 @@
 .results {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
-  background: var(--surface);
+  background: var(--color-surface-raised);
 }
 
 .result {
@@ -154,8 +154,8 @@
   align-items: center;
   gap: 10px;
   padding: 12px 15px;
-  border-bottom: 1px solid var(--border);
-  color: var(--fg);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
   text-decoration: none;
   font-size: 14px;
 }
@@ -165,11 +165,11 @@
 }
 
 .result:hover {
-  background: var(--surface-2);
+  background: var(--color-surface-overlay);
 }
 
 .muted {
   margin: 0;
   font-size: 14px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }

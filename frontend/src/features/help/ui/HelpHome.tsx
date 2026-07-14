@@ -27,7 +27,12 @@ export function HelpHome(): ReactNode {
       </header>
 
       <div className={styles['searchWrap']}>
-        <Icon name="search" size={19} color="var(--fg-3)" className={styles['searchIcon'] ?? ''} />
+        <Icon
+          name="search"
+          size={19}
+          color="var(--color-text-faint)"
+          className={styles['searchIcon'] ?? ''}
+        />
         <input
           type="search"
           className={styles['search']}
@@ -49,7 +54,7 @@ export function HelpHome(): ReactNode {
             <div className={styles['results']}>
               {guides.map((guide) => (
                 <Link key={guide.slug} to={`/help/${guide.slug}`} className={styles['result']}>
-                  <Icon name="article" size={17} color="var(--fg-3)" />
+                  <Icon name="article" size={17} color="var(--color-text-faint)" />
                   <span>{guide.title}</span>
                 </Link>
               ))}
@@ -59,7 +64,7 @@ export function HelpHome(): ReactNode {
                   to={`/help/glossary#gt-${term.id}`}
                   className={styles['result']}
                 >
-                  <Icon name="label" size={17} color="var(--fg-3)" />
+                  <Icon name="label" size={17} color="var(--color-text-faint)" />
                   <span>{term.term}</span>
                 </Link>
               ))}
@@ -73,7 +78,7 @@ export function HelpHome(): ReactNode {
             <div className={styles['tasks']}>
               {TASKS.map((task) => (
                 <Link key={task.to} to={task.to} className={styles['task']}>
-                  <Icon name="arrow_forward" size={18} color="var(--brand)" />
+                  <Icon name="arrow_forward" size={18} color="var(--color-x-brand)" />
                   {t(task.labelKey)}
                 </Link>
               ))}
@@ -99,7 +104,7 @@ export function HelpHome(): ReactNode {
           })}
 
           <Link to="/help/glossary" className={styles['glossaryCta']}>
-            <Icon name="menu_book" size={20} color="var(--brand)" />
+            <Icon name="menu_book" size={20} color="var(--color-x-brand)" />
             {t('suite.help.glossaryCta')}
           </Link>
         </>

@@ -1,16 +1,16 @@
 .term {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 0.86em;
   padding: 1px 5px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface-2);
-  color: var(--brand-strong);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-overlay);
+  color: var(--color-x-brand-strong);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .term:hover {
-  background: var(--brand-softer);
-  border-color: var(--brand-soft);
+  background: var(--color-x-brand-softer);
+  border-color: var(--color-x-brand-soft);
 }

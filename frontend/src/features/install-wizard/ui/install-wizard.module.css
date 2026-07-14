@@ -5,10 +5,10 @@
 }
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: var(--shadow);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  box-shadow: var(--shadow-md);
   padding: 26px;
 }
 
@@ -41,7 +41,7 @@
   margin: 0 0 20px;
   font-size: 13.5px;
   line-height: 1.7;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .startRow {
@@ -65,40 +65,40 @@
 .stepDot {
   width: 26px;
   height: 26px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-x-pill);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 12px;
   font-weight: 600;
-  border: 1px solid var(--border-2);
-  background: var(--surface);
-  color: var(--fg-3);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-raised);
+  color: var(--color-text-faint);
   flex: none;
 }
 
 .step[data-state='current'] .stepDot {
-  background: var(--brand);
-  border-color: var(--brand);
-  color: var(--on-brand);
+  background: var(--color-x-brand);
+  border-color: var(--color-x-brand);
+  color: var(--color-on-accent);
 }
 
 .step[data-state='done'] .stepDot {
-  background: var(--brand-softer);
-  border-color: var(--brand);
-  color: var(--brand);
+  background: var(--color-x-brand-softer);
+  border-color: var(--color-x-brand);
+  color: var(--color-x-brand);
 }
 
 .stepLabel {
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   white-space: nowrap;
 }
 
 .step[data-state='current'] .stepLabel {
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 /* Decorative connector between steps — pseudo-element so the <ol> only has
@@ -107,7 +107,7 @@
   content: '';
   width: 18px;
   height: 1px;
-  background: var(--border-2);
+  background: var(--color-border-strong);
   flex: none;
 }
 
@@ -135,7 +135,7 @@
   margin: 0 0 16px;
   font-size: 13px;
   line-height: 1.6;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .appList {
@@ -149,21 +149,21 @@
   align-items: center;
   gap: 12px;
   padding: 13px 15px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
   cursor: pointer;
 }
 
 .appRow:hover {
-  background: var(--surface-2);
+  background: var(--color-surface-overlay);
 }
 
 .appRow input {
   width: 17px;
   height: 17px;
   flex: none;
-  accent-color: var(--brand);
+  accent-color: var(--color-x-brand);
 }
 
 .appName {
@@ -173,14 +173,14 @@
 
 .requiresHint {
   font-size: 11.5px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   margin-left: auto;
 }
 
 .count {
   margin: 14px 0 0;
   font-size: 12.5px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 /* ── Database targets step (ADR 0022 mode A) ────────────────────────────────
@@ -192,9 +192,9 @@
   flex-direction: column;
   gap: 11px;
   padding: 13px 15px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
 }
 
 /* app card head: name + mode toggle on one row */
@@ -217,9 +217,9 @@
   width: 34px;
   height: 34px;
   flex: none;
-  border-radius: var(--r-sm);
-  background: var(--brand-soft);
-  color: var(--brand-strong);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand-soft);
+  color: var(--color-x-brand-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -231,14 +231,14 @@
   display: block;
   font-size: 14.5px;
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .dbAppSlug {
   display: block;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 11.5px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 /* segmented mode toggle (replaces .dbSelect) */
@@ -246,9 +246,9 @@
   display: flex;
   gap: 3px;
   padding: 3px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
   flex: none;
 }
 
@@ -258,9 +258,9 @@
   gap: 6px;
   padding: 7px 13px;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-x-sm);
   background: transparent;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
@@ -268,12 +268,12 @@
 }
 
 .dbToggleBtn:hover {
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .dbToggleBtn[data-active='true'] {
-  background: var(--brand);
-  color: var(--on-brand);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   font-weight: 700;
 }
 
@@ -281,9 +281,9 @@
 .dbAdoptPanel {
   margin-top: 15px;
   padding: 15px 16px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
   animation: dbReveal 0.2s ease both;
 }
 
@@ -293,11 +293,11 @@
   align-items: center;
   gap: 7px;
   font-size: 12px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .dbAdoptNoteIcon {
-  color: var(--brand);
+  color: var(--color-x-brand);
   flex: none;
 }
 
@@ -322,34 +322,34 @@
 .dbLabel {
   font-size: 12px;
   font-weight: 600;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .dbInput {
   width: 100%;
   font-family: inherit;
   font-size: 13.5px;
-  color: var(--fg);
-  background: var(--surface);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-sm);
   padding: 9px 11px;
   outline: none;
 }
 
 .dbInputMono {
   composes: dbInput;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 13px;
 }
 
 .dbInput:focus {
-  border-color: var(--brand);
+  border-color: var(--color-x-brand);
 }
 
 .dbFieldHelp {
   font-size: 11px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 /* one-line per-app summary */
@@ -358,13 +358,13 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 11.5px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .dbSummaryIcon {
-  color: var(--brand);
+  color: var(--color-x-brand);
   flex: none;
 }
 
@@ -391,10 +391,10 @@
   align-items: center;
   gap: 6px;
   padding: 11px 16px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   cursor: pointer;
   font-family: inherit;
   font-size: 13.5px;
@@ -410,9 +410,9 @@
 .primaryBtn {
   padding: 11px 20px;
   border: none;
-  border-radius: var(--r);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   cursor: pointer;
   font-family: inherit;
   font-size: 13.5px;
@@ -420,7 +420,7 @@
 }
 
 .primaryBtn:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }
 
 .primaryBtn:disabled {
@@ -429,13 +429,13 @@
 }
 
 .noticeBox {
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--brand-softer);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand-softer);
   padding: 16px 18px;
   font-size: 13px;
   line-height: 1.8;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .checkLabel {
@@ -445,7 +445,7 @@
   margin: 16px 0 4px;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
@@ -454,13 +454,13 @@
   height: 18px;
   margin-top: 1px;
   flex: none;
-  accent-color: var(--brand);
+  accent-color: var(--color-x-brand);
 }
 
 .mustAccept {
   margin: 6px 0 0;
   font-size: 12px;
-  color: var(--warn);
+  color: var(--color-warn);
 }
 
 .reviewList {
@@ -473,13 +473,13 @@
 }
 
 .reviewChip {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 12px;
   padding: 5px 11px;
-  border-radius: var(--r-pill);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--fg-2);
+  border-radius: var(--r-x-pill);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .reviewRow {
@@ -488,17 +488,17 @@
   align-items: baseline;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   font-size: 13.5px;
 }
 
 .reviewRowLabel {
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .reviewRowValue {
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .reviewSubhead {
@@ -507,15 +507,15 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .reviewAppList {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
 }
 
@@ -525,7 +525,7 @@
   align-items: center;
   gap: 12px;
   padding: 11px 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   font-size: 13px;
 }
 
@@ -535,30 +535,30 @@
 
 .reviewAppName {
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .reviewAppDb {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 12px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   text-align: right;
 }
 
 .reviewIntegration {
   margin: 0 0 16px;
   font-size: 13px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .summaryBox {
-  border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border));
-  border-radius: var(--r);
-  background: color-mix(in srgb, var(--warn) 7%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-warn) 35%, var(--color-border));
+  border-radius: var(--r-x-base);
+  background: color-mix(in srgb, var(--color-warn) 7%, var(--color-surface-raised));
   padding: 14px 16px;
   font-size: 12.5px;
   line-height: 1.7;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .completeWrap {
@@ -573,9 +573,9 @@
 .completeIcon {
   width: 60px;
   height: 60px;
-  border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--ok) 16%, transparent);
-  color: var(--ok);
+  border-radius: var(--r-x-pill);
+  background: color-mix(in srgb, var(--color-success) 16%, transparent);
+  color: var(--color-success);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -584,14 +584,14 @@
 .completeLink {
   margin-top: 6px;
   padding: 11px 20px;
-  border-radius: var(--r);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 700;
 }
 
 .completeLink:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }

@@ -24,10 +24,10 @@ interface CardStateMeta {
 }
 
 export const CARD_STATE_META: Record<CatalogCardState, CardStateMeta> = {
-  installed: { labelKey: 'suite.home.status.active', tone: 'var(--ok)' },
-  installable: { labelKey: 'suite.install.apps.status.installable', tone: 'var(--accent)' },
-  planned: { labelKey: 'suite.install.apps.status.planned', tone: 'var(--fg-3)' },
-  deprecated: { labelKey: 'suite.install.apps.status.deprecated', tone: 'var(--warn)' },
+  installed: { labelKey: 'suite.home.status.active', tone: 'var(--color-success)' },
+  installable: { labelKey: 'suite.install.apps.status.installable', tone: 'var(--color-accent)' },
+  planned: { labelKey: 'suite.install.apps.status.planned', tone: 'var(--color-text-faint)' },
+  deprecated: { labelKey: 'suite.install.apps.status.deprecated', tone: 'var(--color-warn)' },
 }
 
 /** Filter chip order — only chips with ≥1 matching app are shown. */

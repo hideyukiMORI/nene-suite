@@ -36,7 +36,7 @@ export function Dashboard() {
       <div className={styles['root']}>
         <Masthead />
         <div className={styles['errorPanel']} role="alert">
-          <Icon name="error" size={40} fill color="var(--danger)" />
+          <Icon name="error" size={40} fill color="var(--color-danger)" />
           <p>{t('common.state.error')}</p>
           <button type="button" className={styles['retryBtn']} onClick={refetch}>
             <Icon name="refresh" size={18} />

@@ -1,6 +1,6 @@
 /**
  * NeNe Suite brand mark — 4 squares + a central accent. Rendered as inline SVG
- * so it inherits the theme tokens (--brand-deep base, --logo-ring edge, --brand
+ * so it inherits the theme tokens (--color-x-brand-deep base, --color-x-logo-ring edge, --color-x-brand
  * accent square), unlike the colored per-app marks. See handoff/spec.html.
  */
 export function SuiteMark({ size = 28, title }: { size?: number; title?: string }) {
@@ -15,7 +15,7 @@ export function SuiteMark({ size = 28, title }: { size?: number; title?: string 
       aria-label={title}
       aria-hidden={title === undefined}
     >
-      <rect width="120" height="120" rx="27" fill="var(--brand-deep)" />
+      <rect width="120" height="120" rx="27" fill="var(--color-x-brand-deep)" />
       <rect
         x="1"
         y="1"
@@ -23,7 +23,7 @@ export function SuiteMark({ size = 28, title }: { size?: number; title?: string 
         height="118"
         rx="26"
         fill="none"
-        stroke="var(--logo-ring)"
+        stroke="var(--color-x-logo-ring)"
         strokeWidth="2"
       />
       <g fill="#ffffff" opacity="0.92">
@@ -32,7 +32,7 @@ export function SuiteMark({ size = 28, title }: { size?: number; title?: string 
         <rect x="77" y="47" width="26" height="26" rx="7" />
         <rect x="47" y="77" width="26" height="26" rx="7" />
       </g>
-      <rect x="47" y="47" width="26" height="26" rx="7" fill="var(--brand)" />
+      <rect x="47" y="47" width="26" height="26" rx="7" fill="var(--color-x-brand)" />
     </svg>
   )
 }

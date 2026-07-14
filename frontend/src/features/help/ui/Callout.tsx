@@ -12,9 +12,13 @@ interface ToneMeta {
 }
 
 const TONE: Readonly<Record<CalloutTone, ToneMeta>> = {
-  danger: { icon: 'error', color: 'var(--danger)', srLabelKey: 'suite.help.callout.danger' },
-  warning: { icon: 'warning', color: 'var(--warn)', srLabelKey: 'suite.help.callout.warning' },
-  neutral: { icon: 'info', color: 'var(--fg-3)', srLabelKey: null },
+  danger: { icon: 'error', color: 'var(--color-danger)', srLabelKey: 'suite.help.callout.danger' },
+  warning: {
+    icon: 'warning',
+    color: 'var(--color-warn)',
+    srLabelKey: 'suite.help.callout.warning',
+  },
+  neutral: { icon: 'info', color: 'var(--color-text-faint)', srLabelKey: null },
 }
 
 /** Highlighted callout for invariants / warnings inside guides. */

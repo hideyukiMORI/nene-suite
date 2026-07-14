@@ -5,10 +5,10 @@
   justify-content: center;
   text-align: center;
   padding: 70px 20px;
-  border: 1px dashed var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
   gap: 14px;
 }
 
@@ -16,8 +16,8 @@
   width: 64px;
   height: 64px;
   border-radius: 18px;
-  background: var(--brand-deep);
-  color: var(--side-brand);
+  background: var(--color-x-brand-deep);
+  color: var(--color-x-side-brand);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +28,7 @@
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .description {
@@ -36,5 +36,5 @@
   max-width: 420px;
   font-size: 14px;
   line-height: 1.7;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }

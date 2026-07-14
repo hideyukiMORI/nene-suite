@@ -110,7 +110,7 @@ export function Feeds({ apps }: { apps: InstalledApp[] }) {
       <div className={styles['feeds']}>
         <div className={styles['feedPanel']}>
           <div className={styles['feedHead']}>
-            <Icon name="download_for_offline" size={21} color="var(--warn)" />
+            <Icon name="download_for_offline" size={21} color="var(--color-warn)" />
             <h3>{t('suite.home.updates.title')}</h3>
             <span className={styles['originTag']}>Origin</span>
           </div>
@@ -118,7 +118,7 @@ export function Feeds({ apps }: { apps: InstalledApp[] }) {
         </div>
         <div className={styles['feedPanel']}>
           <div className={styles['feedHead']}>
-            <Icon name="campaign" size={21} color="var(--accent)" />
+            <Icon name="campaign" size={21} color="var(--color-accent)" />
             <h3>{t('suite.home.announcements.title')}</h3>
             <span className={styles['originTag']}>Origin</span>
           </div>

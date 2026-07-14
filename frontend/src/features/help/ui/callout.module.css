@@ -3,19 +3,19 @@
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-overlay);
 }
 
 .root[data-tone='danger'] {
-  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
-  background: color-mix(in srgb, var(--danger) 6%, var(--surface));
+  border-color: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
+  background: color-mix(in srgb, var(--color-danger) 6%, var(--color-surface-raised));
 }
 
 .root[data-tone='warning'] {
-  border-color: color-mix(in srgb, var(--warn) 35%, var(--border));
-  background: color-mix(in srgb, var(--warn) 7%, var(--surface));
+  border-color: color-mix(in srgb, var(--color-warn) 35%, var(--color-border));
+  background: color-mix(in srgb, var(--color-warn) 7%, var(--color-surface-raised));
 }
 
 .icon {
@@ -27,7 +27,7 @@
   margin: 0;
   font-size: 13.5px;
   line-height: 1.7;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .srOnly {

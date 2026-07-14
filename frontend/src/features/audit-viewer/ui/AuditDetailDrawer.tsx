@@ -142,7 +142,7 @@ export function AuditDetailDrawer({ event, onClose }: AuditDetailDrawerProps): R
           {metadataEntries.length > 0 ? (
             <section className={styles['section']}>
               <p className={styles['sectionHead']}>
-                <Icon name="data_object" size={17} color="var(--fg-3)" />
+                <Icon name="data_object" size={17} color="var(--color-text-faint)" />
                 {t('suite.audit.metadata')}
               </p>
               <div className={styles['metadataList']}>
@@ -163,7 +163,7 @@ export function AuditDetailDrawer({ event, onClose }: AuditDetailDrawerProps): R
 
           <div className={styles['diffHead']}>
             <p className={styles['sectionHead']}>
-              <Icon name="difference" size={17} color="var(--fg-3)" />
+              <Icon name="difference" size={17} color="var(--color-text-faint)" />
               {t('suite.audit.diff.title')}
               <span className={styles['diffArrow']}>before → after</span>
             </p>
@@ -220,13 +220,13 @@ export function AuditDetailDrawer({ event, onClose }: AuditDetailDrawerProps): R
 
           {kind === 'create' ? (
             <div className={styles['banner']} data-kind="create">
-              <Icon name="add_circle" size={17} color="var(--ok)" />
+              <Icon name="add_circle" size={17} color="var(--color-success)" />
               {t('suite.audit.diff.bannerCreate')}
             </div>
           ) : null}
           {kind === 'delete' ? (
             <div className={styles['banner']} data-kind="delete">
-              <Icon name="remove_circle" size={17} color="var(--danger)" />
+              <Icon name="remove_circle" size={17} color="var(--color-danger)" />
               {t('suite.audit.diff.bannerDelete')}
             </div>
           ) : null}

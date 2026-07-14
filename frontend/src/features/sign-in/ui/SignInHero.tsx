@@ -55,7 +55,7 @@ export function SignInHero() {
             aria-label={t('suite.nav.appTitle')}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <rect width="120" height="120" rx="27" fill="var(--brand-deep)" />
+            <rect width="120" height="120" rx="27" fill="var(--color-x-brand-deep)" />
             <rect
               x="1"
               y="1"
@@ -72,7 +72,7 @@ export function SignInHero() {
               <rect x="77" y="47" width="26" height="26" rx="7" />
               <rect x="47" y="77" width="26" height="26" rx="7" />
             </g>
-            <rect x="47" y="47" width="26" height="26" rx="7" fill="var(--side-brand)" />
+            <rect x="47" y="47" width="26" height="26" rx="7" fill="var(--color-x-side-brand)" />
           </svg>
           <span className={styles['brandName']}>NeNe Suite</span>
           <span className={styles['orchTag']}>Orchestrator</span>
@@ -84,7 +84,7 @@ export function SignInHero() {
         <div className={styles['trust']}>
           {TRUST.map((chip) => (
             <span key={chip.key} className={styles['trustChip']}>
-              <Icon name={chip.icon} size={17} color="var(--side-brand)" />
+              <Icon name={chip.icon} size={17} color="var(--color-x-side-brand)" />
               {t(chip.key)}
             </span>
           ))}
