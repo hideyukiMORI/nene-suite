@@ -1,73 +1,106 @@
+import {
+  createNene2Transport,
+  isNene2ClientError,
+  type ProblemDetailsDocument,
+  type TokenStore,
+} from '@hideyukimori/nene2-client'
 import { authStore } from '@/entities/auth/model'
-import { AppError, parseProblemDetails } from '@/shared/api/errors'
+import { AppError, type ProblemDetails } from '@/shared/api/errors'
 import { env } from '@/shared/config/env'
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-
-interface RequestOptions {
-  method?: HttpMethod
-  body?: unknown
-  signal?: AbortSignal
+/**
+ * Adapts the existing `authStore` (an `AuthSession` JSON blob in sessionStorage,
+ * `entities/auth/model.ts` — sessionStorage-ified in #375/#376) to the transport's
+ * minimal {@link TokenStore} contract. We deliberately do NOT switch to the
+ * package's `createSessionTokenStore`: the session object carries more than the
+ * bearer token (operator, org context, role, superadmin flag) and the storage
+ * key/shape is a settled contract (#375/#376). `clearToken` clears the whole
+ * session, matching the pre-migration `authStore.clearSession()` behavior on 401.
+ */
+const authTokenStore: TokenStore = {
+  getToken: () => authStore.getToken(),
+  clearToken: () => {
+    authStore.clearSession()
+  },
 }
 
 /**
- * On an expired/invalid apex token, clear the session and bounce to login.
- * Login attempts (POST /auth/session) are excluded so invalid-credentials errors
- * surface on the form instead of redirecting.
+ * On an expired/invalid apex token, bounce to login. Login attempts
+ * (POST /auth/session) never reach here: the transport only fires
+ * `onUnauthorized` when a token was attached to the failed request, and a
+ * login attempt has none yet, so invalid-credentials errors surface on the
+ * form instead of redirecting (same behavior as before the migration).
  */
-function handleErrorResponse(response: Response, path: string): void {
-  if (response.status === 401 && !path.includes('/auth/session')) {
-    authStore.clearSession()
-    window.location.href = '/login'
-  }
+function handleUnauthorized(): void {
+  window.location.href = '/login'
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const base = env.apiBaseUrl.replace(/\/$/, '')
-  const headers: Record<string, string> = {}
-  if (options.body !== undefined) {
-    headers['Content-Type'] = 'application/json'
-  }
-  const token = authStore.getToken()
-  if (token !== null) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
+const transport = createNene2Transport({
+  baseUrl: env.apiBaseUrl,
+  tokenStore: authTokenStore,
+  credentials: 'include',
+  onUnauthorized: handleUnauthorized,
+  // A thin pass-through, not `globalThis.fetch` directly: the transport resolves
+  // and binds its `fetch` once, at module-load time. Passing the global directly
+  // would freeze that early reference — MSW (our test HTTP mock, see
+  // tests/msw/server.ts) patches `globalThis.fetch` later, in `beforeAll`, so the
+  // frozen pre-patch reference would bypass it entirely. This wrapper re-reads
+  // `globalThis.fetch` on every call instead, exactly like the pre-migration
+  // client's bare `fetch(...)` call did.
+  fetch: (input, init) => globalThis.fetch(input, init),
+})
 
-  const response = await fetch(`${base}${path}`, {
-    method: options.method ?? 'GET',
-    headers,
-    credentials: 'include',
-    ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
-    ...(options.signal !== undefined ? { signal: options.signal } : {}),
+/** Maps a parsed Problem Details document (already validated by the transport) to `AppError`. */
+function problemToAppError(problem: ProblemDetailsDocument): AppError {
+  return new AppError({
+    type: problem.type,
+    title: problem.title,
+    status: problem.status,
+    ...(typeof problem.detail === 'string' ? { detail: problem.detail } : {}),
+    ...(typeof problem.instance === 'string' ? { instance: problem.instance } : {}),
+    ...(Array.isArray(problem.errors)
+      ? { errors: problem.errors as NonNullable<ProblemDetails['errors']> }
+      : {}),
   })
+}
 
-  if (!response.ok) {
-    handleErrorResponse(response, path)
-    throw await parseProblemDetails(response)
+/**
+ * Maps any transport failure to the product's `AppError` (unchanged public shape).
+ * The transport already guarantees non-2xx errors never surface as raw HTML.
+ */
+async function withAppError<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run()
+  } catch (error) {
+    if (isNene2ClientError(error)) {
+      if (error.problem !== undefined) {
+        throw problemToAppError(error.problem)
+      }
+      throw new AppError({
+        type: 'about:blank',
+        title: error.message || 'Request failed',
+        status: error.status,
+      })
+    }
+    throw error
   }
-
-  if (response.status === 204) {
-    return undefined as T
-  }
-
-  return (await response.json()) as T
 }
 
 export const apiClient = {
   get<T>(path: string, signal?: AbortSignal): Promise<T> {
-    return request<T>(path, signal !== undefined ? { signal } : {})
+    return withAppError(() => transport.get<T>(path, signal !== undefined ? { signal } : {}))
   },
   post<T>(path: string, body: unknown): Promise<T> {
-    return request<T>(path, { method: 'POST', body })
+    return withAppError(() => transport.post<T>(path, body))
   },
   put<T>(path: string, body: unknown): Promise<T> {
-    return request<T>(path, { method: 'PUT', body })
+    return withAppError(() => transport.put<T>(path, body))
   },
   patch<T>(path: string, body: unknown): Promise<T> {
-    return request<T>(path, { method: 'PATCH', body })
+    return withAppError(() => transport.patch<T>(path, body))
   },
   delete(path: string): Promise<undefined> {
-    return request<undefined>(path, { method: 'DELETE' })
+    return withAppError(() => transport.delete<undefined>(path))
   },
 }
 
