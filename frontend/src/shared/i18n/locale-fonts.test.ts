@@ -13,21 +13,14 @@ describe('LOCALE_FONT_STACKS', () => {
     expect(LOCALE_FONT_STACKS.ja.startsWith('"Noto Sans JP"')).toBe(true)
     expect(LOCALE_FONT_STACKS.en.startsWith('"Noto Sans JP"')).toBe(true)
   })
-
-  it('leads zh-Hans with simplified-Chinese fonts, not JP glyph variants', () => {
-    const stack = LOCALE_FONT_STACKS['zh-Hans']
-    expect(stack.startsWith('"Noto Sans SC"')).toBe(true)
-    // JP coverage stays available further down the stack
-    expect(stack.indexOf('Noto Sans JP')).toBeGreaterThan(stack.indexOf('Noto Sans SC'))
-  })
 })
 
 describe('applyLocaleFontFamily', () => {
   it('writes the locale stack onto the font CSS variable', () => {
     const root = document.createElement('div')
 
-    applyLocaleFontFamily('zh-Hans', root)
+    applyLocaleFontFamily('ja', root)
 
-    expect(root.style.getPropertyValue(LOCALE_FONT_FAMILY_VAR)).toBe(LOCALE_FONT_STACKS['zh-Hans'])
+    expect(root.style.getPropertyValue(LOCALE_FONT_FAMILY_VAR)).toBe(LOCALE_FONT_STACKS['ja'])
   })
 })

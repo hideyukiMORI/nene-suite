@@ -2,15 +2,15 @@ import { useTranslation } from '@/shared/i18n'
 import styles from './LocaleToggle.module.css'
 
 /**
- * Compact header shortcut for the maintained locale pair (en + ja) only.
- * Clamp rule (docs/development/i18n.md): ja → en, en → ja, and any stub
- * locale (fr / zh-Hans / pt-BR / de) clamps to en — the fallback language the
- * user is already reading — never implicitly to ja. The full six-locale
- * picker is the LocaleSwitcher in Settings → General → Language.
+ * Compact header shortcut toggling the two supported locales (en ↔ ja).
+ * `resolveLocale` (docs/development/i18n.md) already clamps any legacy or
+ * unrecognized locale — including the removed fr / zh-Hans / pt-BR / de
+ * stub catalogs — to `en` at load time, so by the time this component reads
+ * `locale` it is always `'en'` or `'ja'`.
  */
 export function LocaleToggle() {
   const { locale, setLocale, t } = useTranslation()
-  const next = locale === 'ja' ? 'en' : locale === 'en' ? 'ja' : 'en'
+  const next = locale === 'ja' ? 'en' : 'ja'
   return (
     <button
       type="button"

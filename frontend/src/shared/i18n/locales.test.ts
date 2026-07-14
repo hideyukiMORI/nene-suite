@@ -11,23 +11,23 @@ describe('resolveLocale', () => {
 
   it('resolves language-region tags', () => {
     expect(resolveLocale('ja-JP')).toBe('ja')
-    expect(resolveLocale('fr-FR')).toBe('fr')
-    expect(resolveLocale('de-AT')).toBe('de')
-  })
-
-  it('aliases simplified-Chinese region tags to zh-Hans', () => {
-    expect(resolveLocale('zh')).toBe('zh-Hans')
-    expect(resolveLocale('zh-CN')).toBe('zh-Hans')
-    expect(resolveLocale('zh-SG')).toBe('zh-Hans')
-  })
-
-  it('keeps the en fallback for traditional-Chinese tags (no zh-Hant catalog)', () => {
-    expect(resolveLocale('zh-TW')).toBe(DEFAULT_LOCALE)
-    expect(resolveLocale('zh-Hant')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('en-GB')).toBe('en')
   })
 
   it('falls back to default for unknown locales', () => {
     expect(resolveLocale('unknown')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('zh-TW')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('zh-Hant')).toBe(DEFAULT_LOCALE)
+  })
+
+  it('falls back removed stub-locale catalogs (fr / zh-Hans / pt-BR / de) to en', () => {
+    // Catalogs deleted 2026-07-14 (stub-only, parity-100%-or-delete). A
+    // browser or stored localStorage value still carrying one of these
+    // codes must degrade to en, not throw or resolve to an empty catalog.
+    expect(resolveLocale('fr')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('zh-Hans')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('pt-BR')).toBe(DEFAULT_LOCALE)
+    expect(resolveLocale('de')).toBe(DEFAULT_LOCALE)
   })
 })
 
