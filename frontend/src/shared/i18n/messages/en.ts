@@ -1,14 +1,21 @@
+import type { MessageCatalog, MessageKey } from './ja'
+
 /**
- * English message catalog — source of truth for all NeNe Suite UI strings.
+ * English message catalog — the reference locale and runtime fallback for all
+ * NeNe Suite UI strings.
+ *
+ * Authority note (規約 04 I18N-8): the message key set is owned by `ja.ts`
+ * (`MessageKey = keyof typeof ja`). This catalog is typed `MessageCatalog`
+ * (= `Record<MessageKey, string>`), so it mirrors `ja` exactly — adding or
+ * removing a key in `ja` becomes a compile error here.
  *
  * Key naming: suite.{feature}.{element} | common.{element}
  * Param interpolation: {{paramName}}
- *
  * All other locales are Partial<MessageCatalog> and fall back to these values.
  * Operator-facing disclaimer copy aligns with docs/explanation/installer-disclaimer-copy.md
  */
 
-export const en = {
+export const en: MessageCatalog = {
   // ── Common actions ───────────────────────────────────────────────────────
   'common.actions.cancel': 'Cancel',
   'common.actions.confirm': 'Confirm',
@@ -462,4 +469,6 @@ export const en = {
   'suite.help.callout.warning': 'Caution: ',
 }
 
-export type MessageCatalog = typeof en
+// `MessageCatalog`/`MessageKey` authority now lives in `ja.ts` (規約 04 I18N-8).
+// Re-exported here so existing `./en` type imports keep resolving unchanged.
+export type { MessageCatalog, MessageKey }
