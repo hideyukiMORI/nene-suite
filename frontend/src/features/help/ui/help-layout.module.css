@@ -29,27 +29,27 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .link {
   padding: 7px 10px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-x-sm);
   font-size: 13px;
   font-weight: 600;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   text-decoration: none;
   line-height: 1.4;
 }
 
 .link:hover {
-  background: var(--surface-2);
-  color: var(--fg);
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
 }
 
 .linkActive {
-  background: var(--brand-soft);
-  color: var(--brand-strong);
+  background: var(--color-x-brand-soft);
+  color: var(--color-x-brand-strong);
 }
 
 .content {

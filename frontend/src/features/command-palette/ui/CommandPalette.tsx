@@ -84,7 +84,7 @@ export function CommandPalette({ onClose, commands, labels }: CommandPaletteProp
         aria-label={labels.title}
       >
         <div className={styles['field']}>
-          <Icon name="search" size={20} color="var(--fg-3)" />
+          <Icon name="search" size={20} color="var(--color-text-faint)" />
           <input
             ref={inputRef}
             type="text"
@@ -132,7 +132,7 @@ export function CommandPalette({ onClose, commands, labels }: CommandPaletteProp
                       runCommand(command)
                     }}
                   >
-                    <Icon name={command.icon} size={19} color="var(--fg-3)" />
+                    <Icon name={command.icon} size={19} color="var(--color-text-faint)" />
                     <span>{command.label}</span>
                   </button>
                 </li>

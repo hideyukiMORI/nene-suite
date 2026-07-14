@@ -78,7 +78,7 @@ export function AuditViewer(): ReactNode {
         </div>
         <div className={styles['headerActions']}>
           <span className={styles['appendOnly']}>
-            <Icon name="circle" size={12} color="var(--ok)" />
+            <Icon name="circle" size={12} color="var(--color-success)" />
             {t('suite.audit.appendOnly')}
           </span>
           {ready && events.length > 0 ? (
@@ -94,7 +94,7 @@ export function AuditViewer(): ReactNode {
 
       {isError ? (
         <div className={styles['errorPanel']} role="alert">
-          <Icon name="error" size={40} fill color="var(--danger)" />
+          <Icon name="error" size={40} fill color="var(--color-danger)" />
           <p>{t('common.state.error')}</p>
           <button type="button" className={styles['retryBtn']} onClick={refetch}>
             <Icon name="refresh" size={18} />
@@ -111,7 +111,7 @@ export function AuditViewer(): ReactNode {
         <>
           <div className={styles['toolbar']}>
             <label className={styles['search']}>
-              <Icon name="search" size={18} color="var(--fg-3)" />
+              <Icon name="search" size={18} color="var(--color-text-faint)" />
               <input
                 type="search"
                 value={query}
@@ -142,7 +142,7 @@ export function AuditViewer(): ReactNode {
               <Icon
                 name="expand_more"
                 size={18}
-                color="var(--fg-3)"
+                color="var(--color-text-faint)"
                 className={styles['selectChevron'] ?? ''}
               />
             </div>
@@ -189,7 +189,7 @@ export function AuditViewer(): ReactNode {
             </div>
             {visible.length === 0 ? (
               <div className={styles['empty']}>
-                <Icon name="search_off" size={32} color="var(--fg-3)" />
+                <Icon name="search_off" size={32} color="var(--color-text-faint)" />
                 <span>{t('suite.audit.noMatch')}</span>
               </div>
             ) : (
@@ -284,7 +284,7 @@ function AuditRow({ event, selected, onOpen }: AuditRowProps): ReactNode {
       </span>
 
       <div className={styles['cellActor']}>
-        <Icon name={machine ? 'smart_toy' : 'person'} size={18} color="var(--fg-3)" />
+        <Icon name={machine ? 'smart_toy' : 'person'} size={18} color="var(--color-text-faint)" />
         <span className={styles['actorText']}>
           <span className={styles['actorLabel']}>{event.actorLabel ?? '—'}</span>
           <span className={styles['sourcePill']}>

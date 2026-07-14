@@ -24,9 +24,9 @@
   width: min(600px, 100%);
   max-height: 85vh;
   overflow-y: auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   box-shadow: var(--shadow-lg);
   padding: 26px;
   animation: popIn 0.16s ease;
@@ -38,10 +38,10 @@
   right: 16px;
   width: 34px;
   height: 34px;
-  border-radius: var(--r);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--fg-2);
+  border-radius: var(--r-x-base);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-overlay);
+  color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -49,6 +49,6 @@
 }
 
 .close:hover {
-  color: var(--fg);
-  border-color: var(--border-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }

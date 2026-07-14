@@ -23,8 +23,8 @@ export function AppLogo({
       style={{
         display: 'block',
         flex: 'none',
-        boxShadow: 'var(--shadow)',
-        borderRadius: 'var(--r-sm)',
+        boxShadow: 'var(--shadow-md)',
+        borderRadius: 'var(--r-x-sm)',
       }}
     />
   )

@@ -121,11 +121,11 @@ export function AccountMenu() {
             </div>
             <div className={styles['sep']} />
             <button type="button" role="menuitem" className={styles['item']} onClick={goAccount}>
-              <Icon name="person" size={19} color="var(--fg-3)" />
+              <Icon name="person" size={19} color="var(--color-text-faint)" />
               {t('suite.shell.account.profile')}
             </button>
             <button type="button" role="menuitem" className={styles['item']} onClick={goAccount}>
-              <Icon name="shield" size={19} color="var(--fg-3)" />
+              <Icon name="shield" size={19} color="var(--color-text-faint)" />
               {t('suite.shell.account.security')}
             </button>
             <button

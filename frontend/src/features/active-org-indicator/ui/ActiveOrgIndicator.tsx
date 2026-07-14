@@ -54,7 +54,7 @@ export function ActiveOrgIndicator() {
       >
         <span className={styles['avatar']}>{initial}</span>
         <span className={styles['name']}>{activeLabel}</span>
-        <Icon name="unfold_more" size={18} color="var(--fg-3)" />
+        <Icon name="unfold_more" size={18} color="var(--color-text-faint)" />
       </button>
       {open ? (
         <>
@@ -84,7 +84,7 @@ export function ActiveOrgIndicator() {
                   <span className={styles['itemMeta']}>{org.slug}</span>
                 </span>
                 {org.externalId === activeExternalId ? (
-                  <Icon name="check" size={19} color="var(--accent)" />
+                  <Icon name="check" size={19} color="var(--color-accent)" />
                 ) : null}
               </button>
             ))}

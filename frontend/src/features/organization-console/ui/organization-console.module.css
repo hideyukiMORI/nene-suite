@@ -10,9 +10,9 @@
   gap: 8px;
   padding: 8px 12px;
   margin-bottom: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
 }
 
 .filterInput {
@@ -22,21 +22,21 @@
   background: transparent;
   font-family: inherit;
   font-size: 13.5px;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .fieldError {
   font-size: 12px;
   font-weight: 500;
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 /* ── Create-organization card ─────────────────────────────────────────── */
 .createCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: var(--shadow);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  box-shadow: var(--shadow-md);
   padding: 20px 22px;
   margin-bottom: 22px;
 }
@@ -50,14 +50,14 @@
 
 .cardIcon {
   flex: none;
-  color: var(--brand);
+  color: var(--color-x-brand);
 }
 
 .cardTitle {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
   white-space: nowrap;
 }
 
@@ -79,29 +79,29 @@
 .label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .input {
   width: 100%;
   font-family: inherit;
   font-size: 14px;
-  color: var(--fg);
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-sm);
   padding: 10px 12px;
   outline: none;
 }
 
 .input:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 13%, transparent);
+  border-color: var(--color-x-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-x-brand) 13%, transparent);
 }
 
 .inputMono {
   composes: input;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 13px;
 }
 
@@ -113,9 +113,9 @@
   height: 40px;
   padding: 0 20px;
   border: none;
-  border-radius: var(--r-sm);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   font-family: inherit;
   font-size: 13.5px;
   font-weight: 700;
@@ -123,7 +123,7 @@
 }
 
 .primaryBtn:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }
 
 .primaryBtn:disabled {
@@ -138,16 +138,16 @@
   gap: 7px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 /* ── Organizations table ──────────────────────────────────────────────── */
 .table {
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
 }
 
 .headRow,
@@ -160,13 +160,13 @@
 
 .headRow {
   padding: 12px 20px;
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
+  background: var(--color-surface-overlay);
+  border-bottom: 1px solid var(--color-border);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .headActions {
@@ -175,7 +175,7 @@
 
 .row {
   padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .row:last-child {
@@ -193,9 +193,9 @@
   width: 32px;
   height: 32px;
   flex: none;
-  border-radius: var(--r-sm);
-  background: var(--brand-soft);
-  color: var(--brand-strong);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand-soft);
+  color: var(--color-x-brand-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -206,16 +206,16 @@
 .orgName {
   font-size: 14px;
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .slug {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 12px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -227,23 +227,23 @@
   align-items: center;
   gap: 6px;
   padding: 4px 11px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-x-pill);
   font-size: 12px;
   font-weight: 600;
 }
 
 .statusActive {
   composes: statusPill;
-  background: var(--brand-softer);
-  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
-  color: var(--brand-strong);
+  background: var(--color-x-brand-softer);
+  border: 1px solid color-mix(in srgb, var(--color-x-brand) 22%, transparent);
+  color: var(--color-x-brand-strong);
 }
 
 .statusDisabled {
   composes: statusPill;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--fg-3);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-faint);
 }
 
 .dot {
@@ -253,11 +253,11 @@
 }
 
 .statusActive .dot {
-  background: var(--brand);
+  background: var(--color-x-brand);
 }
 
 .statusDisabled .dot {
-  background: var(--fg-3);
+  background: var(--color-text-faint);
 }
 
 /* row actions */
@@ -274,10 +274,10 @@
   align-items: center;
   gap: 6px;
   padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
@@ -286,8 +286,8 @@
 }
 
 .linkBtn:hover {
-  color: var(--brand-strong);
-  border-color: color-mix(in srgb, var(--brand) 40%, var(--border));
+  color: var(--color-x-brand-strong);
+  border-color: color-mix(in srgb, var(--color-x-brand) 40%, var(--color-border));
 }
 
 .iconBtn {
@@ -296,16 +296,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
 .iconBtn:hover {
-  color: var(--fg);
-  border-color: var(--border-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 /* dropdown menu */
@@ -315,9 +315,9 @@
   right: 0;
   z-index: 25;
   min-width: 172px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
   box-shadow: var(--shadow-lg);
   padding: 5px;
   animation: menuIn 0.14s ease both;
@@ -330,9 +330,9 @@
   width: 100%;
   padding: 9px 10px;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-x-sm);
   background: transparent;
-  color: var(--fg);
+  color: var(--color-text-primary);
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -341,20 +341,20 @@
 }
 
 .menuItem:hover {
-  background: var(--surface-2);
+  background: var(--color-surface-overlay);
 }
 
 .menuIcon {
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .menuItemDanger {
   composes: menuItem;
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 .menuItemDanger:hover {
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }
 
 .menuConfirm {
@@ -367,14 +367,14 @@
 .menuConfirmLabel {
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .menuConfirmImpact {
   margin: 0;
   font-size: 12px;
   line-height: 1.55;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .menuConfirmActions {
@@ -385,10 +385,10 @@
 .menuConfirmYes {
   flex: 1;
   padding: 7px 10px;
-  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
-  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 45%, var(--color-border));
+  border-radius: var(--r-x-sm);
+  background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface-raised));
+  color: var(--color-danger);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 700;
@@ -403,10 +403,10 @@
 .menuConfirmYesSafe {
   flex: 1;
   padding: 7px 10px;
-  border: 1px solid color-mix(in srgb, var(--brand) 45%, var(--border));
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
-  color: var(--brand);
+  border: 1px solid color-mix(in srgb, var(--color-x-brand) 45%, var(--color-border));
+  border-radius: var(--r-x-sm);
+  background: color-mix(in srgb, var(--color-x-brand) 10%, var(--color-surface-raised));
+  color: var(--color-x-brand);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 700;
@@ -421,10 +421,10 @@
 .menuConfirmNo {
   flex: 1;
   padding: 7px 10px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
@@ -443,10 +443,10 @@
   min-width: 0;
   font-family: inherit;
   font-size: 13.5px;
-  color: var(--fg);
-  background: var(--surface-2);
-  border: 1px solid var(--brand);
-  border-radius: var(--r-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-x-brand);
+  border-radius: var(--r-x-sm);
   padding: 7px 10px;
   outline: none;
 }
@@ -458,9 +458,9 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--r-sm);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   cursor: pointer;
 }
 
@@ -470,10 +470,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 

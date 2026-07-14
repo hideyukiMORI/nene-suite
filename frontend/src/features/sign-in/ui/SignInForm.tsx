@@ -65,28 +65,28 @@ export function SignInForm() {
 
         {hasEmptyError ? (
           <p role="alert" className={styles['empty']}>
-            <Icon name="info" size={18} color="var(--warn)" />
+            <Icon name="info" size={18} color="var(--color-warn)" />
             {t('suite.auth.emptyFields')}
           </p>
         ) : null}
 
         {showInvalid ? (
           <div role="alert" className={styles['errorBox']}>
-            <Icon name="error" size={19} color="var(--danger)" />
+            <Icon name="error" size={19} color="var(--color-danger)" />
             <span className={styles['errorText']}>{t('suite.auth.invalidCredentials')}</span>
           </div>
         ) : null}
 
         {showRateLimit ? (
           <div role="status" className={styles['statusBox']}>
-            <Icon name="schedule" size={19} color="var(--warn)" />
+            <Icon name="schedule" size={19} color="var(--color-warn)" />
             <span className={styles['statusText']}>{t('common.error.rateLimit')}</span>
           </div>
         ) : null}
 
         {showGeneric ? (
           <div role="alert" className={styles['errorBox']}>
-            <Icon name="error" size={19} color="var(--danger)" />
+            <Icon name="error" size={19} color="var(--color-danger)" />
             <span className={styles['errorText']}>{t('common.error.serverError')}</span>
           </div>
         ) : null}
@@ -104,7 +104,7 @@ export function SignInForm() {
       </form>
 
       <p className={styles['help']}>
-        <Icon name="help" size={16} color="var(--fg-3)" />
+        <Icon name="help" size={16} color="var(--color-text-faint)" />
         {t('suite.auth.help.contact')}
       </p>
       <p className={styles['disclaimer']}>{t('suite.disclaimer.footer')}</p>

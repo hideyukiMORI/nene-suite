@@ -38,19 +38,19 @@
   0%,
   16%,
   100% {
-    background: var(--side-active);
-    border-color: var(--side-line);
+    background: var(--color-x-side-active);
+    border-color: var(--color-x-side-line);
     box-shadow: none;
-    color: var(--side-brand);
+    color: var(--color-x-side-brand);
   }
   5%,
   11% {
-    background: color-mix(in srgb, var(--side-brand) 28%, var(--side-active));
-    border-color: color-mix(in srgb, var(--side-brand) 55%, transparent);
+    background: color-mix(in srgb, var(--color-x-side-brand) 28%, var(--color-x-side-active));
+    border-color: color-mix(in srgb, var(--color-x-side-brand) 55%, transparent);
     box-shadow:
-      0 0 0 3px color-mix(in srgb, var(--side-brand) 15%, transparent),
-      0 7px 20px color-mix(in srgb, var(--side-brand) 24%, transparent);
-    color: var(--side-fg);
+      0 0 0 3px color-mix(in srgb, var(--color-x-side-brand) 15%, transparent),
+      0 7px 20px color-mix(in srgb, var(--color-x-side-brand) 24%, transparent);
+    color: var(--color-x-side-fg);
   }
 }
 
@@ -71,8 +71,8 @@
   flex-direction: row;
   min-height: 100vh;
   width: 100%;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   position: relative;
   overflow: hidden;
 }
@@ -92,27 +92,27 @@
   display: flex;
   gap: 2px;
   padding: 2px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
 }
 
 .localeBtn {
   padding: 6px 11px;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-x-sm);
   cursor: pointer;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.02em;
   background: transparent;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .localeBtn[data-active='true'] {
-  background: var(--brand);
-  color: var(--on-brand);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
 }
 
 .themeBtn {
@@ -121,21 +121,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--surface-2);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-overlay);
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
 .themeBtn:hover {
-  color: var(--fg);
-  border-color: var(--border-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 /* ── hero (left, always dark) ───────────────────────────────────────────── */
 .hero {
-  --dot: oklch(100% 0 0 / 0.05);
+  --color-x-dot: oklch(100% 0 0 / 0.05);
   flex: 1 1 0;
   min-width: 0;
   min-height: 100vh;
@@ -145,7 +145,7 @@
   justify-content: center;
   padding: clamp(44px, 6vw, 96px);
   overflow: hidden;
-  background: linear-gradient(168deg, var(--side-bg) 0%, var(--side-bg-2) 100%);
+  background: linear-gradient(168deg, var(--color-x-side-bg) 0%, var(--color-x-side-bg-2) 100%);
 }
 
 .heroDots {
@@ -153,7 +153,7 @@
   inset: -40px;
   opacity: 0.55;
   pointer-events: none;
-  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-image: radial-gradient(var(--color-x-dot) 1px, transparent 1px);
   background-size: 22px 22px;
   animation: drift 34s linear infinite alternate;
 }
@@ -168,7 +168,7 @@
   pointer-events: none;
   background: radial-gradient(
     circle at 32% 32%,
-    color-mix(in srgb, var(--side-brand) 22%, transparent),
+    color-mix(in srgb, var(--color-x-side-brand) 22%, transparent),
     transparent 66%
   );
   animation: aurora 16s ease-in-out infinite;
@@ -207,18 +207,18 @@
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: var(--side-fg);
+  color: var(--color-x-side-fg);
 }
 
 .orchTag {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 9.5px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--side-fg-mut);
-  border: 1px solid var(--side-line);
-  border-radius: var(--r-sm);
+  color: var(--color-x-side-fg-mut);
+  border: 1px solid var(--color-x-side-line);
+  border-radius: var(--r-x-sm);
   padding: 3px 7px;
 }
 
@@ -227,7 +227,7 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  color: var(--side-fg);
+  color: var(--color-x-side-fg);
   font-size: clamp(42px, 5.6vw, 72px);
   text-wrap: balance;
   animation: lpUp 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -239,7 +239,7 @@
   font-size: clamp(16px, 1.5vw, 20px);
   line-height: 1.75;
   font-weight: 500;
-  color: var(--side-fg-mut);
+  color: var(--color-x-side-fg-mut);
   text-wrap: pretty;
   animation: lpUp 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.08s both;
 }
@@ -257,29 +257,29 @@
   align-items: center;
   gap: 7px;
   padding: 7px 13px 7px 10px;
-  border: 1px solid var(--side-line);
-  border-radius: var(--r);
+  border: 1px solid var(--color-x-side-line);
+  border-radius: var(--r-x-base);
   background: oklch(100% 0 0 / 0.04);
   font-size: 13px;
   font-weight: 600;
-  color: var(--side-fg);
+  color: var(--color-x-side-fg);
   white-space: nowrap;
 }
 
 .portfolio {
   margin-top: clamp(34px, 6vh, 52px);
   padding-top: clamp(22px, 3.5vh, 30px);
-  border-top: 1px solid var(--side-line);
+  border-top: 1px solid var(--color-x-side-line);
   animation: lpUp 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.24s both;
 }
 
 .portfolioLabel {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--side-fg-mut);
+  color: var(--color-x-side-fg-mut);
   margin-bottom: 14px;
 }
 
@@ -292,16 +292,16 @@
 .tile {
   width: 38px;
   height: 38px;
-  border-radius: var(--r-sm);
-  background: var(--side-active);
-  border: 1px solid var(--side-line);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-side-active);
+  border: 1px solid var(--color-x-side-line);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 14px;
   font-weight: 700;
-  color: var(--side-brand);
+  color: var(--color-x-side-brand);
   animation: tileGlow 6s ease-in-out infinite;
 }
 
@@ -330,10 +330,10 @@
   align-items: center;
   gap: 9px;
   margin-top: clamp(20px, 3vh, 28px);
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 11.5px;
   line-height: 1;
-  color: var(--side-fg-mut);
+  color: var(--color-x-side-fg-mut);
   min-height: 14px;
   overflow: hidden;
   animation: lpUp 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.32s both;
@@ -342,14 +342,14 @@
 .consoleDot {
   width: 7px;
   height: 7px;
-  border-radius: var(--r-pill);
-  background: var(--side-brand);
+  border-radius: var(--r-x-pill);
+  background: var(--color-x-side-brand);
   flex: none;
   animation: pulse 1.7s ease-in-out infinite;
 }
 
 .consolePrompt {
-  color: var(--side-brand);
+  color: var(--color-x-side-brand);
   flex: none;
 }
 
@@ -361,7 +361,7 @@
 .consoleCaret {
   width: 6px;
   height: 13px;
-  background: var(--side-brand);
+  background: var(--color-x-side-brand);
   flex: none;
   animation: caret 1.05s steps(1) infinite;
 }
@@ -374,7 +374,7 @@
   display: flex;
   flex-direction: column;
   padding: clamp(28px, 4vw, 56px);
-  background: var(--bg);
+  background: var(--color-surface);
 }
 
 .formCenter {
@@ -389,9 +389,9 @@
 .card {
   width: 100%;
   max-width: 404px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   box-shadow: var(--shadow-lg);
   padding: clamp(28px, 3.4vw, 40px);
   animation: popIn 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -408,17 +408,17 @@
   width: 8px;
   height: 8px;
   border-radius: 2px;
-  background: var(--brand);
+  background: var(--color-x-brand);
   flex: none;
 }
 
 .eyebrowText {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   white-space: nowrap;
 }
 
@@ -427,14 +427,14 @@
   font-size: 25px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .subtitle {
   margin: 8px 0 26px;
   font-size: 14px;
   line-height: 1.6;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .form {
@@ -449,26 +449,26 @@
   gap: 7px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .input {
   font-size: 14px;
-  color: var(--fg);
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-sm);
   padding: 12px 13px;
   outline: none;
   width: 100%;
 }
 
 .input:focus {
-  border-color: var(--brand);
+  border-color: var(--color-x-brand);
 }
 
 .inputMono {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
 }
 
 .empty {
@@ -478,7 +478,7 @@
   gap: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .errorBox,
@@ -487,32 +487,32 @@
   align-items: flex-start;
   gap: 9px;
   padding: 11px 13px;
-  border-radius: var(--r);
+  border-radius: var(--r-x-base);
   animation: lpUp 0.25s ease both;
 }
 
 .errorBox {
-  border: 1px solid color-mix(in srgb, var(--danger) 38%, var(--border));
-  background: color-mix(in srgb, var(--danger) 9%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-danger) 38%, var(--color-border));
+  background: color-mix(in srgb, var(--color-danger) 9%, var(--color-surface-raised));
 }
 
 .statusBox {
-  border: 1px solid color-mix(in srgb, var(--warn) 34%, var(--border));
-  background: color-mix(in srgb, var(--warn) 9%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-warn) 34%, var(--color-border));
+  background: color-mix(in srgb, var(--color-warn) 9%, var(--color-surface-raised));
 }
 
 .errorText {
   font-size: 13px;
   line-height: 1.5;
   font-weight: 600;
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 .statusText {
   font-size: 13px;
   line-height: 1.5;
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .submit {
@@ -524,19 +524,19 @@
   width: 100%;
   padding: 13px;
   border: none;
-  border-radius: var(--r);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   cursor: pointer;
   font-family: inherit;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .submit:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }
 
 .submit:disabled {
@@ -548,8 +548,8 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--on-brand) 35%, transparent);
-  border-top-color: var(--on-brand);
+  border: 2px solid color-mix(in srgb, var(--color-on-accent) 35%, transparent);
+  border-top-color: var(--color-on-accent);
   animation: spin 0.7s linear infinite;
   flex: none;
 }
@@ -561,16 +561,16 @@
   gap: 7px;
   font-size: 12.5px;
   line-height: 1.55;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .disclaimer {
   margin: 18px 0 0;
   padding-top: 18px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
   font-size: 11.5px;
   line-height: 1.6;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   text-wrap: pretty;
 }
 
@@ -586,10 +586,10 @@
 }
 
 .poweredBy {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 10.5px;
   letter-spacing: 0.01em;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .footerLinks {
@@ -604,18 +604,18 @@
   align-items: center;
   gap: 5px;
   padding: 5px 9px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
   font-size: 12px;
   font-weight: 600;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .footerLink:hover {
-  color: var(--fg);
-  border-color: var(--border-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 @media (max-width: 860px) {

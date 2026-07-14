@@ -18,7 +18,7 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--hero-accent);
+  color: var(--color-x-hero-accent);
   margin-bottom: 9px;
 }
 
@@ -28,7 +28,7 @@
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.32;
-  color: var(--fg);
+  color: var(--color-text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -37,14 +37,14 @@
 
 .name {
   font-weight: 700;
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 .subtitle {
   margin: 8px 0 0;
   font-size: 13.5px;
   line-height: 1.75;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   max-width: 460px;
 }
 
@@ -54,9 +54,9 @@
   gap: 8px;
   padding: 11px 18px;
   border: none;
-  border-radius: var(--r-sm);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   cursor: pointer;
   font-family: inherit;
   font-size: 13.5px;
@@ -66,7 +66,7 @@
 }
 
 .getApps:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }
 
 /* ── KPI strip ──────────────────────────────────────────────────────────── */
@@ -74,39 +74,39 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
   margin-bottom: 36px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .kpiCell {
-  background: var(--surface);
+  background: var(--color-surface-raised);
   padding: 17px 22px;
 }
 
 .kpiNum {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 26px;
   font-weight: 600;
   line-height: 1;
-  color: var(--ink);
+  color: var(--color-x-ink);
 }
 
 .kpiNumMuted {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 26px;
   font-weight: 600;
   line-height: 1;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .kpiLabel {
   font-size: 11px;
   font-weight: 600;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   margin-top: 9px;
   letter-spacing: 0.02em;
 }
@@ -124,13 +124,13 @@
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .sectionLine {
   height: 1px;
   flex: 1;
-  background: var(--border);
+  background: var(--color-border);
 }
 
 /* ── Pillars ────────────────────────────────────────────────────────────── */
@@ -138,17 +138,17 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
   margin-bottom: 34px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .pillar {
   position: relative;
-  background: var(--surface);
+  background: var(--color-surface-raised);
   padding: 24px 22px 20px;
   display: flex;
   flex-direction: column;
@@ -164,13 +164,13 @@
 .pillarFallback {
   width: 56px;
   height: 56px;
-  border-radius: var(--r-sm);
-  background: var(--brand-deep);
-  color: var(--side-brand);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand-deep);
+  color: var(--color-x-side-brand);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   flex: none;
 }
 
@@ -179,10 +179,10 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ok);
-  border: 1px solid color-mix(in oklch, var(--ok) 32%, var(--border));
+  color: var(--color-success);
+  border: 1px solid color-mix(in oklch, var(--color-success) 32%, var(--color-border));
   padding: 4px 10px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-x-pill);
   white-space: nowrap;
 }
 
@@ -195,7 +195,7 @@
 
 .pillarMeta {
   font-size: 12px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   margin-top: 4px;
   flex: 1;
 }
@@ -210,9 +210,9 @@
   flex: 1;
   padding: 10px;
   border: none;
-  border-radius: var(--r);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
@@ -222,15 +222,15 @@
 }
 
 .openBtn:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }
 
 .detailBtn {
   padding: 10px 16px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-base);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
@@ -238,8 +238,8 @@
 }
 
 .detailBtn:hover {
-  background: var(--surface-2);
-  color: var(--fg);
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
 }
 
 /* ── Feeds ──────────────────────────────────────────────────────────────── */
@@ -251,11 +251,11 @@
 }
 
 .feedPanel {
-  border-radius: var(--r);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: var(--r-x-base);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
   padding: 18px 20px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .feedHead {
@@ -272,12 +272,12 @@
 }
 
 .originTag {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 10px;
-  color: var(--origin);
-  background: color-mix(in srgb, var(--origin) 14%, transparent);
+  color: var(--color-x-origin);
+  background: color-mix(in srgb, var(--color-x-origin) 14%, transparent);
   padding: 2px 9px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-x-pill);
 }
 
 .feedPlaceholder {
@@ -285,7 +285,7 @@
   padding: 18px 2px;
   font-size: 13px;
   line-height: 1.7;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .feedList {
@@ -302,7 +302,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 9px 2px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
   font-size: 13px;
 }
 
@@ -312,12 +312,12 @@
 
 .feedRowName {
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .feedRowVersion {
-  color: var(--fg-3);
-  font-family: var(--font-num), monospace;
+  color: var(--color-text-faint);
+  font-family: var(--font-x-num), monospace;
   font-size: 12px;
 }
 
@@ -325,30 +325,30 @@
   font-size: 11px;
   font-weight: 600;
   padding: 2px 9px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-x-pill);
   white-space: nowrap;
-  color: var(--fg-3);
-  background: color-mix(in srgb, var(--fg-3) 12%, transparent);
+  color: var(--color-text-faint);
+  background: color-mix(in srgb, var(--color-text-faint) 12%, transparent);
 }
 
 .statusBadge[data-status='update_available'] {
-  color: var(--warn);
-  background: color-mix(in srgb, var(--warn) 14%, transparent);
+  color: var(--color-warn);
+  background: color-mix(in srgb, var(--color-warn) 14%, transparent);
 }
 
 .statusBadge[data-status='forced'] {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
 }
 
 .statusBadge[data-status='up_to_date'] {
-  color: var(--ok);
-  background: color-mix(in srgb, var(--ok) 14%, transparent);
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
 }
 
 .announcement {
   padding: 10px 2px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
 }
 
 .announcement:first-child {
@@ -367,32 +367,32 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 2px 8px;
-  border-radius: var(--r-pill);
-  color: var(--fg-3);
-  background: color-mix(in srgb, var(--fg-3) 12%, transparent);
+  border-radius: var(--r-x-pill);
+  color: var(--color-text-faint);
+  background: color-mix(in srgb, var(--color-text-faint) 12%, transparent);
 }
 
 .severityBadge[data-severity='important'] {
-  color: var(--warn);
-  background: color-mix(in srgb, var(--warn) 14%, transparent);
+  color: var(--color-warn);
+  background: color-mix(in srgb, var(--color-warn) 14%, transparent);
 }
 
 .severityBadge[data-severity='critical'] {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
 }
 
 .announcementTitle {
   font-weight: 600;
   font-size: 13px;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .announcementBody {
   margin: 5px 0 0;
   font-size: 12px;
   line-height: 1.6;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .houseAds {
@@ -402,17 +402,17 @@
   align-items: center;
   gap: 10px 18px;
   padding: 12px 16px;
-  border-radius: var(--r);
-  border: 1px dashed var(--border-2);
-  background: var(--surface-2);
+  border-radius: var(--r-x-base);
+  border: 1px dashed var(--color-border-strong);
+  background: var(--color-surface-overlay);
 }
 
 .houseAdsTag {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .houseAd {
@@ -424,18 +424,18 @@
 }
 
 .houseAd:hover .houseAdTitle {
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 .houseAdTitle {
   font-weight: 600;
   font-size: 13px;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .houseAdBody {
   font-size: 12px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 /* ── Loading / error ────────────────────────────────────────────────────── */
@@ -446,11 +446,11 @@
 }
 
 .skeletonCard {
-  border-radius: var(--r);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: var(--r-x-base);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
   padding: 18px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   height: 150px;
   animation: pulse 1.4s ease-in-out infinite;
 }
@@ -461,9 +461,9 @@
   align-items: center;
   justify-content: center;
   padding: 64px 20px;
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--border));
-  border-radius: var(--r);
-  background: color-mix(in srgb, var(--danger) 5%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, var(--color-border));
+  border-radius: var(--r-x-base);
+  background: color-mix(in srgb, var(--color-danger) 5%, var(--color-surface-raised));
   gap: 14px;
   text-align: center;
 }
@@ -474,9 +474,9 @@
   gap: 7px;
   padding: 10px 17px;
   border: none;
-  border-radius: var(--r);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-base);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   cursor: pointer;
   font-family: inherit;
   font-size: 13.5px;

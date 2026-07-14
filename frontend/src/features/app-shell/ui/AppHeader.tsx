@@ -33,7 +33,7 @@ export function AppHeader({ onOpenPalette, onOpenMenu }: AppHeaderProps) {
         aria-label={t('suite.shell.commandPalette')}
         onClick={onOpenPalette}
       >
-        <Icon name="search" size={19} color="var(--fg-3)" />
+        <Icon name="search" size={19} color="var(--color-text-faint)" />
         <span className={styles['searchLabel']}>{t('suite.shell.search')}</span>
         <span className={styles['kbd']}>⌘K</span>
       </button>

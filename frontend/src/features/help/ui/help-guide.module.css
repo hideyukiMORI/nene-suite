@@ -16,7 +16,7 @@
   margin: -10px 0 0;
   font-size: 14.5px;
   line-height: 1.7;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .section {
@@ -29,14 +29,14 @@
   margin: 0;
   font-size: 17px;
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .paragraph {
   margin: 0;
   font-size: 14px;
   line-height: 1.85;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .steps,
@@ -48,7 +48,7 @@
   gap: 9px;
   font-size: 14px;
   line-height: 1.7;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .steps {
@@ -67,8 +67,8 @@
   border-collapse: collapse;
   width: 100%;
   font-size: 13.5px;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
 }
 
@@ -76,18 +76,18 @@
 .table td {
   padding: 10px 13px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   vertical-align: top;
 }
 
 .table th {
-  background: var(--surface-2);
+  background: var(--color-surface-overlay);
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .table td {
-  color: var(--fg);
+  color: var(--color-text-primary);
   line-height: 1.6;
 }
 
@@ -99,11 +99,11 @@
   margin: 0;
   font-size: 14px;
   line-height: 1.7;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .inlineLink {
-  color: var(--brand-strong);
+  color: var(--color-x-brand-strong);
   text-decoration: none;
   font-weight: 600;
 }
@@ -117,7 +117,7 @@
   flex-direction: column;
   gap: 9px;
   padding-top: 18px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
 }
 
 .relatedLabel {
@@ -125,7 +125,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .relatedLinks {
@@ -136,15 +136,15 @@
 
 .relatedLink {
   padding: 7px 13px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-pill);
-  background: var(--surface);
-  color: var(--brand-strong);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-x-brand-strong);
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
 }
 
 .relatedLink:hover {
-  background: var(--brand-softer);
+  background: var(--color-x-brand-softer);
 }

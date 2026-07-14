@@ -1,7 +1,7 @@
 .shell {
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .maincol {
@@ -15,7 +15,7 @@
   flex: 1;
   min-width: 0;
   padding: 30px 38px 60px;
-  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-image: radial-gradient(var(--color-x-dot) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: -1px -1px;
 }

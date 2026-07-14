@@ -35,7 +35,12 @@ export function HelpGlossary(): ReactNode {
       <p className={styles['subtitle']}>{t('suite.help.glossary.subtitle')}</p>
 
       <div className={styles['searchWrap']}>
-        <Icon name="search" size={19} color="var(--fg-3)" className={styles['searchIcon'] ?? ''} />
+        <Icon
+          name="search"
+          size={19}
+          color="var(--color-text-faint)"
+          className={styles['searchIcon'] ?? ''}
+        />
         <input
           type="search"
           className={styles['search']}

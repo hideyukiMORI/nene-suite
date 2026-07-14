@@ -126,7 +126,7 @@ export function OrganizationConsole() {
       ) : (
         <>
           <div className={styles['filterWrap']}>
-            <Icon name="search" size={18} color="var(--fg-3)" />
+            <Icon name="search" size={18} color="var(--color-text-faint)" />
             <input
               type="search"
               className={styles['filterInput']}

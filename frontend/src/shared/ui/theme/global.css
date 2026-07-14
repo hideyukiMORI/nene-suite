@@ -16,14 +16,14 @@ body {
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-x-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: color-mix(in oklch, var(--brand) 22%, transparent);
+  background: color-mix(in oklch, var(--color-x-brand) 22%, transparent);
 }
 
 /* Material Symbols Rounded — opt into fill per-icon via font-variation-settings. */
@@ -48,12 +48,12 @@ body {
 }
 
 .serif {
-  font-family: var(--font-serif), serif;
+  font-family: var(--font-x-serif), serif;
 }
 
 /* Dot-grid background utility — applied to scroll regions (e.g. <main>). */
 .dotgrid {
-  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-image: radial-gradient(var(--color-x-dot) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: -1px -1px;
 }
@@ -79,11 +79,11 @@ input {
 }
 
 input:focus {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 14%, transparent);
 }
 
 :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
   outline-offset: 2px;
 }
 
@@ -100,8 +100,8 @@ input:focus {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-2);
-  border-radius: var(--r);
+  background: var(--color-border-strong);
+  border-radius: var(--r-x-base);
   border: 2px solid transparent;
   background-clip: padding-box;
 }

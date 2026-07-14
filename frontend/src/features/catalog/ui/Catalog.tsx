@@ -40,7 +40,7 @@ export function Catalog() {
       <div className={styles['root']}>
         <h1 className={styles['title']}>{t('suite.catalog.title')}</h1>
         <div className={styles['errorPanel']} role="alert">
-          <Icon name="error" size={40} fill color="var(--danger)" />
+          <Icon name="error" size={40} fill color="var(--color-danger)" />
           <p>{t('common.state.error')}</p>
           <button type="button" className={styles['retryBtn']} onClick={refetch}>
             <Icon name="refresh" size={18} />
@@ -82,7 +82,7 @@ export function Catalog() {
 
       {visible.length === 0 ? (
         <div className={styles['empty']}>
-          <Icon name="apps" size={40} color="var(--fg-3)" />
+          <Icon name="apps" size={40} color="var(--color-text-faint)" />
           <p>{t('suite.catalog.empty')}</p>
         </div>
       ) : (

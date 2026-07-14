@@ -11,9 +11,9 @@
   gap: 10px;
   padding: 12px 16px;
   margin-bottom: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
 }
 
 .orgContextLabel {
@@ -21,36 +21,36 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .orgContextName {
   font-size: 14.5px;
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
 }
 
 .orgContextSlug {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 12px;
   padding: 2px 8px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-sm);
+  color: var(--color-text-muted);
 }
 
 .orgContextDisabled {
   font-size: 12px;
   font-weight: 600;
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 /* ── Grant-member card ────────────────────────────────────────────────── */
 .grantCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: var(--shadow);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
+  box-shadow: var(--shadow-md);
   padding: 20px 22px;
   margin-bottom: 22px;
 }
@@ -64,21 +64,21 @@
 
 .cardIcon {
   flex: none;
-  color: var(--brand);
+  color: var(--color-x-brand);
 }
 
 .cardTitle {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--fg);
+  color: var(--color-text-primary);
   white-space: nowrap;
 }
 
 .cardSub {
   margin: 0 0 16px 28px;
   font-size: 12.5px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
 }
 
 .grantForm {
@@ -107,7 +107,7 @@
 .label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 /* custom select (chevron via the wrapper) */
@@ -121,17 +121,17 @@
   -webkit-appearance: none;
   font-family: inherit;
   font-size: 14px;
-  color: var(--fg);
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-sm);
   padding: 10px 36px 10px 12px;
   outline: none;
   cursor: pointer;
 }
 
 .select:focus {
-  border-color: var(--brand);
+  border-color: var(--color-x-brand);
 }
 
 .selectChevron {
@@ -139,7 +139,7 @@
   right: 11px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   pointer-events: none;
 }
 
@@ -151,9 +151,9 @@
   height: 40px;
   padding: 0 20px;
   border: none;
-  border-radius: var(--r-sm);
-  background: var(--brand);
-  color: var(--on-brand);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand);
+  color: var(--color-on-accent);
   font-family: inherit;
   font-size: 13.5px;
   font-weight: 700;
@@ -161,7 +161,7 @@
 }
 
 .primaryBtn:hover {
-  background: var(--brand-strong);
+  background: var(--color-x-brand-strong);
 }
 
 .primaryBtn:disabled {
@@ -175,7 +175,7 @@
   gap: 8px;
   margin: 4px 0 0 28px;
   font-size: 13px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .errorText {
@@ -185,16 +185,16 @@
   gap: 7px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--danger);
+  color: var(--color-danger);
 }
 
 /* ── Members list ─────────────────────────────────────────────────────── */
 .table {
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-base);
   overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
 }
 
 .headRow,
@@ -207,13 +207,13 @@
 
 .headRow {
   padding: 12px 20px;
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
+  background: var(--color-surface-overlay);
+  border-bottom: 1px solid var(--color-border);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 .headActions {
@@ -222,7 +222,7 @@
 
 .row {
   padding: 13px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .row:last-child {
@@ -241,9 +241,9 @@
   width: 36px;
   height: 36px;
   flex: none;
-  border-radius: var(--r-sm);
-  background: var(--brand-soft);
-  color: var(--brand-strong);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-brand-soft);
+  color: var(--color-x-brand-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,7 +259,7 @@
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: var(--fg);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -267,9 +267,9 @@
 
 .operatorEmail {
   display: block;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 11.5px;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -277,7 +277,7 @@
 
 .stale {
   font-style: italic;
-  color: var(--fg-3);
+  color: var(--color-text-faint);
 }
 
 /* role select (tidy, pill) */
@@ -299,17 +299,17 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: var(--fg);
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-pill);
+  color: var(--color-text-primary);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-x-pill);
   padding: 7px 30px 7px 13px;
   outline: none;
   cursor: pointer;
 }
 
 .roleSelect:focus {
-  border-color: var(--brand);
+  border-color: var(--color-x-brand);
 }
 
 .roleChevron {
@@ -317,7 +317,7 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--fg-3);
+  color: var(--color-text-faint);
   pointer-events: none;
 }
 
@@ -334,10 +334,10 @@
   align-items: center;
   gap: 6px;
   padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
@@ -350,22 +350,22 @@
 }
 
 .revokeBtn:not(:disabled):hover {
-  color: var(--danger);
-  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
-  background: color-mix(in srgb, var(--danger) 7%, var(--surface));
+  color: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--color-danger) 7%, var(--color-surface-raised));
 }
 
 .confirmLabel {
   font-size: 12px;
-  color: var(--fg-2);
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 
 .confirmYes {
   padding: 7px 11px;
   border: none;
-  border-radius: var(--r-sm);
-  background: var(--danger);
+  border-radius: var(--r-x-sm);
+  background: var(--color-danger);
   color: #fff;
   font-family: inherit;
   font-size: 12.5px;
@@ -375,10 +375,10 @@
 
 .confirmNo {
   padding: 7px 11px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--fg-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-x-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;

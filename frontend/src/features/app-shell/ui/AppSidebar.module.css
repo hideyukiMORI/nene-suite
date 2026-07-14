@@ -7,9 +7,9 @@
   z-index: 60;
   display: flex;
   flex-direction: column;
-  background: var(--side-bg);
-  color: var(--side-fg);
-  border-right: 1px solid var(--side-line);
+  background: var(--color-x-side-bg);
+  color: var(--color-x-side-fg);
+  border-right: 1px solid var(--color-x-side-line);
 }
 
 .brand {
@@ -23,18 +23,18 @@
   font-size: 15.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--side-fg);
+  color: var(--color-x-side-fg);
   white-space: nowrap;
 }
 
 .edition {
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: var(--side-fg-mut);
-  border: 1px solid var(--side-line);
-  border-radius: var(--r-sm);
+  color: var(--color-x-side-fg-mut);
+  border: 1px solid var(--color-x-side-line);
+  border-radius: var(--r-x-sm);
   padding: 2px 5px;
 }
 
@@ -56,7 +56,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--side-fg-mut);
+  color: var(--color-x-side-fg-mut);
 }
 
 .item {
@@ -65,22 +65,22 @@
   gap: 12px;
   padding: 9px 14px;
   margin: 1px 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-x-sm);
   text-decoration: none;
-  color: var(--side-fg);
+  color: var(--color-x-side-fg);
   font-size: 13.5px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .item:hover {
-  background: color-mix(in srgb, var(--side-fg) 8%, transparent);
+  background: color-mix(in srgb, var(--color-x-side-fg) 8%, transparent);
 }
 
 .itemActive,
 .itemActive:hover {
-  background: var(--side-active);
-  color: var(--side-fg);
+  background: var(--color-x-side-active);
+  color: var(--color-x-side-fg);
 }
 
 .label {
@@ -95,16 +95,16 @@
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  border-top: 1px solid var(--side-line);
+  border-top: 1px solid var(--color-x-side-line);
 }
 
 .avatar {
   width: 30px;
   height: 30px;
   flex: none;
-  border-radius: var(--r-sm);
-  background: var(--side-brand);
-  color: var(--side-bg);
+  border-radius: var(--r-x-sm);
+  background: var(--color-x-side-brand);
+  color: var(--color-x-side-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,7 +121,7 @@
   display: block;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--side-fg);
+  color: var(--color-x-side-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -129,11 +129,11 @@
 
 .version {
   display: block;
-  font-family: var(--font-num), monospace;
+  font-family: var(--font-x-num), monospace;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--side-fg-mut);
+  color: var(--color-x-side-fg-mut);
 }
 
 /* ≤1000px — icon rail: labels and headings collapse, items center. */
@@ -160,7 +160,7 @@
     margin: 14px 16px 9px;
     padding: 0;
     overflow: hidden;
-    background: var(--side-line);
+    background: var(--color-x-side-line);
   }
 
   .groupHeading > span {

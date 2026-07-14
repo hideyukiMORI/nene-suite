@@ -1,6 +1,6 @@
 import type { SupportedLocale } from './locales'
 
-export const LOCALE_FONT_FAMILY_VAR = '--font-sans'
+export const LOCALE_FONT_FAMILY_VAR = '--font-x-sans'
 
 // Design typography (DESIGN-SYSTEM.md §2): Noto Sans JP leads the body/UI stack
 // so the apex shell is visually consistent ja↔en; each locale keeps its native

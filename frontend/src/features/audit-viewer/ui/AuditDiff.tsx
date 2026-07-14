@@ -66,7 +66,7 @@ export function AuditDiff({ result, view, showAll }: AuditDiffProps): ReactNode 
               <Icon
                 name={row.isArray ? 'data_array' : 'data_object'}
                 size={16}
-                color="var(--fg-3)"
+                color="var(--color-text-faint)"
               />
               <span className={styles['containerKey']}>{row.key}</span>
               <span className={styles['glyph']}>{row.isArray ? '[ ]' : '{ }'}</span>
