@@ -10,10 +10,9 @@ interface LocaleSwitcherProps {
 }
 
 /**
- * Full six-locale selector backed by the i18n context; persists via the i18n
- * provider. This is the only picker where every locale — including the four
- * English-fallback stubs — is reachable; the header LocaleToggle only clamps
- * within the maintained en+ja pair (docs/development/i18n.md).
+ * Locale selector backed by the i18n context; persists via the i18n
+ * provider. Currently offers the two maintained locales (en / ja) — same
+ * pair as the header LocaleToggle (docs/development/i18n.md).
  */
 export function LocaleSwitcher({
   className,

@@ -28,7 +28,7 @@ export function SettingsView() {
             <span className={styles['rowLabel']}>{t('suite.settings.edition')}</span>
             <span className={styles['mono']}>{env.edition.toUpperCase()}</span>
           </div>
-          {/* Full six-locale picker — the header toggle only clamps within en+ja. */}
+          {/* Locale picker — same en/ja pair as the header toggle. */}
           <LocaleSwitcher
             className={styles['localeRow'] ?? ''}
             labelClassName={styles['rowLabel'] ?? ''}

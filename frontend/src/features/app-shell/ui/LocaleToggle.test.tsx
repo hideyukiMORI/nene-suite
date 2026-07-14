@@ -22,27 +22,20 @@ describe('LocaleToggle', () => {
     expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('en')
   })
 
-  it('clamps a stub locale to en — never implicitly to ja', async () => {
-    const user = userEvent.setup()
+  it('falls back a removed stub-locale value (fr) to en on load — never to ja', () => {
     localStorage.setItem(LOCALE_STORAGE_KEY, 'fr')
     renderWithProviders(<LocaleToggle />)
     const toggle = screen.getByRole('button')
 
-    // shows the current locale, but the first press clamps into the pair via en
-    expect(toggle).toHaveTextContent('FR')
-
-    await user.click(toggle)
-    expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('en')
+    // resolveLocale clamps the legacy value at detectLocale() time, before
+    // the first render — no residual 'fr' state, and never an implicit 'ja'.
     expect(toggle).toHaveTextContent('EN')
   })
 
-  it('clamps zh-Hans to en as well', async () => {
-    const user = userEvent.setup()
+  it('falls back a removed stub-locale value (zh-Hans) to en on load as well', () => {
     localStorage.setItem(LOCALE_STORAGE_KEY, 'zh-Hans')
     renderWithProviders(<LocaleToggle />)
 
-    await user.click(screen.getByRole('button'))
-
-    expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('en')
+    expect(screen.getByRole('button')).toHaveTextContent('EN')
   })
 })

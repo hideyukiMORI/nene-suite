@@ -1,8 +1,15 @@
 /**
- * i18n locale definitions — 6 locales matching NENE2 docs / nene-records.
+ * i18n locale definitions — en + ja only.
+ *
+ * fr / zh-Hans / pt-BR / de were removed 2026-07-14: each catalog held ~7
+ * stub keys (English-fallback for everything else) and was never a real
+ * translation, failing the frontend parity-100%-or-delete ship bar (frontend
+ * standards doc 04). `resolveLocale` still falls back unknown/legacy tags —
+ * including these four — to `en`, so a browser or `localStorage` still
+ * carrying one of the old codes degrades safely instead of breaking.
  */
 
-export type SupportedLocale = 'en' | 'ja' | 'fr' | 'zh-Hans' | 'pt-BR' | 'de'
+export type SupportedLocale = 'en' | 'ja'
 
 export interface LocaleMeta {
   label: string
@@ -13,10 +20,6 @@ export interface LocaleMeta {
 export const LOCALES: Record<SupportedLocale, LocaleMeta> = {
   en: { label: 'English', dir: 'ltr', nene2Id: null },
   ja: { label: '日本語', dir: 'ltr', nene2Id: 'ja' },
-  fr: { label: 'Français', dir: 'ltr', nene2Id: 'fr' },
-  'zh-Hans': { label: '中文（简体）', dir: 'ltr', nene2Id: 'zh' },
-  'pt-BR': { label: 'Português (Brasil)', dir: 'ltr', nene2Id: 'pt-br' },
-  de: { label: 'Deutsch', dir: 'ltr', nene2Id: 'de' },
 }
 
 export const DEFAULT_LOCALE: SupportedLocale = 'en'
@@ -24,17 +27,6 @@ export const DEFAULT_LOCALE: SupportedLocale = 'en'
 export const SUPPORTED_LOCALE_IDS = Object.keys(LOCALES) as SupportedLocale[]
 
 export const LOCALE_STORAGE_KEY = 'nene-suite-locale'
-
-/**
- * BCP 47 tags that do not prefix-match a supported ID but still have a clear
- * home: simplified-Chinese region tags map to `zh-Hans`. (zh-TW / zh-Hant are
- * traditional — no catalog, so they keep the `en` fallback.)
- */
-const LOCALE_ALIASES: Readonly<Record<string, SupportedLocale>> = {
-  zh: 'zh-Hans',
-  'zh-CN': 'zh-Hans',
-  'zh-SG': 'zh-Hans',
-}
 
 export function resolveLocale(raw: string): SupportedLocale {
   if (SUPPORTED_LOCALE_IDS.includes(raw as SupportedLocale)) {
@@ -47,12 +39,6 @@ export function resolveLocale(raw: string): SupportedLocale {
   const singlePrefix = raw.split('-')[0] ?? ''
   if (SUPPORTED_LOCALE_IDS.includes(singlePrefix as SupportedLocale)) {
     return singlePrefix as SupportedLocale
-  }
-  // Alias only on the exact tag or its two-part prefix — a bare language
-  // fallback here would wrongly pull zh-TW / zh-Hant into zh-Hans.
-  const alias = LOCALE_ALIASES[raw] ?? LOCALE_ALIASES[prefix]
-  if (alias !== undefined) {
-    return alias
   }
   return DEFAULT_LOCALE
 }
