@@ -1,7 +1,10 @@
-import type { MessageCatalog } from './en'
-
-/** Japanese — full coverage required (enforced by locales.test.ts). */
-export const ja: Partial<MessageCatalog> = {
+/**
+ * Japanese message catalog — the authority catalog (規約 04 I18N-8).
+ * `MessageKey` derives from these keys (`keyof typeof ja`); `en.ts` mirrors it
+ * exactly at the type level (`Record<MessageKey, string>`), and the runtime
+ * parity test (`locales.test.ts`) keeps every locale in sync.
+ */
+export const ja = {
   'common.actions.cancel': 'キャンセル',
   'common.actions.confirm': '確認',
   'common.actions.retry': '再試行',
@@ -433,3 +436,7 @@ export const ja: Partial<MessageCatalog> = {
   'suite.help.callout.danger': '重要: ',
   'suite.help.callout.warning': '注意: ',
 }
+
+/** Authority key set (規約 04 I18N-8): every `MessageKey` derives from `ja`. */
+export type MessageKey = keyof typeof ja
+export type MessageCatalog = Record<MessageKey, string>
