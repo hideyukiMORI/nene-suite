@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
 import { Icon } from '@/shared/ui'
-import { useSignIn, type SignInCredentials } from '../hooks/use-sign-in'
+import { useSignIn, type SignInCredentials } from '../model/use-sign-in'
 import styles from './sign-in.module.css'
 
 /**

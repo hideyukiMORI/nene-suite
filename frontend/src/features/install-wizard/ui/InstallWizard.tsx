@@ -1,6 +1,6 @@
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { HelpLink, Icon } from '@/shared/ui'
-import { useInstallWizard, type WizardStep } from '../hooks/use-install-wizard'
+import { useInstallWizard, type WizardStep } from '../model/use-install-wizard'
 import styles from './install-wizard.module.css'
 import { AppSelectionStep } from './steps/AppSelectionStep'
 import { CompleteStep } from './steps/CompleteStep'

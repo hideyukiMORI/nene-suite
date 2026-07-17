@@ -1,3 +1,3 @@
 export { InstallWizard } from './ui/InstallWizard'
-export { useInstallWizard } from './hooks/use-install-wizard'
-export type { WizardStep } from './hooks/use-install-wizard'
+export { useInstallWizard } from './model/use-install-wizard'
+export type { WizardStep } from './model/use-install-wizard'

@@ -9,7 +9,7 @@ import {
 import { AppDetailDrawer } from '@/features/app-detail'
 import { useTranslation } from '@/shared/i18n'
 import { AppLogo, catalogIdToLogoSlug, Icon } from '@/shared/ui'
-import { useCatalog } from '../hooks/use-catalog'
+import { useCatalog } from '../model/use-catalog'
 import styles from './catalog.module.css'
 
 type Filter = 'all' | CatalogCardState

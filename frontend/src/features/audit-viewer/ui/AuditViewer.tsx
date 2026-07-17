@@ -3,7 +3,7 @@ import type { SuiteAuditEvent } from '@/entities/suite-audit-event'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { Icon } from '@/shared/ui'
 import { buildAuditCsv } from '../csv'
-import { useAuditViewer } from '../hooks/use-audit-viewer'
+import { useAuditViewer } from '../model/use-audit-viewer'
 import {
   CHANGE_ICON,
   absoluteTime,

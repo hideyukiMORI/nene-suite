@@ -8,7 +8,7 @@ import type {
 import { useOrganizations } from '@/entities/organization'
 import { useTranslation } from '@/shared/i18n'
 import { ErrorState, Icon, InfoHint, LoadingState, PlaceholderState } from '@/shared/ui'
-import { useMembershipConsole, type GrantMemberFields } from '../hooks/use-membership-console'
+import { useMembershipConsole, type GrantMemberFields } from '../model/use-membership-console'
 import styles from './membership-console.module.css'
 
 const ROLES: readonly MembershipRole[] = ['admin', 'member', 'viewer']
@@ -226,7 +226,6 @@ function MemberRow({
           )}
         </span>
       </div>
-
       {/* role select */}
       <div className={styles['roleCell']}>
         <span className={styles['roleWrap']}>
@@ -257,7 +256,6 @@ function MemberRow({
           />
         ) : null}
       </div>
-
       {/* revoke with inline confirm */}
       <div className={styles['rowActions']}>
         {confirming ? (
@@ -298,5 +296,5 @@ function MemberRow({
         )}
       </div>
     </div>
-  )
+  );
 }

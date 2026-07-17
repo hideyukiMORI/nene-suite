@@ -1,6 +1,6 @@
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { Icon } from '@/shared/ui'
-import { useConsoleStream } from '../hooks/use-console-stream'
+import { useConsoleStream } from '../model/use-console-stream'
 import styles from './sign-in.module.css'
 
 const TRUST: readonly { icon: string; key: MessageKey }[] = [
