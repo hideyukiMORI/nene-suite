@@ -296,5 +296,5 @@ function MemberRow({
         )}
       </div>
     </div>
-  );
+  )
 }

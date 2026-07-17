@@ -186,7 +186,7 @@ export function OrganizationConsole() {
         />
       ) : null}
     </div>
-  );
+  )
 }
 
 interface OrganizationRowProps {
