@@ -7,7 +7,7 @@ import { ErrorState, Icon, LoadingState, PlaceholderState } from '@/shared/ui'
 import {
   useOrganizationConsole,
   type CreateOrganizationFields,
-} from '../hooks/use-organization-console'
+} from '../model/use-organization-console'
 import styles from './organization-console.module.css'
 
 /**
@@ -119,7 +119,6 @@ export function OrganizationConsole() {
           </p>
         ) : null}
       </section>
-
       {/* Organizations list */}
       {organizations.length === 0 ? (
         <PlaceholderState icon="corporate_fare" title={t('suite.org.empty')} />
@@ -176,7 +175,6 @@ export function OrganizationConsole() {
           )}
         </>
       )}
-
       {menuOpenId !== null ? (
         <button
           type="button"

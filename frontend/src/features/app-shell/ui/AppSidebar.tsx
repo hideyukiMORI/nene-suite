@@ -3,7 +3,7 @@ import { useCurrentOperator } from '@/entities/auth'
 import { env } from '@/shared/config/env'
 import { useTranslation } from '@/shared/i18n'
 import { Icon, SuiteMark } from '@/shared/ui'
-import { useAppNavGroups } from '../hooks/use-app-nav'
+import { useAppNavGroups } from '../model/use-app-nav'
 import styles from './AppSidebar.module.css'
 
 interface AppSidebarProps {

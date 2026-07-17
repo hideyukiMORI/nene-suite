@@ -4,7 +4,7 @@ import type { SsotRole } from '@/entities/installed-app'
 import { useOriginUpdates } from '@/entities/origin-update'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { AppLogo, catalogIdToLogoSlug, Drawer, Icon } from '@/shared/ui'
-import { useAppDetail } from '../hooks/use-app-detail'
+import { useAppDetail } from '../model/use-app-detail'
 import styles from './app-detail.module.css'
 
 const SSOT_LABEL_KEYS: Record<SsotRole, MessageKey | null> = {
