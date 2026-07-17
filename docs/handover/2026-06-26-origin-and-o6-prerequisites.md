@@ -173,7 +173,7 @@ npm run check; the local `.env` caveat for `ControlDatabaseConfigResolverTest`; 
 - Epics: **#230** (Origin consumption, closed), **#251** (upgrade orchestration).
 - Milestone: [`../milestones/2026-06-origin-and-upgrade-orchestration.md`](../milestones/2026-06-origin-and-upgrade-orchestration.md).
   Prior handover: [`2026-06-22-multi-tenant-phase-a.md`](./2026-06-22-multi-tenant-phase-a.md).
-- Daily report: [`../daily-reports/2026-06-26.md`](../daily-reports/2026-06-26.md).
+- Daily report: [`../daily/2026-06-26.md`](../daily/2026-06-26.md).
 - Cross-repo: NENE2#1414 (`/machine/health` version, shipped v1.5.330).
 - Key code: `src/SiblingHealth/`, `src/AppCatalog/` (version mirror), `src/Origin/GetOriginUpdatesUseCase.php`,
   `src/SuiteEnv/EnvSuiteAppMachineKeyReader.php`.

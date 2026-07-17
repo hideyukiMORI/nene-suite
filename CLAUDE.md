@@ -2,6 +2,8 @@
 
 Agent entry point: see [`AGENTS.md`](./AGENTS.md) for operating rules, scope contract, and ADR policy.
 
+- **日報**: `docs/daily/<YYYY-MM-DD>.md`。置き場・書式・運用は `_work/daily-report-convention.md` が正。
+
 ---
 
 ## Local development port assignments
