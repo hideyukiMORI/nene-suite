@@ -26,9 +26,10 @@ image recreate + min-version gating; the sibling migrates on boot) + apex "updat
 The Phase A / B1 build-out is tracked in
 [`docs/milestones/2026-06-multi-tenant-suite.md`](../milestones/2026-06-multi-tenant-suite.md)
 and the [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md); the Origin
-client is recorded in [`docs/daily-reports/2026-06-25.md`](../daily-reports/2026-06-25.md).
-`main`'s git log is the authoritative shipped record. Gate state: PHPUnit **476** /
-vitest **134**, all green. **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
+client is recorded in [`docs/daily/2026-06-25.md`](../daily/2026-06-25.md).
+`main`'s git log is the authoritative shipped record. Gate state: PHPUnit **513** /
+vitest **138**, all green (measured 2026-07-18; `composer check` now includes the
+conformance linter). **ADR 0022 mode A** shipped and **ADR 0023 accepted** (post-install DB
 re-adoption / sibling preflight). A **2026-06-27/28 UX-remediation + ClaudeDesign-integration arc**
 layered on top: **in-app help** (ADR 0024), the audit viewer's **before/after diff detail + evidence
 CSV**, a **responsive left-sidebar shell** (closes B3 #331), home/install polish, and the **MFA /
@@ -36,11 +37,22 @@ step-up** decision (**ADR 0025** — generic TOTP in NENE2). **Near-term TODO: f
 group** (#332 a11y ✅ · #330 help-i18n ✅ · #333 org-reversibility ✅ · #334 locale ✅ — **B group
 complete**) and the **#327 medium sweep ✅** (PR #354–#357; server-side org-list pagination is the one
 explicit defer). **Next: B2 / O6 (#251)** — see the
-[2026-07-02 daily report](../daily-reports/2026-07-02.md).
+[2026-07-02 daily report](../daily/2026-07-02.md).
 Repo posture: the repository is **public** and professional (士業)
 review is **advisory** — consolidated before a public release, not a per-change gate (ADR 0003 / 0005
 amended 2026-06-27, #320). Latest session handover (state + challenges + ordered TODO):
 [`../handover/2026-07-03-ux-remediation-adr0019-o6-ready.md`](../handover/2026-07-03-ux-remediation-adr0019-o6-ready.md).
+
+**2026-07-18 (fleet conformance campaign, suite slice).** The **conformance linter is now a
+`composer check` gate** (#386/#387 — the 2026-07-07 fleet wave had skipped suite; baseline froze
+34 findings, shrink-only). **A1 hooks→model landed** via the fleet codemod (#388/#389 — 18 moves,
+FSD `model/` segment). **D1 remediated** (#390/#391): `JwtSecretResolver` now delegates to
+`Nene2\Auth\GuardedJwtSecretResolver` (production ignores the dev-secret opt-in and hard-fails;
+baseline shrunk 33→32). W1 stage1 (token vocabulary) was verified already complete since PR #381;
+the remaining W1 item after `@hideyukimori/nene2-tokens` publishes is a small
+codemod-no-op-proof + script-retirement PR. Ops follow-up (fleet-level, hub ledger): audit
+`APP_ENV=production` on real deployment env files. Daily reports moved to `docs/daily/`
+(fleet convention, #392).
 
 ---
 
@@ -164,7 +176,7 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - GitHub Actions staging deploy is active: `main` CI success triggers SSH deploy
   to the VPS and reaches `health OK`. The deploy logic is repository-managed
   (`ops/staging/deploy-staging.sh`); the workflow pulls, then runs that script.
-- Detailed daily report: `docs/daily-reports/2026-06-20.md`.
+- Detailed daily report: `docs/daily/2026-06-20.md`.
 
 ### 2026-06-21
 
@@ -175,7 +187,7 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 - Product direction set: self-hosted OSS + hosted **NeNe Cloud Free**
   (ADR 0015, draft). Anti-lock-in / data portability is the headline.
 - phpMyAdmin runs as a VPS-local, out-of-repo compose project (SSH-tunnel only).
-- Detailed daily report: `docs/daily-reports/2026-06-21.md`.
+- Detailed daily report: `docs/daily/2026-06-21.md`.
 
 ### 2026-06-22
 
@@ -320,7 +332,7 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   アイコンレール / ≤680px オフキャンバスドロワー＋top-bar ハンバーガー＋オーバーレイ**。top-bar は検索⌘K＋
   ActiveOrg/通知/locale/theme/account。superadmin 専用 nav を非 superadmin に出さない（無言リダイレクト解消）。
   新規 AppSidebar、use-app-nav は grouped 化。SuiteMark/`--side-*` は既存流用。
-- Detailed daily report: [`docs/daily-reports/2026-06-27.md`](../daily-reports/2026-06-27.md).
+- Detailed daily report: [`docs/daily/2026-06-27.md`](../daily/2026-06-27.md).
 - ホーム挨拶の名前カラーピッカー（ClaudeDesign プレビュー用 UI）を撤去（#345）。名前は既定色 `--accent` 維持。
 - Gate state: PHPUnit **468** / vitest **98**, all green（greet-color テスト2件撤去）.
 - **a11y: command palette / Modal の focus trap・SR アナウンス（#332・B4 解消）**: 共有 `useFocusTrap`
@@ -377,13 +389,13 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
   clear PR#240/#241・2026-07-03）**: Suite の update diff は key ペアリング（`NENE2_MACHINE_API_KEY` ↔
   `NENE_SUITE_APP_NENE_CLEAR_MACHINE_KEY`）設定後に clear で実データ化。ADR 0023 slice①の read 消費も
   clear 相手に結線可能に。invoice（#496/#497）・records（#586/#648）は未採用。
-- Detailed daily report: [`docs/daily-reports/2026-07-02.md`](../daily-reports/2026-07-02.md)
+- Detailed daily report: [`docs/daily/2026-07-02.md`](../daily/2026-07-02.md)
   （persona-eval B group 完了＋#327 medium sweep 完了＋鮮度更新の一日）.
 - **#341 close（回答済み・ADR 0025 で確定・NENE2#1427 は v1.5.333 出荷済み）**。
 - **O6 実装スライス起票（epic #251・ADR 0019 accepted 後）**: **#361**（S2-1a deploy-control seam＋
   監査・opt-in capability flag 既定 off）→ **#362**（S2-1b 依存順 plan＋min-version gating）→
   **#363**（S2-1c halt-don't-unwind 実行）→ **#364**（S2-1d apex「update all」UI）。Origin live 不要。
-- Detailed daily report: [`docs/daily-reports/2026-07-03.md`](../daily-reports/2026-07-03.md)
+- Detailed daily report: [`docs/daily/2026-07-03.md`](../daily/2026-07-03.md)
   （ADR 0019 受理＋#341 close＋clear 採用＋O6 スライス起票）。Session handover:
   [`docs/handover/2026-07-03-ux-remediation-adr0019-o6-ready.md`](../handover/2026-07-03-ux-remediation-adr0019-o6-ready.md)（#365）.
 - **ADR 0019 accepted（2026-07-02 amendment・O6 前提の最終ピース）**: OQ1 = host-side deploy agent

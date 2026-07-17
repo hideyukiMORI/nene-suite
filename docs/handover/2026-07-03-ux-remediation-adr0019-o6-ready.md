@@ -176,8 +176,8 @@ O6 upgrade orchestrator (epic #251) — is unblocked and sliced into issues** (#
 
 - ADRs: 0019 (accepted, amended 2026-07-02) · 0020 · 0021 · 0022 · 0023 · 0024 · 0025.
 - Epic #251 (+ status comment 2026-07-03) · slices #361–#364 · epic #327 (complete, one defer).
-- Daily reports: [`../daily-reports/2026-07-02.md`](../daily-reports/2026-07-02.md) ·
-  [`../daily-reports/2026-07-03.md`](../daily-reports/2026-07-03.md).
+- Daily reports: [`../daily/2026-07-02.md`](../daily/2026-07-02.md) ·
+  [`../daily/2026-07-03.md`](../daily/2026-07-03.md).
 - Cross-repo: nene-clear PR#240/#241 (clear#182/#183) · NENE2 v1.5.333 (NENE2#1427).
 
 Last updated: 2026-07-03

@@ -71,7 +71,8 @@ Use ADRs for decisions that affect architecture, installer contracts, dependency
 
 ## Daily reports and documentation freshness
 
-**Binding.** A daily report (`docs/daily-reports/YYYY-MM-DD.md`) is **not complete** until the same
+**Binding.** A daily report (`docs/daily/YYYY-MM-DD.md` — location/format per the fleet-wide
+convention `_work/daily-report-convention.md`) is **not complete** until the same
 change **raises the freshness of the living status docs** to match the state the report describes.
 This is mandatory, not optional.
 
