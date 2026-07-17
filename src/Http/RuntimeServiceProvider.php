@@ -166,12 +166,21 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
             )
             ->set(
                 LocalBearerTokenVerifier::class,
-                static fn (ContainerInterface $container): LocalBearerTokenVerifier => new LocalBearerTokenVerifier(
-                    (new JwtSecretResolver(
-                        self::env('NENE_SUITE_JWT_SECRET', ''),
-                        self::env('NENE_SUITE_ALLOW_DEV_SECRET', ''),
-                    ))->resolve(),
-                ),
+                static function (ContainerInterface $container): LocalBearerTokenVerifier {
+                    $config = $container->get(AppConfig::class);
+
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('Application config service is invalid.');
+                    }
+
+                    return new LocalBearerTokenVerifier(
+                        (new JwtSecretResolver(
+                            self::env('NENE_SUITE_JWT_SECRET', ''),
+                            self::env('NENE_SUITE_ALLOW_DEV_SECRET', ''),
+                            $config->environment,
+                        ))->resolve(),
+                    );
+                },
             )
             ->set(
                 TokenVerifierInterface::class,
