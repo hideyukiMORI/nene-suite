@@ -36,6 +36,7 @@
         "cs": "php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.php",
         "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.php",
         "openapi": "php tools/validate-openapi.php",
+        "conformance": "php vendor/hideyukimori/nene2/tools/conformance.php --root=.",
         "schema:docs": "php tools/generate-schema-doc.php",
         "schema:docs:check": "php tools/generate-schema-doc.php --check",
         "migrations:status": "phinx status -c phinx.php",
@@ -46,7 +47,8 @@
             "@analyse",
             "@cs",
             "@openapi",
-            "@schema:docs:check"
+            "@schema:docs:check",
+            "@conformance"
         ]
     },
     "config": {
