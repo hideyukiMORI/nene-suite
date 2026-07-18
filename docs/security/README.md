@@ -57,7 +57,37 @@ Forward-looking, not yet landed:
 - Automated **authorization-regression** coverage (a role × route matrix) built on
   the existing fail-closed guards.
 - **Dependency audit** wired into CI (supply-chain signal).
-- A **response-header baseline** for the served SPA.
+- A **response-header baseline** for the served SPA (proposed shape below).
 - Live-fire assessment with a disposable harness (fleet precedent: Vault
   `docs/security/harness/`), against self-owned isolated environments only — never
   a production host — pending maintainer decision (L3/L4).
+
+### Proposed CSP baseline
+
+Forward-looking target for the response-header baseline. The **layer** that emits
+it (application vs. reverse proxy) is a deployment-topology decision still to be
+settled with the fleet; this records the *minimum policy shape* the SPA should be
+able to run under, so whichever layer owns it has a concrete target. The Suite SPA
+is a single-origin app that talks only to its own API, which keeps the policy
+tight — no third-party script/style/frame origins are required.
+
+```
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self';                 # no 'unsafe-inline' / 'unsafe-eval'
+  style-src 'self';                  # validate against the build; use a hash/nonce if any inline style remains
+  img-src 'self' data:;
+  font-src 'self';
+  connect-src 'self';                # same-origin API only
+  object-src 'none';
+  base-uri 'self';
+  frame-ancestors 'none';            # clickjacking: app is not embeddable
+  form-action 'self'
+```
+
+Companion headers in the same baseline: `X-Content-Type-Options: nosniff`,
+`Referrer-Policy: strict-origin-when-cross-origin`, and (transport-dependent)
+`Strict-Transport-Security`. Exact `script-src` / `style-src` sources must be
+validated against the Vite production bundle before enforcement; ship in
+report-only first, then enforce. This block is a proposal to validate in T3, not a
+shipped configuration.
