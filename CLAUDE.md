@@ -2,7 +2,9 @@
 
 Agent entry point: see [`AGENTS.md`](./AGENTS.md) for operating rules, scope contract, and ADR policy.
 
-- **日報**: `docs/daily/<YYYY-MM-DD>.md`。置き場・書式・運用は `_work/daily-report-convention.md` が正。
+- **運用ログ**（`docs/todo`・`docs/daily`・handover 相当）は private
+  `nene-origin/internal-docs/suite/` に移設済み（P3）。最新の作業状況・申し送り・日報はそちらを読むこと。
+  日報の置き場・書式・運用の正本は `_work/daily-report-convention.md`。
 
 ---
 

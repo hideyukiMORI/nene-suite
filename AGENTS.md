@@ -37,7 +37,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Workflow:** `docs/workflow.md`
 - **Commit conventions:** `docs/development/commit-conventions.md`
 - **ADR policy:** `docs/development/adr.md`
-- **Current work:** `docs/todo/current.md`
+- **Current work:** private `nene-origin/internal-docs/suite/todo/current.md` (operational logs — todo/daily/handover — moved out of this public repo in P3)
 - **Roadmap:** `docs/roadmap.md`
 
 ## Operating Rules
@@ -52,7 +52,7 @@ See [ADR 0002](docs/adr/0002-orchestrator-not-application-monolith.md).
 - **Follow NENE2-derived coding standards** — placement, layering, naming, schema rules block merge (ADR 0008)
 - **Repository docs: English only**
 - **No secrets** — never commit `.env`, tokens, or production credentials
-- **Daily report ⇒ documentation freshness (binding)** — writing a daily report is **incomplete** until the same change raises the freshness of the living status docs (`docs/todo/current.md`, `README` status, `docs/roadmap.md`, the relevant `docs/milestones/`): ADR ranges/status, phase ✅ markers, gate counts, dates. Bump `Last updated:` only on docs you actually edited. See [`docs/workflow.md`](docs/workflow.md#daily-reports-and-documentation-freshness)
+- **Daily report ⇒ documentation freshness (binding)** — writing a daily report is **incomplete** until the same change raises the freshness of the living status docs (the private current TODO at `nene-origin/internal-docs/suite/todo/current.md`, `README` status, `docs/roadmap.md`, the relevant `docs/milestones/`): ADR ranges/status, phase ✅ markers, gate counts, dates. Bump `Last updated:` only on docs you actually edited. See [`docs/workflow.md`](docs/workflow.md#daily-reports-and-documentation-freshness)
 
 ## Framework boundary
 

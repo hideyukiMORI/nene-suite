@@ -72,7 +72,7 @@ ADR 0017 consumer. PRs #232–#250.
   **0018** (aggregation contract — superseded), **0019** (Tier B deployment-driven upgrade,
   proposed), **0014** (boot-time migration), **0007** (audit).
 - Epics: **#230** (Origin consumption, closed), **#251** (upgrade orchestration).
-- Handover: [`../handover/2026-06-26-origin-and-o6-prerequisites.md`](../handover/2026-06-26-origin-and-o6-prerequisites.md).
+- Handover: `2026-06-26-origin-and-o6-prerequisites` (operational log moved to private `nene-origin/internal-docs/suite/handover/`).
 - Prior milestone: [`2026-06-multi-tenant-suite.md`](./2026-06-multi-tenant-suite.md).
 
 Last updated: 2026-06-26. Still current as of **2026-06-27** — ADR 0019 remains **proposed** (its open questions are the next gate); the O6 deployment-driven orchestrator + apex "update all" UI (epic #251) are the remaining work.
