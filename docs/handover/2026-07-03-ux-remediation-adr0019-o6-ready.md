@@ -37,7 +37,7 @@ O6 upgrade orchestrator (epic #251) — is unblocked and sliced into issues** (#
   preflight is live. nene-invoice and nene-records have not adopted yet, so their installed
   versions stay `unknown` (defensive, no fabrication).
 - Gate state: PHPUnit **476** / vitest **134** / PHPStan / CS / terminology / links / OpenAPI —
-  all green. CI + staging deploy to `suite-stg.nene-suite.com` remain live.
+  all green. CI + staging deploy to the staging host remain live.
 
 ## 2. What shipped recently (merged to `main`, since the 2026-06-28 handover)
 

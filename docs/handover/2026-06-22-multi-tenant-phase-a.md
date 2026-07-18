@@ -194,10 +194,10 @@ actors** — even admins cannot `--admin` merge or direct-push). Flow: create/re
 `feat/<issue>-<summary>` branch → Conventional Commit (English type/scope, Japanese body, `(#n)`)
 → PR → green CI → squash-merge `--delete-branch`. Repo docs are English.
 
-**Staging** (`deploy-staging.yml`, auto after CI-success on main push): SSH to the VPS,
+**Staging** (`deploy-staging.yml`, auto after CI-success on main push): SSH to the host,
 `git reset --hard origin/main`, `ops/staging/deploy-staging.sh` (`docker compose … -f
-compose.staging.yaml up -d --build`, polls `/health`). The container serves on internal :80
-behind a shared Caddy on the `edge` network. **Staging is operator-0 / schema-only:** migrations
+compose.staging.yaml up -d --build`, polls `/health`). The app container is served behind the
+shared reverse proxy on the edge network. **Staging is operator-0 / schema-only:** migrations
 run on every boot (entrypoint), but `install.php` (org bootstrap: first operator) is a one-time
 per-environment step that has not been run there — so login isn't exercisable, and probes show
 the firewall (no token → 401/403) rather than full flows.
