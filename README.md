@@ -45,7 +45,7 @@ installable standalone via their own git clone or release ZIP.
 | API contract (Phase 1, SSOT) | [`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml) |
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |
 | Commit conventions | [`docs/development/commit-conventions.md`](./docs/development/commit-conventions.md) |
-| Current work | [`docs/todo/current.md`](./docs/todo/current.md) |
+| Current work | private `nene-origin/internal-docs/suite/todo/current.md` (operational logs moved out of this public repo, P3) |
 | Roadmap | [`docs/roadmap.md`](./docs/roadmap.md) |
 
 ## Repository status

@@ -10,7 +10,7 @@ JWT carrying only `sub` + `suite_id` — no organization, membership, or role.
 deployed to staging). Every step of the dependency-verified build-out below shipped — plus
 **A8b** (member-list endpoint + membership console UI), one step beyond the recorded plan. The
 M3 audit-vocabulary fork was **resolved — Option A (add `organization` + `membership`)**. See the
-**[2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md)** for the full record,
+**the 2026-06-22 handover** (private `nene-origin/internal-docs/suite/handover/`) for the full record,
 architecture map, invariants, deferred items, and Phase B next steps. Remaining: Phase B (hosted
 edition) and the deferred polish in the handover §7.
 Steps that change auth behavior (A6 / M4) still must not auto-merge unreviewed.
@@ -126,7 +126,7 @@ harmless). Edit sites: `docs/openapi/openapi.yaml` (`AuditEntityType`),
 > **✅ Phase A shipped (2026-06-22).** A0 #142 · A1 #144 · A1.5 #146 · A2 #148 · A3 #150 ·
 > A4 #152 · A4.5 #154 · A5 #156 · A6 #158 · A7a #160 · A7b #162 · A8a #164 ·
 > A8b-1 (member-list endpoint) #166 · A8b-2 (membership console) #168. All merged, CI-green,
-> staging-verified. Full record + handover: [2026-06-22 handover](../handover/2026-06-22-multi-tenant-phase-a.md).
+> staging-verified. Full record + handover: the 2026-06-22 handover (private `nene-origin/internal-docs/suite/handover/`).
 
 ### §3. Phase B — hosted edition (edition-flagged off for OSS; ADR 0015 acceptance is the terminal gate)
 
@@ -249,4 +249,4 @@ then **B1 → B2 → {B3, B5} → B4 → B6**.
   + role; behavior change — review).
 
 Last updated: 2026-06-22 (Phase A complete; §7 polish done; **B1 complete** — IdP key plane shipped; next B2 cross-repo).
-Still current as of **2026-06-27** — **B2** remains the next federation step; for everything landed since (Origin client epic #230, ADR 0020–0023, mode A) see [`../todo/current.md`](../todo/current.md).
+Still current as of **2026-06-27** — **B2** remains the next federation step; for everything landed since (Origin client epic #230, ADR 0020–0023, mode A) see the current TODO (private `nene-origin/internal-docs/suite/todo/current.md`).
