@@ -92,4 +92,11 @@ export const installSessionHandlers = [
     }
     return HttpResponse.json(session)
   }),
+  http.post('/api/v1/install-sessions/:id/fail', async ({ request }) => {
+    const body = (await request.json()) as { failureCode?: string }
+    if (session !== null) {
+      session = { ...session, status: 'failed', failureCode: body.failureCode ?? 'unknown' }
+    }
+    return HttpResponse.json(session)
+  }),
 ]
