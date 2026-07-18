@@ -6,7 +6,7 @@ This workflow inherits [NENE2 `docs/workflow.md`](https://github.com/hideyukiMOR
 ## Standard Flow
 
 1. Create or reuse a focused GitHub Issue.
-2. Confirm context in `docs/roadmap.md`, `docs/milestones/`, and `docs/todo/current.md`.
+2. Confirm context in `docs/roadmap.md`, `docs/milestones/`, and the private current TODO (`nene-origin/internal-docs/suite/todo/current.md`).
 3. Create a branch from `main` named like `type/issue-number-summary`.
 4. Implement the smallest useful change.
 5. Update docs, roadmap, milestone, or TODO files when the decision or state changes.
@@ -61,7 +61,7 @@ join CI when their prerequisites land (backend scaffold; link-check tool).
 
 - `docs/roadmap.md`: long-lived direction and phases
 - `docs/milestones/`: medium-sized goals and acceptance criteria
-- `docs/todo/current.md`: current task board and handoff notes
+- private `nene-origin/internal-docs/suite/todo/current.md`: current task board and handoff notes (operational logs moved out of this public repo, P3)
 - `docs/adr/`: major architecture decisions
 - `catalog/apps.json`: installable sibling products and dependency graph
 
@@ -71,15 +71,15 @@ Use ADRs for decisions that affect architecture, installer contracts, dependency
 
 ## Daily reports and documentation freshness
 
-**Binding.** A daily report (`docs/daily/YYYY-MM-DD.md` — location/format per the fleet-wide
-convention `_work/daily-report-convention.md`) is **not complete** until the same
-change **raises the freshness of the living status docs** to match the state the report describes.
-This is mandatory, not optional.
+**Binding.** A daily report (now in the private mirror `nene-origin/internal-docs/suite/daily/YYYY-MM-DD.md`
+— location/format per the fleet-wide convention `_work/daily-report-convention.md`) is **not complete**
+until the same change **raises the freshness of the living status docs** to match the state the report
+describes. This is mandatory, not optional.
 
 When you write or update a daily report you **MUST**:
 
-1. Update `docs/todo/current.md` — status line/date, gate counts (PHPUnit / vitest), and a dated
-   entry for what shipped.
+1. Update the private current TODO (`nene-origin/internal-docs/suite/todo/current.md`) — status line/date,
+   gate counts (PHPUnit / vitest), and a dated entry for what shipped.
 2. Reconcile `README.md` "Repository status", `docs/roadmap.md`, and the relevant
    `docs/milestones/` file with reality — ADR ranges and status, phase / ✅ markers, dates.
 3. Fix any doc whose stated **status, date, gate counts, or ADR status** no longer matches `main`.
@@ -106,4 +106,4 @@ If a user explicitly says investigation only, no commit, no PR, or another narro
 
 ## Initial Issues Backlog
 
-Phase 0 bootstrap Issues are tracked in `docs/todo/current.md`. After governance lands, use GitHub Issues for all work — no direct `main` commits.
+Phase 0 bootstrap Issues are tracked in the private current TODO (`nene-origin/internal-docs/suite/todo/current.md`). After governance lands, use GitHub Issues for all work — no direct `main` commits.

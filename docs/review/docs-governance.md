@@ -24,7 +24,7 @@ Use before merging docs-only or governance PRs.
 
 ## Memory files
 
-- [ ] `docs/todo/current.md` updated when phase or Issue state changes.
+- [ ] private `nene-origin/internal-docs/suite/todo/current.md` updated when phase or Issue state changes.
 - [ ] `docs/roadmap.md` or milestone updated when direction changes.
 
 ## Language
