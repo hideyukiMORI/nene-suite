@@ -96,10 +96,10 @@ codemod-no-op-proof + script-retirement PR. Ops follow-up (fleet-level, hub ledg
 - [x] Issue #69: WriteEnvConfig / ProvisionAppDatabases use case をサービスプロバイダーに配線 — PR #70
 - [x] Issue #71: frontend api-types → schema.gen.ts generated types に置き換え — PR #72
 - [x] Issue #73: ADR 0011 — NENE_SUITE_CONTROL_DATABASE_URL 解決方針 — PR #74
-- [x] Issue #100: Staging compose + operations docs for ConoHa VPS — PR #101
+- [x] Issue #100: Staging compose + operations docs for the staging VPS — PR #101
 - [x] Issue #103: Docker build/runtime fixes for staging (`NENE2` build clone, Composer failure hard-stop, front-controller rewrite) — PR #104
 - [x] Issue #105: Align staging operations docs with the actual VPS layout — PR #106
-- [x] Issue #102: Manual ConoHa VPS staging runtime build-out — completed 2026-06-20
+- [x] Issue #102: Manual staging VPS runtime build-out — completed 2026-06-20
 - [x] Issue #107: Automatic GitHub Actions deploy to staging after successful `main` CI — PR #108
 - [x] Issue #109: Automatic staging deploy smoke test — PR #110
 
@@ -113,7 +113,7 @@ health · catalog · install-session (start/get/app-selection/disclaimer/complet
 
 - [x] Move staging deploy script into repository-managed `ops/staging/` while keeping VPS-specific values out of git — `ops/staging/deploy-staging.sh` (bootstrap-safe split: pull in workflow, build+health in script) — Issue #111, PR #112.
 - [x] **税理士 / 公認会計士 sign-off** — orchestration-compliance §2–§5, ADR 0005 — 辻村総合会計事務所 / 2026-05-31 (Issue #75, PR #76)
-- [x] **弁護士 sign-off** — disclaimer.md + installer-disclaimer-copy.md — 西村法律事務所 / 2026-05-31 (Issue #77, PR #78)
+- [x] **弁護士 sign-off** — disclaimer.md + installer-disclaimer-copy.md — 外部法務 / 2026-05-31 (Issue #77, PR #78)
 - [x] **Tier B installer** (Docker Compose MVP) — InstallerUseCase + installer/install.php + Dockerfile + docker-compose.yml — PR #80
 - [x] `ControlDatabaseConfigResolver` 実装 — ADR 0011 follow-up; `phinx.php` と `RuntimeServiceProvider` を更新 — PR #81
 - [x] README status / TODO 整合 — PR #116
@@ -149,7 +149,7 @@ Remaining (B2–B6 — see milestone §3):
 - [ ] entitlement / quota + house-ads 配線（B4 — ADR 0013; suite mode の `tier` は federation IdP claim 由来）
 - [ ] 組織まるごと export → 自己ホスト import（B5 — 移行可 headline の launch 前提; 現状 CSV のみ）
 - [ ] ADR 0015 の open questions 解消（signup/不正対策、org解決方式、terminology 登録）→ ADR を accepted へ（B6 terminal gate）
-- [ ] **launch 前にまとめて** 法務再レビュー（西村法律事務所 — データ受託化）（B6）
+- [ ] **launch 前にまとめて** 外部法務レビュー（データ受託化）（B6）
 
 ## Blockers
 
@@ -164,17 +164,17 @@ Binding trio: scope-contract + orchestration-compliance + disclaimer.
 
 ### VPS staging status — 2026-06-20
 
-- ConoHa VPS is active for `suite-stg.nene-suite.com`.
-- Shared Caddy stack lives at `/home/deploy/stacks/caddy/` and is attached to the
-  external Docker network `edge`.
-- Suite staging lives at `/home/deploy/envs/suite-stg/nene-suite/`.
-- `.env.suite` is VPS-local and must not be committed.
-- `suite-stg.nene-suite.com` routes through Caddy to `nene-suite-app:80`.
+- The staging VPS is active for the staging host.
+- A shared reverse proxy (Caddy) is attached to the external Docker network
+  `edge`; the proxy and each environment root live in out-of-repo paths on the host.
+- Suite staging runs from an out-of-repo environment root on the host.
+- `.env.suite` is host-local and must not be committed.
+- The staging host routes through the reverse proxy to the app container.
 - Suite database is internal only; it is not attached to `edge` and has no
   published host ports.
-- `https://suite-stg.nene-suite.com/health` returns HTTP 200.
-- GitHub Actions staging deploy is active: `main` CI success triggers SSH deploy
-  to the VPS and reaches `health OK`. The deploy logic is repository-managed
+- The staging `/health` endpoint returns HTTP 200.
+- GitHub Actions staging deploy is active: `main` CI success triggers an SSH deploy
+  to the host and reaches `health OK`. The deploy logic is repository-managed
   (`ops/staging/deploy-staging.sh`); the workflow pulls, then runs that script.
 - Detailed daily report: `docs/daily/2026-06-20.md`.
 
