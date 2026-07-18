@@ -10,10 +10,15 @@
     </testsuite>
   </testsuites>
   <php>
+    <!-- Run the suite as the `test` environment. GuardedJwtSecretResolver (NENE2) rejects the
+         dev-secret opt-in whenever AppEnvironment is production, and an unset APP_ENV resolves
+         to production — so without this the container build fails closed under a clean CI
+         checkout. `test` keeps the dev-secret path valid; the production throw path is covered
+         by tests/Http/JwtSecretResolverTest.php, which drives the resolver directly. -->
+    <env name="APP_ENV" value="test"/>
     <!-- Tests build the runtime container (e.g. OpenApiContractTest), which resolves the
          apex token verifier. Permit the built-in dev JWT secret so a clean checkout with no
-         NENE_SUITE_JWT_SECRET does not fail closed. The throw path is covered by
-         tests/Http/JwtSecretResolverTest.php, which drives the resolver directly. -->
+         NENE_SUITE_JWT_SECRET does not fail closed. -->
     <env name="NENE_SUITE_ALLOW_DEV_SECRET" value="1"/>
   </php>
   <source>
