@@ -20,7 +20,7 @@ NeNe Suite is built through small, Issue-driven changes. This document is the sh
 | Workflow | `docs/workflow.md` |
 | Commit conventions | `docs/development/commit-conventions.md` |
 | Roadmap | `docs/roadmap.md` |
-| Current work | `docs/todo/current.md` |
+| Current work | private `nene-origin/internal-docs/suite/todo/current.md` (operational logs moved out of this public repo, P3) |
 
 ## Collaboration Policy
 
@@ -32,7 +32,7 @@ Follow [`docs/workflow.md`](workflow.md) — inherited from [NENE2](https://gith
 4. Push, open PR with `Closes #number`, merge after checks — **do not push directly to `main`**.
 
 - Use one branch and one PR per focused work unit.
-- Keep `docs/milestones/`, `docs/roadmap.md`, and `docs/todo/current.md` updated when direction changes.
+- Keep `docs/milestones/`, `docs/roadmap.md`, and the private current TODO (`nene-origin/internal-docs/suite/todo/current.md`) updated when direction changes.
 - Explain intent, impact, verification, and remaining risk in PRs.
 - Prefer documentation that helps the next developer or AI agent decide what to do without rereading chat history.
 
