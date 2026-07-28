@@ -26,5 +26,8 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests"],
+  // The toolchain guard runs on Node APIs (fs/module/path/url), not in the app
+  // environment — it is type-checked by tsconfig.node.json instead.
+  "exclude": ["tests/toolchain"]
 }
