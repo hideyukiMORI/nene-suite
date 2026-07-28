@@ -46,7 +46,9 @@ export default tseslint.config(
       ecmaVersion: 2023,
       globals: globals.browser,
       parserOptions: {
-        project: ['./tsconfig.app.json'],
+        // tsconfig.node.json covers tests/toolchain (Node-side guards); typed linting needs
+        // every linted file to belong to one of the listed projects.
+        project: ['./tsconfig.app.json', './tsconfig.node.json'],
         tsconfigRootDir: dirname,
       },
     },
