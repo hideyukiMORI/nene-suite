@@ -34,8 +34,16 @@ final readonly class OriginUpdateSignal
     ) {
     }
 
-    public static function unavailable(OriginUpdateQuery $query, string $reason, ?OriginFreshnessState $freshness = null): self
-    {
+    /**
+     * @param list<string> $warnings per-mirror failover notices (mirrors.md §4.2) when the walk was
+     *                               attempted against more than one base
+     */
+    public static function unavailable(
+        OriginUpdateQuery $query,
+        string $reason,
+        ?OriginFreshnessState $freshness = null,
+        array $warnings = [],
+    ): self {
         return new self(
             product: $query->product,
             channel: $query->channel,
@@ -43,6 +51,7 @@ final readonly class OriginUpdateSignal
             status: OriginUpdateStatus::Unavailable,
             freshness: $freshness,
             reason: $reason,
+            warnings: $warnings,
         );
     }
 }

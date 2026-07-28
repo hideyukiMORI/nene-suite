@@ -11,7 +11,8 @@ use NeNeSuite\SiblingHealth\InstalledVersionResolverInterface;
 /**
  * Assembles the roster of suite-installed products and checks each against Origin (O3 aggregator),
  * returning the verified update signals. Disabled — returns {@see OriginUpdatesOutput::disabled()} —
- * unless both `NENE_ORIGIN_URL` and an embedded trust anchor are configured (no fabricated data).
+ * unless a mirror list (embedded default, or the `NENE_ORIGIN_URL` exclusive override) and an
+ * embedded trust anchor are both configured (no fabricated data).
  * Installed versions come from the sibling `/health` probe (#255); when a product's version is known
  * the signal's status is a real diff, otherwise it stays `unknown` while surfacing the verified
  * latest. Version resolution runs only on the enabled path (never probed when Origin is off).
@@ -25,7 +26,7 @@ final readonly class GetOriginUpdatesUseCase implements GetOriginUpdatesUseCaseI
         private OriginTrustAnchorProvider $anchors,
         private ListInstalledAppsUseCaseInterface $installed,
         private InstalledVersionResolverInterface $versions,
-        private OriginObjectStore $store,
+        private OriginObjectStoreProvider $stores,
         private OriginUpdateAggregator $aggregator,
         private OriginGenWatermarkRepositoryInterface $watermarks,
     ) {
@@ -53,7 +54,7 @@ final readonly class GetOriginUpdatesUseCase implements GetOriginUpdatesUseCaseI
 
         return OriginUpdatesOutput::enabled($this->aggregator->aggregate(
             $queries,
-            $this->store,
+            $this->stores,
             $anchor,
             $this->config->rootVersionFloor,
             $this->config->genFloor,

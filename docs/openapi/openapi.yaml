@@ -2473,6 +2473,10 @@ components:
           description: Stable verification reason when status is unavailable (or origin_unreachable).
         warnings:
           type: array
+          description: >-
+            Non-fatal notices for this product, e.g. a warn-state freshness notice or a
+            `mirror failover: {base} skipped ({reason})` line for every read-path mirror that was
+            tried and denied before one verified (ADR 0017 §9).
           items:
             type: string
 
@@ -2526,6 +2530,9 @@ components:
           description: Stable verification reason when the feed is unavailable (or origin_unreachable).
         warnings:
           type: array
+          description: >-
+            Non-fatal notices for this feed, including a `mirror failover: {base} skipped ({reason})`
+            line per denied read-path mirror (ADR 0017 §9).
           items:
             type: string
 

@@ -1113,6 +1113,7 @@ export interface components {
             freshness: "fresh" | "warn" | "refuse_new" | "hard" | null;
             /** @description Stable verification reason when status is unavailable (or origin_unreachable). */
             reason: string | null;
+            /** @description Non-fatal notices for this product, e.g. a warn-state freshness notice or a `mirror failover: {base} skipped ({reason})` line for every read-path mirror that was tried and denied before one verified (ADR 0017 §9). */
             warnings: string[];
         };
         OriginUpdateList: {
@@ -1140,6 +1141,7 @@ export interface components {
             freshness: "fresh" | "warn" | "refuse_new" | "hard" | null;
             /** @description Stable verification reason when the feed is unavailable (or origin_unreachable). */
             reason: string | null;
+            /** @description Non-fatal notices for this feed, including a `mirror failover: {base} skipped ({reason})` line per denied read-path mirror (ADR 0017 §9). */
             warnings: string[];
         };
         OriginFeedList: {

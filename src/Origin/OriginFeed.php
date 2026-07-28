@@ -52,8 +52,17 @@ final readonly class OriginFeed
         );
     }
 
-    public static function unavailable(OriginFeedQuery $query, string $servedLocale, string $reason, ?OriginFreshnessState $freshness = null): self
-    {
+    /**
+     * @param list<string> $warnings per-mirror failover notices (mirrors.md §4.2) when the walk was
+     *                               attempted against more than one base
+     */
+    public static function unavailable(
+        OriginFeedQuery $query,
+        string $servedLocale,
+        string $reason,
+        ?OriginFreshnessState $freshness = null,
+        array $warnings = [],
+    ): self {
         return new self(
             product: $query->product,
             audience: $query->audience,
@@ -64,6 +73,33 @@ final readonly class OriginFeed
             count: 0,
             freshness: $freshness,
             reason: $reason,
+            warnings: $warnings,
+        );
+    }
+
+    /**
+     * The same feed with `$warnings` prepended — used to carry mirror-failover notices outward.
+     *
+     * @param list<string> $warnings
+     */
+    public function withWarningsPrepended(array $warnings): self
+    {
+        if ($warnings === []) {
+            return $this;
+        }
+
+        return new self(
+            product: $this->product,
+            audience: $this->audience,
+            kind: $this->kind,
+            requestedLocale: $this->requestedLocale,
+            servedLocale: $this->servedLocale,
+            available: $this->available,
+            count: $this->count,
+            items: $this->items,
+            freshness: $this->freshness,
+            reason: $this->reason,
+            warnings: [...$warnings, ...$this->warnings],
         );
     }
 }

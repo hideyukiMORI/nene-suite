@@ -16,8 +16,9 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Origin client services: config resolution + the outbound HTTP seam (O0), the JWS signature
- * primitive (O1a), the gen watermark store (O2), the verifier + fetch/aggregate engines (O1b/O3),
- * and the read API (O4 — the updates endpoint, operator-authenticated).
+ * primitive (O1a), the gen watermark store (O2), the mirror-ordered object-store provider, the
+ * verifier + fetch/aggregate engines (O1b/O3), and the read API (O4 — the updates endpoint,
+ * operator-authenticated).
  */
 final readonly class OriginServiceProvider implements ServiceProviderInterface
 {
@@ -73,8 +74,8 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                 static fn (ContainerInterface $container): OriginReadModelVerifier => new OriginReadModelVerifier(),
             )
             ->set(
-                HttpOriginObjectStore::class,
-                static function (ContainerInterface $container): HttpOriginObjectStore {
+                OriginObjectStoreProvider::class,
+                static function (ContainerInterface $container): OriginObjectStoreProvider {
                     $client = $container->get(OriginHttpClientInterface::class);
                     $config = $container->get(OriginClientConfig::class);
 
@@ -86,7 +87,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Origin client config service is invalid.');
                     }
 
-                    return new HttpOriginObjectStore($client, $config->baseUrl);
+                    return new HttpOriginObjectStoreProvider($client, $config->mirrors);
                 },
             )
             ->set(
@@ -132,7 +133,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                     $anchors = $container->get(OriginTrustAnchorProvider::class);
                     $installed = $container->get(ListInstalledAppsUseCaseInterface::class);
                     $versions = $container->get(InstalledVersionResolverInterface::class);
-                    $store = $container->get(HttpOriginObjectStore::class);
+                    $stores = $container->get(OriginObjectStoreProvider::class);
                     $aggregator = $container->get(OriginUpdateAggregator::class);
                     $watermarks = $container->get(OriginGenWatermarkRepositoryInterface::class);
 
@@ -152,8 +153,8 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Installed version resolver service is invalid.');
                     }
 
-                    if (!$store instanceof HttpOriginObjectStore) {
-                        throw new LogicException('Origin HTTP object store service is invalid.');
+                    if (!$stores instanceof OriginObjectStoreProvider) {
+                        throw new LogicException('Origin object store provider service is invalid.');
                     }
 
                     if (!$aggregator instanceof OriginUpdateAggregator) {
@@ -164,7 +165,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Origin gen watermark repository service is invalid.');
                     }
 
-                    return new GetOriginUpdatesUseCase($config, $anchors, $installed, $versions, $store, $aggregator, $watermarks);
+                    return new GetOriginUpdatesUseCase($config, $anchors, $installed, $versions, $stores, $aggregator, $watermarks);
                 },
             )
             ->set(
@@ -207,7 +208,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                     $config = $container->get(OriginClientConfig::class);
                     $anchors = $container->get(OriginTrustAnchorProvider::class);
                     $installed = $container->get(ListInstalledAppsUseCaseInterface::class);
-                    $store = $container->get(HttpOriginObjectStore::class);
+                    $stores = $container->get(OriginObjectStoreProvider::class);
                     $reader = $container->get(OriginFeedReader::class);
                     $watermarks = $container->get(OriginGenWatermarkRepositoryInterface::class);
 
@@ -223,8 +224,8 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Installed apps use case service is invalid.');
                     }
 
-                    if (!$store instanceof HttpOriginObjectStore) {
-                        throw new LogicException('Origin HTTP object store service is invalid.');
+                    if (!$stores instanceof OriginObjectStoreProvider) {
+                        throw new LogicException('Origin object store provider service is invalid.');
                     }
 
                     if (!$reader instanceof OriginFeedReader) {
@@ -235,7 +236,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Origin gen watermark repository service is invalid.');
                     }
 
-                    return new GetOriginFeedsUseCase($config, $anchors, $installed, $store, $reader, $watermarks);
+                    return new GetOriginFeedsUseCase($config, $anchors, $installed, $stores, $reader, $watermarks);
                 },
             )
             ->set(

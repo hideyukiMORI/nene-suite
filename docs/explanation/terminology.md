@@ -206,6 +206,20 @@ It is **portfolio-neutral**: standalone siblings and the suite consume it identi
 it deliberately does **not** carry the `NENE_SUITE_` prefix. Suite is one client of Origin,
 not its authority.
 
+**Mirror-list vocabulary** ([ADR 0017 §9](../adr/0017-origin-client-consumption-contract.md); Origin
+`docs/spec/mirrors.md`). The read path is a **mirror list**, not a host:
+
+| Concept | Canonical | Never |
+| --- | --- | --- |
+| Ordered read-path base URLs shipped in the client | **embedded default list** | "mirror config", "bootstrap list" |
+| `NENE_ORIGIN_URL` when set | **exclusive override** (that one base, no fallback) | "primary", "preferred mirror" |
+| One `root → current → targets` fetch sequence | **walk** (one base per walk) | "request", "poll" (a poll may contain several walks) |
+| Moving to the next base after a failed walk | **failover** | "retry" (a retry re-tries the same base) |
+
+A mirror is an **untrusted transport**: the list is an *availability preference* and never a trust
+decision, so "trusted mirror" is a contradiction in this vocabulary. A failed *verification* and a
+failed *connection* are the same event to the failover rule — both are a denial by that mirror.
+
 **Origin read-model vocabulary (profiled TUF — [ADR 0017](../adr/0017-origin-client-consumption-contract.md)).**
 Canonical object / field names the Suite client consumes; do not rename or invent variants in code.
 

@@ -12,6 +12,7 @@ use NeNeSuite\Origin\OriginFeedQuery;
 use NeNeSuite\Origin\OriginFeedReader;
 use NeNeSuite\Origin\OriginReadModelVerifier;
 use NeNeSuite\Origin\OriginTrustAnchor;
+use NeNeSuite\Origin\SingleOriginObjectStoreProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -61,7 +62,7 @@ final class OriginFeedReaderTest extends TestCase
     {
         return (new OriginFeedReader(new OriginReadModelVerifier()))->read(
             $query,
-            new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-feed'),
+            new SingleOriginObjectStoreProvider(new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-feed')),
             $this->anchor(),
             1,
             1,

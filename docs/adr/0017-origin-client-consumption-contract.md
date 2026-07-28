@@ -4,6 +4,10 @@
 
 accepted
 
+**Amended 2026-07-29 (origin-0010, §9).** The read path is an **ordered mirror list**, not a single
+base URL. This adds §9 and gives `NENE_ORIGIN_URL` precise semantics; nothing in §1–§8 changes (the
+object model, trust decisions, and verification order are untouched — mirrors are transports).
+
 **Revised 2026-06-24 (Topic 2).** The read model is now a **profiled TUF** model
 (Origin [ADR 0006](https://github.com/hideyukiMORI/nene-origin)); this revision **supersedes the
 flat shape** recorded in the original 2026-06-23 version (a single `manifest` object + a JWKS
@@ -155,6 +159,46 @@ Origin entitlement audience-policy / `min_valid_generation` object in suite mode
   catalog DAG (`tools/validate-catalog.sh`), per ADR 0013. `requires` stays in `targets`.
 - No PII / customer data ever sent to Origin (signed static GETs only).
 
+### 9. Mirror list & failover (amendment 2026-07-29, origin-0010)
+
+§2 said "Base = `NENE_ORIGIN_URL`". Origin has since landed the mirror-list spec
+(`nene-origin/docs/spec/mirrors.md`, PR #263, closing ADR 0007 §D3-5): the read path is served by
+**≥2 zero-trust mirrors** (ADR 0006 §6), so the base is a **list**. Origin's spec is authoritative;
+this section is the consumer record.
+
+- **Distribution is out-of-band.** The list ships as an **ordered default embedded in the client
+  build**. There is **no signed `mirrors.json`** on the read path at launch (aligned with modern TUF,
+  which removed signed mirror lists); introducing one is deferred behind an ADR 0008-style trigger
+  (mirror churn outpacing client release cadence).
+- **The list is never a trust decision.** Mirrors are untrusted transports; §4's verification is the
+  only trust decision. A hostile mirror can deny service; it can never make the client accept
+  tampered bytes. The list is an *availability preference*, nothing more.
+- **`NENE_ORIGIN_URL` semantics** (no new env var — mirrors.md §3): **unset** = the embedded default
+  list, in order; **set** = **exactly that one base**, with no fallback to the defaults (the
+  dev / staging / self-host escape hatch, and the operator-side bridge if the embedded list goes
+  stale). Neither switches the client on: the embedded **trust anchor** remains the on/off gate, so
+  shipping a default list does **not** enable Origin on unconfigured installs.
+- **One base per walk.** A walk (`root → current → [snapshot] → targets` + body / artifact) MUST
+  complete against a single base; objects are never mixed across bases within a walk. In Suite this
+  means the walk unit is **one product** for updates and **one `(product, audience, locale)`** for
+  feeds — the aggregator's per-product degrade (§5) is unchanged.
+- **Ordered failover; a REJECT is a denial.** Each cycle tries bases in list order. An attempt fails
+  on a transport error **and equally on verification REJECT** — a broken or hostile mirror is a
+  denial, not a verdict on the tree — and the client moves to the next base. The first fully verified
+  walk wins. When **every** mirror fails, the cycle fails and the freshness state machine advances
+  exactly as for any failed poll (`fresh → warn → refuse-new → hard`); there is no partial acceptance
+  and no special state.
+- **Per-mirror surface.** Every skipped mirror is surfaced as a **warning on that product's signal /
+  feed** (`mirror failover: {base} skipped ({reason})`), so a silently degraded read path is visible
+  to the operator. Mirror choice and failover events stay **local** — never transmitted (ADR 0002 §4;
+  no telemetry, no PII). After a feed falls back to `en` (§6), the warnings carried are the
+  **fallback cycle's own**: the requested-locale cycle failed against the same mirrors, so repeating
+  its notices would duplicate rather than inform.
+- **Not adopted at launch (mirrors.md §4.4, optional).** *Stickiness* — remembering the last-good
+  base within a process session — is deliberately **not** implemented: Suite's poll is short-lived
+  and returning to list order every cycle keeps the primary's preference obvious and the behaviour
+  explainable. Revisit only if failover cost shows up in practice.
+
 ## Consequences
 
 **Benefits.** Vetted resistance to rollback / freeze / mix-and-match / key-compromise without
@@ -189,6 +233,8 @@ change). The dashboard's Origin feeds remain a Phase-B placeholder until the cli
 
 - Origin authority: `nene-origin/docs/adr/0006-signed-static-read-model-profiled-tuf.md` (proposed →
   to be accepted), `…/0001`, `…/0002`, `…/0005`
+- Origin mirror-list spec (§9 authority): `nene-origin/docs/spec/mirrors.md` (huddle origin-0010 /
+  suite-0008; Suite issue `#371`)
 - ADR 0013 (update aggregation & dependency-ordered upgrade orchestration)
 - ADR 0012 (federation participation — entitlement claim source)
 - Terminology: `docs/explanation/terminology.md` §4.3 (Origin read-model vocabulary)
