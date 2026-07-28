@@ -4,6 +4,15 @@
 
 accepted
 
+> **Note (2026-07-29, [#407](https://github.com/hideyukiMORI/nene-suite/issues/407)).** The
+> decision text below still names `docs/todo/current.md` as local project memory. That path no
+> longer exists in this public repository: the operational logs (todo / daily / handover) moved to
+> the private mirror `nene-origin/internal-docs/suite/` in P3 (#405 / #406). The **decision** —
+> inherit portfolio governance, keep a living local memory — is unchanged; only the location moved.
+> The decision text is left as recorded, because an ADR is a record of what was decided when, not a
+> live pointer. Live pointers are in [`AGENTS.md`](../../AGENTS.md) and
+> [`README.md`](../../README.md).
+
 ## Context
 
 NeNe Suite is a public meta repository that orchestrates multiple NENE2-based
