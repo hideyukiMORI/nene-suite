@@ -12,6 +12,7 @@ use NeNeSuite\Origin\OriginUpdateAggregator;
 use NeNeSuite\Origin\OriginUpdateQuery;
 use NeNeSuite\Origin\OriginUpdateSignal;
 use NeNeSuite\Origin\OriginUpdateStatus;
+use NeNeSuite\Origin\SingleOriginObjectStoreProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -63,7 +64,7 @@ final class OriginUpdateAggregatorTest extends TestCase
     {
         $signals = (new OriginUpdateAggregator(new OriginReadModelVerifier()))->aggregate(
             [new OriginUpdateQuery('nene-invoice', 'stable', $installed)],
-            new FilesystemOriginObjectStore(self::CORPUS . '/cases/' . $case),
+            new SingleOriginObjectStoreProvider(new FilesystemOriginObjectStore(self::CORPUS . '/cases/' . $case)),
             $this->anchor(),
             1,
             1,

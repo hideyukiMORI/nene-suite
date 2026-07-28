@@ -10,7 +10,7 @@ use NeNeSuite\InstalledApps\ListInstalledAppsUseCaseInterface;
 /**
  * Fans out the installed roster to fetch one content-tree feed kind (announcements or house-ads)
  * per product via the O3b {@see OriginFeedReader}. Disabled — {@see OriginFeedsOutput::disabled()} —
- * unless Origin is configured (URL + embedded trust anchor); no fabricated data.
+ * unless Origin is configured (a mirror list + an embedded trust anchor); no fabricated data.
  *
  * `audience` is `free` for now: the org tier (free/paid) is not tracked yet, and house-ads are a
  * `free`-only cohort (paid suppression lands when org-tier tracking does). `locale` is supplied by
@@ -24,7 +24,7 @@ final readonly class GetOriginFeedsUseCase
         private OriginClientConfig $config,
         private OriginTrustAnchorProvider $anchors,
         private ListInstalledAppsUseCaseInterface $installed,
-        private OriginObjectStore $store,
+        private OriginObjectStoreProvider $stores,
         private OriginFeedReader $reader,
         private OriginGenWatermarkRepositoryInterface $watermarks,
     ) {
@@ -42,7 +42,7 @@ final readonly class GetOriginFeedsUseCase
         foreach ($this->installed->execute()->apps as $app) {
             $feeds[] = $this->reader->read(
                 new OriginFeedQuery($app->catalogId, self::AUDIENCE, $locale, $kind),
-                $this->store,
+                $this->stores,
                 $anchor,
                 $this->config->rootVersionFloor,
                 $this->config->genFloor,

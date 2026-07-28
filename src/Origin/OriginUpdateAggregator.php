@@ -12,6 +12,11 @@ use DateTimeImmutable;
  * {@see OriginUpdateSignal}. The anti-rollback `persisted_gen` comes from the O2 watermark (falling
  * back to the build-time `gen` floor on first sight). A per-product verification failure or an
  * unreachable Origin degrades to an `unavailable` signal — it never aborts the whole roster.
+ *
+ * **Mirror failover** (mirrors.md §4): one product = one walk, and each walk is retried in mirror
+ * order until one *fully verifies*. A transport failure and a verification REJECT are treated
+ * identically — a broken or hostile mirror is a denial — and each skipped mirror is surfaced as a
+ * warning on the resulting signal. Objects are never mixed across bases within a walk (§4.1).
  */
 final readonly class OriginUpdateAggregator
 {
@@ -27,7 +32,7 @@ final readonly class OriginUpdateAggregator
      */
     public function aggregate(
         iterable $queries,
-        OriginObjectStore $store,
+        OriginObjectStoreProvider $stores,
         OriginTrustAnchor $anchor,
         int $rootVersionFloor,
         int $genFloor,
@@ -37,7 +42,7 @@ final readonly class OriginUpdateAggregator
         $signals = [];
 
         foreach ($queries as $query) {
-            $signals[] = $this->evaluate($query, $store, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+            $signals[] = $this->evaluate($query, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
         }
 
         return $signals;
@@ -45,7 +50,7 @@ final readonly class OriginUpdateAggregator
 
     private function evaluate(
         OriginUpdateQuery $query,
-        OriginObjectStore $store,
+        OriginObjectStoreProvider $stores,
         OriginTrustAnchor $anchor,
         int $rootVersionFloor,
         int $genFloor,
@@ -53,7 +58,6 @@ final readonly class OriginUpdateAggregator
         OriginGenWatermarkRepositoryInterface $watermarks,
     ): OriginUpdateSignal {
         $persistedGen = $watermarks->current($query->product) ?? $genFloor;
-        $client = new OriginClientState($persistedGen, $rootVersionFloor, $genFloor, $now);
         $request = new OriginVerificationRequest(
             OriginTreeKind::Update,
             sprintf('v1/%s/%s/current', $query->product, $query->channel),
@@ -61,14 +65,48 @@ final readonly class OriginUpdateAggregator
             true, // consumer reduction (verification-order §2.4)
         );
 
-        try {
-            $outcome = $this->verifier->verify($store, $anchor, $client, $request);
-        } catch (OriginUnreachableException) {
-            return OriginUpdateSignal::unavailable($query, 'origin_unreachable');
+        $mirrorWarnings = [];
+        $attempted = false;
+        $lastReason = 'origin_unreachable';
+        $lastFreshness = null;
+        $outcome = null;
+
+        foreach ($stores->stores() as $baseUrl => $store) {
+            $attempted = true;
+            // A fresh client state per attempt: each mirror is walked from the embedded root.
+            $client = new OriginClientState($persistedGen, $rootVersionFloor, $genFloor, $now);
+
+            try {
+                $attempt = $this->verifier->verify($store, $anchor, $client, $request);
+            } catch (OriginUnreachableException) {
+                $mirrorWarnings[] = self::mirrorWarning($baseUrl, 'origin_unreachable');
+                $lastReason = 'origin_unreachable';
+                $lastFreshness = null;
+
+                continue;
+            }
+
+            if (!$attempt->accepted) {
+                // A verification REJECT is a denial by this mirror, not a verdict on the tree.
+                $mirrorWarnings[] = self::mirrorWarning($baseUrl, $attempt->reason->value);
+                $lastReason = $attempt->reason->value;
+                $lastFreshness = $attempt->freshness;
+
+                continue;
+            }
+
+            $outcome = $attempt;
+
+            break;
         }
 
-        if (!$outcome->accepted) {
-            return OriginUpdateSignal::unavailable($query, $outcome->reason->value, $outcome->freshness);
+        if ($outcome === null) {
+            return OriginUpdateSignal::unavailable(
+                $query,
+                $attempted ? $lastReason : 'origin_not_configured',
+                $lastFreshness,
+                $mirrorWarnings,
+            );
         }
 
         $leaf = $outcome->leaf ?? [];
@@ -96,9 +134,15 @@ final readonly class OriginUpdateAggregator
             changelogUrl: $changelogUrl,
             releasedAt: $releasedAt,
             freshness: $outcome->freshness,
-            warnings: $outcome->warnings,
+            warnings: [...$mirrorWarnings, ...$outcome->warnings],
             requires: $requires,
         );
+    }
+
+    /** The per-mirror surface required by mirrors.md §4.2 — local only, never transmitted (§4.5). */
+    private static function mirrorWarning(string $baseUrl, string $reason): string
+    {
+        return sprintf('mirror failover: %s skipped (%s)', $baseUrl, $reason);
     }
 
     private function status(?string $installed, ?string $latest, ?string $minSupported): OriginUpdateStatus

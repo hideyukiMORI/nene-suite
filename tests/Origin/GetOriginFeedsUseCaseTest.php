@@ -14,8 +14,10 @@ use NeNeSuite\Origin\OriginClientConfig;
 use NeNeSuite\Origin\OriginFeed;
 use NeNeSuite\Origin\OriginFeedKind;
 use NeNeSuite\Origin\OriginFeedReader;
+use NeNeSuite\Origin\OriginMirrorList;
 use NeNeSuite\Origin\OriginReadModelVerifier;
 use NeNeSuite\Origin\OriginTrustAnchorProvider;
+use NeNeSuite\Origin\SingleOriginObjectStoreProvider;
 use PHPUnit\Framework\TestCase;
 
 final class GetOriginFeedsUseCaseTest extends TestCase
@@ -26,7 +28,7 @@ final class GetOriginFeedsUseCaseTest extends TestCase
 
     public function testDisabledWhenNotConfigured(): void
     {
-        $output = $this->useCase(new OriginClientConfig('', 10, 1, 1, null), null)
+        $output = $this->useCase(new OriginClientConfig(OriginMirrorList::none(), 10, 1, 1, null), null)
             ->execute(OriginFeedKind::Announcement, 'ja', new DateTimeImmutable(self::NOW));
 
         self::assertFalse($output->available);
@@ -56,7 +58,7 @@ final class GetOriginFeedsUseCaseTest extends TestCase
     private function firstFeed(OriginFeedKind $kind): OriginFeed
     {
         $anchorPath = self::CORPUS . '/trust-anchor.json';
-        $output = $this->useCase(new OriginClientConfig('https://origin.example.com', 10, 1, 1, $anchorPath), $anchorPath)
+        $output = $this->useCase(new OriginClientConfig(OriginMirrorList::exclusive('https://origin.example.com'), 10, 1, 1, $anchorPath), $anchorPath)
             ->execute($kind, 'ja', new DateTimeImmutable(self::NOW));
 
         self::assertTrue($output->available);
@@ -76,7 +78,7 @@ final class GetOriginFeedsUseCaseTest extends TestCase
             new FakeListInstalledAppsUseCase(new ListInstalledAppsOutput([
                 new InstalledApp('nene-invoice', 'NeNe Invoice', 'https://example.com/nene-invoice/', null, SsotRole::None),
             ])),
-            new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-feed'),
+            new SingleOriginObjectStoreProvider(new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-feed')),
             new OriginFeedReader(new OriginReadModelVerifier()),
             new InMemoryOriginGenWatermarkRepository(),
         );

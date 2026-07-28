@@ -11,11 +11,13 @@ use NeNeSuite\InstalledApps\SsotRole;
 use NeNeSuite\Origin\FilesystemOriginObjectStore;
 use NeNeSuite\Origin\GetOriginUpdatesUseCase;
 use NeNeSuite\Origin\OriginClientConfig;
+use NeNeSuite\Origin\OriginMirrorList;
 use NeNeSuite\Origin\OriginReadModelVerifier;
 use NeNeSuite\Origin\OriginTrustAnchorProvider;
 use NeNeSuite\Origin\OriginUpdateAggregator;
 use NeNeSuite\Origin\OriginUpdateSignal;
 use NeNeSuite\Origin\OriginUpdateStatus;
+use NeNeSuite\Origin\SingleOriginObjectStoreProvider;
 use NeNeSuite\SiblingHealth\InstalledVersionResolver;
 use NeNeSuite\Tests\SiblingHealth\FakeSiblingHealthClient;
 use NeNeSuite\Tests\SiblingHealth\FakeSuiteAppMachineKeyReader;
@@ -30,7 +32,7 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
 
     public function testDisabledWhenNotConfigured(): void
     {
-        $useCase = $this->useCase(new OriginClientConfig('', 10, 1, 1, null), null);
+        $useCase = $this->useCase(new OriginClientConfig(OriginMirrorList::none(), 10, 1, 1, null), null);
 
         $output = $useCase->execute(new DateTimeImmutable(self::NOW));
 
@@ -40,7 +42,7 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
 
     public function testDisabledWhenUrlSetButNoTrustAnchor(): void
     {
-        $useCase = $this->useCase(new OriginClientConfig('https://origin.example.com', 10, 1, 1, null), null);
+        $useCase = $this->useCase(new OriginClientConfig(OriginMirrorList::exclusive('https://origin.example.com'), 10, 1, 1, null), null);
 
         $output = $useCase->execute(new DateTimeImmutable(self::NOW));
 
@@ -51,7 +53,7 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
     {
         $anchorPath = self::CORPUS . '/trust-anchor.json';
         $useCase = $this->useCase(
-            new OriginClientConfig('https://origin.example.com', 10, 1, 1, $anchorPath),
+            new OriginClientConfig(OriginMirrorList::exclusive('https://origin.example.com'), 10, 1, 1, $anchorPath),
             $anchorPath,
         );
 
@@ -73,7 +75,7 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
     {
         $anchorPath = self::CORPUS . '/trust-anchor.json';
         $useCase = $this->useCase(
-            new OriginClientConfig('https://origin.example.com', 10, 1, 1, $anchorPath),
+            new OriginClientConfig(OriginMirrorList::exclusive('https://origin.example.com'), 10, 1, 1, $anchorPath),
             $anchorPath,
             ['https://example.com/nene-invoice/' => '1.3.0'],
             ['nene-invoice' => 'machine-key'],
@@ -107,7 +109,7 @@ final class GetOriginUpdatesUseCaseTest extends TestCase
                 new InMemoryInstalledVersionRepository(),
                 new FakeSuiteAppMachineKeyReader($keysByCatalogId),
             ),
-            new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-update-reduced'),
+            new SingleOriginObjectStoreProvider(new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-update-reduced')),
             new OriginUpdateAggregator(new OriginReadModelVerifier()),
             new InMemoryOriginGenWatermarkRepository(),
         );

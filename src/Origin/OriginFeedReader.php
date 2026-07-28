@@ -26,24 +26,61 @@ final readonly class OriginFeedReader
 
     public function read(
         OriginFeedQuery $query,
-        OriginObjectStore $store,
+        OriginObjectStoreProvider $stores,
         OriginTrustAnchor $anchor,
         int $rootVersionFloor,
         int $genFloor,
         DateTimeImmutable $now,
         OriginGenWatermarkRepositoryInterface $watermarks,
     ): OriginFeed {
-        $feed = $this->readLocale($query, $query->locale, $store, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+        $feed = $this->readLocale($query, $query->locale, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
 
-        // Missing locale variant (404 → unreachable) falls back to en; a verification failure does not.
+        // Missing locale variant (404 → unreachable) falls back to en — after every mirror has been
+        // tried for the requested locale (mirrors serve byte-identical objects, so an absent variant
+        // is absent everywhere); a verification failure does not fall back.
         if (!$feed->available && $feed->reason === 'origin_unreachable' && $query->locale !== self::FALLBACK_LOCALE) {
-            return $this->readLocale($query, self::FALLBACK_LOCALE, $store, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+            return $this->readLocale($query, self::FALLBACK_LOCALE, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
         }
 
         return $feed;
     }
 
+    /**
+     * One locale, walked in mirror order (mirrors.md §4): the first mirror whose walk fully verifies
+     * wins; transport failures and verification rejects alike move to the next base, each surfaced
+     * as a warning. The whole walk — `current` → `feed-targets` → **feed body** — runs against a
+     * single store, so a body is never paired with another mirror's targets (§4.1).
+     */
     private function readLocale(
+        OriginFeedQuery $query,
+        string $locale,
+        OriginObjectStoreProvider $stores,
+        OriginTrustAnchor $anchor,
+        int $rootVersionFloor,
+        int $genFloor,
+        DateTimeImmutable $now,
+        OriginGenWatermarkRepositoryInterface $watermarks,
+    ): OriginFeed {
+        $mirrorWarnings = [];
+        $last = null;
+
+        foreach ($stores->stores() as $baseUrl => $store) {
+            $feed = $this->readLocaleFrom($query, $locale, $store, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+
+            if ($feed->available) {
+                return $feed->withWarningsPrepended($mirrorWarnings);
+            }
+
+            $mirrorWarnings[] = sprintf('mirror failover: %s skipped (%s)', $baseUrl, $feed->reason ?? 'unknown');
+            $last = $feed;
+        }
+
+        $last ??= OriginFeed::unavailable($query, $locale, 'origin_not_configured');
+
+        return $last->withWarningsPrepended($mirrorWarnings);
+    }
+
+    private function readLocaleFrom(
         OriginFeedQuery $query,
         string $locale,
         OriginObjectStore $store,
