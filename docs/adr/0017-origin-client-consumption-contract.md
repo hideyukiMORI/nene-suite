@@ -191,7 +191,9 @@ this section is the consumer record.
 - **Per-mirror surface.** Every skipped mirror is surfaced as a **warning on that product's signal /
   feed** (`mirror failover: {base} skipped ({reason})`), so a silently degraded read path is visible
   to the operator. Mirror choice and failover events stay **local** — never transmitted (ADR 0002 §4;
-  no telemetry, no PII).
+  no telemetry, no PII). After a feed falls back to `en` (§6), the warnings carried are the
+  **fallback cycle's own**: the requested-locale cycle failed against the same mirrors, so repeating
+  its notices would duplicate rather than inform.
 - **Not adopted at launch (mirrors.md §4.4, optional).** *Stickiness* — remembering the last-good
   base within a process session — is deliberately **not** implemented: Suite's poll is short-lived
   and returning to list order every cycle keeps the primary's preference obvious and the behaviour
