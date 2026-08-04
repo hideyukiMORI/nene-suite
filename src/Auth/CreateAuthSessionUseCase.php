@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NeNeSuite\Auth;
 
 use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Http\ClockInterface;
+use Nene2\Http\UtcClock;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -23,6 +25,7 @@ final readonly class CreateAuthSessionUseCase implements CreateAuthSessionUseCas
         private string $suiteId,
         private OperatorSessionContextResolver $sessionContext,
         private LoginRateLimiter $rateLimiter,
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
@@ -55,7 +58,8 @@ final readonly class CreateAuthSessionUseCase implements CreateAuthSessionUseCas
         // authenticator can read role/org without a repo round-trip on every request.
         $context = $this->sessionContext->resolve($operator->id);
 
-        $issuedAt = time();
+        // One read: `exp` must be exactly TTL after the `iat` that ships in the same token.
+        $issuedAt = $this->clock->now()->getTimestamp();
         $expiresAt = $issuedAt + self::TOKEN_TTL_SECONDS;
 
         $token = $this->tokenIssuer->issue([

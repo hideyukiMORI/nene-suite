@@ -8,6 +8,7 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use NeNeSuite\Auth\PdoRevokedTokenRepository;
+use NeNeSuite\Tests\Support\FixedClock;
 use PHPUnit\Framework\TestCase;
 
 final class PdoRevokedTokenRepositoryTest extends TestCase
@@ -69,5 +70,40 @@ final class PdoRevokedTokenRepositoryTest extends TestCase
 
         self::assertFalse($repository->isRevoked('01J0EXPIRED00000000000000ZA'));
         self::assertTrue($repository->isRevoked('01J0LIVE00000000000000000ZA'));
+    }
+
+    public function testGcBoundaryKeepsARowExpiringOnTheCurrentSecond(): void
+    {
+        // `expires_at < now` — a token expiring exactly now is still rejected on `exp` by the
+        // verifier, but its revocation row must not be reclaimed a second early.
+        $repository = new PdoRevokedTokenRepository($this->executor);
+        $repository->revoke(self::JTI, 2_000, '2026-06-22T00:00:00Z', 'logout');
+
+        $repository->deleteExpired(2_000);
+        self::assertTrue($repository->isRevoked(self::JTI));
+
+        $repository->deleteExpired(2_001);
+        self::assertFalse($repository->isRevoked(self::JTI));
+    }
+
+    public function testOpportunisticGcReclaimsAgainstTheInjectedClockNotWallClock(): void
+    {
+        // The clock is pinned to 2001-09-09T01:46:40Z (epoch 1_000_000_000), far in the past. A row
+        // expiring exactly on that instant must survive the piggybacked GC; a residual `time()`
+        // call would compare against the real current second and wrongly reclaim it.
+        $clock = new FixedClock('2001-09-09T01:46:40Z');
+        $repository = new PdoRevokedTokenRepository($this->executor, $clock);
+
+        $repository->revoke('01J0ATBOUNDARY0000000000ZA', $clock->timestamp(), '2026-06-22T00:00:00Z', 'logout');
+        $repository->revoke('01J0PASTBOUNDARY00000000ZA', $clock->timestamp() - 1, '2026-06-22T00:00:00Z', 'logout');
+
+        // GC piggybacks on ~1% of revocations. Over this many, the chance it never fires is ~2e-9;
+        // the reclaimed-row assertion below fails loudly if it somehow did not.
+        for ($i = 0; $i < 2_000; $i++) {
+            $repository->revoke(sprintf('01J0FILLER%016d', $i), 9_999_999_999, '2026-06-22T00:00:00Z', 'logout');
+        }
+
+        self::assertFalse($repository->isRevoked('01J0PASTBOUNDARY00000000ZA'), 'GC did not run');
+        self::assertTrue($repository->isRevoked('01J0ATBOUNDARY0000000000ZA'));
     }
 }

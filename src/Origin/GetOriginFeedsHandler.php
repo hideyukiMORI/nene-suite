@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Origin;
 
-use DateTimeImmutable;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\UtcClock;
 use NeNeSuite\Auth\BearerTokenAuthenticator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,6 +22,7 @@ final readonly class GetOriginFeedsHandler
         private BearerTokenAuthenticator $authenticator,
         private GetOriginFeedsUseCase $useCase,
         private JsonResponseFactory $response,
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
@@ -28,7 +30,7 @@ final readonly class GetOriginFeedsHandler
     {
         $this->authenticator->operatorId($request);
 
-        $output = $this->useCase->execute($kind, $this->locale($request), new DateTimeImmutable('now'));
+        $output = $this->useCase->execute($kind, $this->locale($request), $this->clock->now());
 
         return $this->response->create([
             'available' => $output->available,

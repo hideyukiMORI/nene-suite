@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Deploy;
 
-use DateTimeImmutable;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\UtcClock;
 use NeNeSuite\Tenancy\SuperadminGuard;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,6 +21,7 @@ final readonly class GetDeployPlanHandler
         private SuperadminGuard $guard,
         private ComputeDeployPlanUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
@@ -27,6 +29,6 @@ final readonly class GetDeployPlanHandler
     {
         $this->guard->ensure($request);
 
-        return $this->response->create($this->useCase->execute(new DateTimeImmutable('now'))->toArray());
+        return $this->response->create($this->useCase->execute($this->clock->now())->toArray());
     }
 }

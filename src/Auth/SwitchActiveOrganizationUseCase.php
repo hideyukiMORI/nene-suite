@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NeNeSuite\Auth;
 
 use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Http\ClockInterface;
+use Nene2\Http\UtcClock;
 use NeNeSuite\Tenancy\MembershipRepositoryInterface;
 use NeNeSuite\Tenancy\OrganizationNotFoundException;
 use NeNeSuite\Tenancy\OrganizationRepositoryInterface;
@@ -32,6 +34,7 @@ final readonly class SwitchActiveOrganizationUseCase implements SwitchActiveOrga
         private OrganizationRepositoryInterface $organizations,
         private TokenIssuerInterface $tokenIssuer,
         private string $suiteId,
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
@@ -54,7 +57,8 @@ final readonly class SwitchActiveOrganizationUseCase implements SwitchActiveOrga
 
         $isSuperadmin = $this->memberships->findByOperatorAndOrganization($input->operatorId, null) !== null;
 
-        $issuedAt = time();
+        // A switch is a session refresh, so the new token gets a full TTL from a single read.
+        $issuedAt = $this->clock->now()->getTimestamp();
         $expiresAt = $issuedAt + self::TOKEN_TTL_SECONDS;
 
         $token = $this->tokenIssuer->issue([

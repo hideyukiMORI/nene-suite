@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeSuite\AppCatalog\CatalogAppRepositoryInterface;
@@ -90,6 +91,7 @@ final readonly class DeployServiceProvider implements ServiceProviderInterface
                     self::superadminGuard($container),
                     self::planUseCase($container),
                     self::jsonResponse($container),
+                    self::clock($container),
                 ),
             )
             ->set(
@@ -331,6 +333,17 @@ final readonly class DeployServiceProvider implements ServiceProviderInterface
         }
 
         return $response;
+    }
+
+    private static function clock(ContainerInterface $container): ClockInterface
+    {
+        $clock = $container->get(ClockInterface::class);
+
+        if (!$clock instanceof ClockInterface) {
+            throw new LogicException('Clock service is invalid.');
+        }
+
+        return $clock;
     }
 
     private static function requestIdHolder(ContainerInterface $container): RequestIdHolder

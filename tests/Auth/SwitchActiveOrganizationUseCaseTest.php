@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeSuite\Tests\Auth;
 
 use Nene2\Auth\LocalBearerTokenVerifier;
+use Nene2\Http\UtcClock;
 use NeNeSuite\Auth\Operator;
 use NeNeSuite\Auth\SwitchActiveOrganizationInput;
 use NeNeSuite\Auth\SwitchActiveOrganizationUseCase;
@@ -14,6 +15,7 @@ use NeNeSuite\Tenancy\Organization;
 use NeNeSuite\Tenancy\OrganizationNotFoundException;
 use NeNeSuite\Tenancy\OrganizationStatus;
 use NeNeSuite\Tenancy\Role;
+use NeNeSuite\Tests\Support\FixedClock;
 use NeNeSuite\Tests\Tenancy\InMemoryMembershipRepository;
 use NeNeSuite\Tests\Tenancy\InMemoryOrganizationRepository;
 use PHPUnit\Framework\TestCase;
@@ -90,7 +92,24 @@ final class SwitchActiveOrganizationUseCaseTest extends TestCase
             ->execute(new SwitchActiveOrganizationInput('01J8XR4ZS6Q9V2H7K3N5M0B8TE', self::ORG_B));
     }
 
-    private function useCase(LocalBearerTokenVerifier $verifier): SwitchActiveOrganizationUseCase
+    public function testRefreshedTokenGetsAFullTtlFromTheInjectedClock(): void
+    {
+        // A switch is a session refresh, not an extension of the prior token — the new `exp` must
+        // be a full TTL from the switch instant, which only a pinned clock can assert exactly.
+        $clock = new FixedClock('2026-08-04T12:00:00Z');
+        $verifier = new LocalBearerTokenVerifier('test-secret', $clock);
+
+        $output = $this->useCase($verifier, $clock)->execute(new SwitchActiveOrganizationInput(self::OP, self::ORG_B));
+
+        $switchedAt = $clock->timestamp();
+        $claims = $verifier->verify($output->token);
+
+        self::assertSame($switchedAt, $claims['iat']);
+        self::assertSame($switchedAt + 86400, $claims['exp']);
+        self::assertSame($claims['exp'], $output->expiresAt);
+    }
+
+    private function useCase(LocalBearerTokenVerifier $verifier, ?FixedClock $clock = null): SwitchActiveOrganizationUseCase
     {
         $operators = new InMemoryOperatorRepository();
         $operators->save(new Operator(self::OP, 'operator@example.com', 'hash', 'Example Operator', self::NOW, self::NOW));
@@ -103,6 +122,13 @@ final class SwitchActiveOrganizationUseCaseTest extends TestCase
         $memberships->save(new Membership('01J0SUP', self::OP, null, Role::Superadmin, self::NOW, self::NOW));
         $memberships->save(new Membership('01J0B', self::OP, self::ORG_B, Role::Viewer, self::NOW, self::NOW));
 
-        return new SwitchActiveOrganizationUseCase($operators, $memberships, $organizations, $verifier, self::SUITE_ID);
+        return new SwitchActiveOrganizationUseCase(
+            $operators,
+            $memberships,
+            $organizations,
+            $verifier,
+            self::SUITE_ID,
+            $clock ?? new UtcClock(),
+        );
     }
 }

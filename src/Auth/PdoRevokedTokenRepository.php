@@ -6,6 +6,8 @@ namespace NeNeSuite\Auth;
 
 use Nene2\Database\DatabaseConstraintException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
+use Nene2\Http\UtcClock;
 use Throwable;
 
 final readonly class PdoRevokedTokenRepository implements RevokedTokenRepositoryInterface
@@ -14,6 +16,7 @@ final readonly class PdoRevokedTokenRepository implements RevokedTokenRepository
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
@@ -53,7 +56,7 @@ final readonly class PdoRevokedTokenRepository implements RevokedTokenRepository
         }
 
         try {
-            $this->deleteExpired(time());
+            $this->deleteExpired($this->clock->now()->getTimestamp());
         } catch (Throwable) {
             // Best-effort cleanup must never fail the revocation it piggybacks on.
         }

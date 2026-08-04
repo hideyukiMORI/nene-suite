@@ -20,9 +20,11 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use Nene2\Log\RequestIdHolder;
 use Nene2\Routing\Router;
 use NeNeSuite\ApplicationServiceProvider;
@@ -67,6 +69,13 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder->addProvider(new ApplicationServiceProvider());
 
         $builder
+            ->set(
+                // Single wall-clock read point for the whole runtime. Injecting this instead of
+                // calling `time()` / `new DateTimeImmutable('now')` inline is what lets auth tests
+                // pin a fixed instant and assert `iat`/`exp`, rate-limit windows, and GC deterministically.
+                ClockInterface::class,
+                static fn (ContainerInterface $container): ClockInterface => new UtcClock(),
+            )
             ->set(
                 self::SUITE_ID,
                 static fn (ContainerInterface $container): string => self::env('NENE_SUITE_ID', self::DEV_SUITE_ID),
@@ -168,9 +177,14 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 LocalBearerTokenVerifier::class,
                 static function (ContainerInterface $container): LocalBearerTokenVerifier {
                     $config = $container->get(AppConfig::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$config instanceof AppConfig) {
                         throw new LogicException('Application config service is invalid.');
+                    }
+
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
                     }
 
                     return new LocalBearerTokenVerifier(
@@ -179,6 +193,9 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                             self::env('NENE_SUITE_ALLOW_DEV_SECRET', ''),
                             $config->environment,
                         ))->resolve(),
+                        // Same clock the session use cases stamp `iat`/`exp` with, so issue →
+                        // verify closes over one instant rather than two independent wall-clock reads.
+                        $clock,
                     );
                 },
             )

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace NeNeSuite\AppCatalog;
 
-use DateTimeImmutable;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\UtcClock;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -22,12 +23,13 @@ final readonly class ListCatalogAppsHandler
     public function __construct(
         private ListCatalogAppsUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $output = $this->useCase->execute(new DateTimeImmutable('now'));
+        $output = $this->useCase->execute($this->clock->now());
         $versions = $output->versions;
 
         return $this->response->create([

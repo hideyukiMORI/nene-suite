@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Auth\BearerTokenAuthenticator;
 use NeNeSuite\InstalledApps\ListInstalledAppsUseCaseInterface;
@@ -186,6 +187,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                     $authenticator = $container->get(BearerTokenAuthenticator::class);
                     $useCase = $container->get(GetOriginUpdatesUseCase::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$authenticator instanceof BearerTokenAuthenticator) {
                         throw new LogicException('Bearer token authenticator service is invalid.');
@@ -199,7 +201,11 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new GetOriginUpdatesHandler($authenticator, $useCase, $response);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new GetOriginUpdatesHandler($authenticator, $useCase, $response, $clock);
                 },
             )
             ->set(
@@ -245,6 +251,7 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                     $authenticator = $container->get(BearerTokenAuthenticator::class);
                     $useCase = $container->get(GetOriginFeedsUseCase::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$authenticator instanceof BearerTokenAuthenticator) {
                         throw new LogicException('Bearer token authenticator service is invalid.');
@@ -258,7 +265,11 @@ final readonly class OriginServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new GetOriginFeedsHandler($authenticator, $useCase, $response);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new GetOriginFeedsHandler($authenticator, $useCase, $response, $clock);
                 },
             )
             ->set(
