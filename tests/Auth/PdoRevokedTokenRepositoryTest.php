@@ -76,7 +76,11 @@ final class PdoRevokedTokenRepositoryTest extends TestCase
     {
         // `expires_at < now` — a token expiring exactly now is still rejected on `exp` by the
         // verifier, but its revocation row must not be reclaimed a second early.
-        $repository = new PdoRevokedTokenRepository($this->executor);
+        //
+        // The clock is pinned *below* the row's expires_at on purpose: `revoke()` piggybacks an
+        // opportunistic GC on ~1% of calls, so with a real clock this row would occasionally be
+        // swept before the assertions ran (a 1-in-100 flake). Pinning makes that GC a no-op.
+        $repository = new PdoRevokedTokenRepository($this->executor, new FixedClock('1970-01-01T00:00:01Z'));
         $repository->revoke(self::JTI, 2_000, '2026-06-22T00:00:00Z', 'logout');
 
         $repository->deleteExpired(2_000);
