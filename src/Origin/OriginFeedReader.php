@@ -33,16 +33,35 @@ final readonly class OriginFeedReader
         DateTimeImmutable $now,
         OriginGenWatermarkRepositoryInterface $watermarks,
     ): OriginFeed {
-        $feed = $this->readLocale($query, $query->locale, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+        $attempt = $this->readLocale($query, $query->locale, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+        $feed = $attempt['feed'];
+
+        if ($feed->available || $query->locale === self::FALLBACK_LOCALE) {
+            return $feed;
+        }
 
         // Missing locale variant (404 → unreachable) falls back to en — after every mirror has been
         // tried for the requested locale (mirrors serve byte-identical objects, so an absent variant
         // is absent everywhere); a verification failure does not fall back.
-        if (!$feed->available && $feed->reason === 'origin_unreachable' && $query->locale !== self::FALLBACK_LOCALE) {
-            return $this->readLocale($query, self::FALLBACK_LOCALE, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
+        //
+        // Order-independence (mirrors.md §4.3): decide from the **set** of attempt results, never
+        // from whichever base happened to fail last. Reading only the last reason makes the outcome
+        // depend on list order — one degraded mirror answering REJECT next to another's honest 404
+        // would silently suppress the fallback, and swapping the two mirrors would restore it.
+        if (!in_array('origin_unreachable', $attempt['reasons'], true)) {
+            return $feed;
         }
 
-        return $feed;
+        $fallback = $this->readLocale($query, self::FALLBACK_LOCALE, $stores, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks)['feed'];
+
+        // Carry forward only what the fallback cycle did not already say. Without this, a mirror
+        // that REJECTED the requested locale vanishes from the operator's view precisely when it
+        // matters — the fallback is the path that hides a degraded mirror behind a working result.
+        // Warnings the en cycle repeats verbatim (both cycles hit the same dead mirror) are dropped:
+        // the line carries no locale, so a second copy adds noise rather than evidence.
+        $carried = array_values(array_diff($feed->warnings, $fallback->warnings));
+
+        return $fallback->withWarningsPrepended($carried);
     }
 
     /**
@@ -50,6 +69,11 @@ final readonly class OriginFeedReader
      * wins; transport failures and verification rejects alike move to the next base, each surfaced
      * as a warning. The whole walk — `current` → `feed-targets` → **feed body** — runs against a
      * single store, so a body is never paired with another mirror's targets (§4.1).
+     *
+     * Returns the resulting feed **and every attempt's reason**, because §4.3 forbids deciding
+     * anything from the last failure alone — the caller needs the whole set.
+     *
+     * @return array{feed: OriginFeed, reasons: list<string>}
      */
     private function readLocale(
         OriginFeedQuery $query,
@@ -60,24 +84,27 @@ final readonly class OriginFeedReader
         int $genFloor,
         DateTimeImmutable $now,
         OriginGenWatermarkRepositoryInterface $watermarks,
-    ): OriginFeed {
+    ): array {
         $mirrorWarnings = [];
+        $reasons = [];
         $last = null;
 
         foreach ($stores->stores() as $baseUrl => $store) {
             $feed = $this->readLocaleFrom($query, $locale, $store, $anchor, $rootVersionFloor, $genFloor, $now, $watermarks);
 
             if ($feed->available) {
-                return $feed->withWarningsPrepended($mirrorWarnings);
+                return ['feed' => $feed->withWarningsPrepended($mirrorWarnings), 'reasons' => $reasons];
             }
 
-            $mirrorWarnings[] = sprintf('mirror failover: %s skipped (%s)', $baseUrl, $feed->reason ?? 'unknown');
+            $reason = $feed->reason ?? 'unknown';
+            $mirrorWarnings[] = sprintf('mirror failover: %s skipped (%s)', $baseUrl, $reason);
+            $reasons[] = $reason;
             $last = $feed;
         }
 
         $last ??= OriginFeed::unavailable($query, $locale, 'origin_not_configured');
 
-        return $last->withWarningsPrepended($mirrorWarnings);
+        return ['feed' => $last->withWarningsPrepended($mirrorWarnings), 'reasons' => $reasons];
     }
 
     private function readLocaleFrom(
