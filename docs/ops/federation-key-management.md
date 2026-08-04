@@ -5,6 +5,13 @@ Operational runbook for the federation IdP signing keys that sign ES256 SSO asse
 **Hosted edition only** — a self-hosted (OSS) install has no federation key plane (the services and
 the JWKS route are not constructed; `ops/keys/*` and the boot preflight self-skip).
 
+> **Keep this page host-independent.** It documents the key lifecycle, not a particular
+> deployment. If you need to record real values — hostnames, server paths, key ids, rotation
+> dates, who is on duty — those belong in the non-public infrastructure runbook, not here. This
+> file is a likely place for such values to accumulate over time, which is why the rule is
+> written down rather than assumed. Same split as
+> [`staging-deploy.md`](staging-deploy.md).
+
 ## Model
 
 - The suite holds the **public** key only, in `federation_signing_keys` (`kid`, `public_jwk`,
