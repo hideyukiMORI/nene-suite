@@ -43,6 +43,9 @@ this gate landed:
 | `js-yaml` | 4.1.1 | 4.3.0 (override) | GHSA-h67p-54hq-rp68, GHSA-52cp-r559-cp3m |
 | `brace-expansion` (top level) | 1.1.16 | 5.0.8 | GHSA-3jxr-9vmj-r5cp |
 
+2026-08-04 follow-up: `brace-expansion` is now pinned **per major line** (1.1.18 / 2.1.4 / 5.0.9)
+to clear GHSA-rgw5-rvv9-x895 — see [Retired exception](#retired-exception-ghsa-mh99-v99m-4gvg-brace-expansion) below.
+
 `js-yaml` needs an override because `@redocly/openapi-core` pins it **exactly** (`"js-yaml":
 "4.2.0"`), so no amount of `npm update` reaches 4.3.0. Verified compatible by running
 `npm run codegen`, which is the only consumer of that dependency.
@@ -99,18 +102,37 @@ override all 5 pass.
 | Advisory | Package | Why it does not apply here | Expires |
 | --- | --- | --- | --- |
 | [GHSA-qwww-vcr4-c8h2](https://github.com/advisories/GHSA-qwww-vcr4-c8h2) | `react-router` (7.12.0–8.2.0) | The apex shell is a **static SPA built by Vite** and copied into the Apache document root by the Dockerfile's frontend stage — **there is no Node server in the image**. `src/app/router.tsx` uses `createBrowserRouter` with **element-only** routes. Measured 2026-07-29: no route `action:` / `loader:` key anywhere in `src/`, no `@react-router/dev`, no `react-router/server`, no `createStaticHandler`, no RSC entry, no SSR render/hydrate call. The advisory's attack path (a server executing a route action before returning 400) has no counterpart in a client-only bundle. | **2026-08-31** |
-| [GHSA-mh99-v99m-4gvg](https://github.com/advisories/GHSA-mh99-v99m-4gvg) | `brace-expansion` (≤5.0.7), nested copies only | The top-level copy **is** fixed (5.0.8). What remains are `minimatch@3`'s copy (eslint-plugin-import, eslint-plugin-jsx-a11y → 1.1.16) and `minimatch@5`'s (@redocly/openapi-core → 2.1.3), which cannot be forced without the breakage documented above. Measured 2026-07-29: `npm ls --omit=dev --all brace-expansion` is **empty** (as are the same queries for `minimatch` and `js-yaml`) — none of these reach the shipped bundle. Their inputs are repo-authored lint globs and our own OpenAPI file, not attacker-controlled data. | **2026-08-31** |
 
 `react-router` has **no fix in the 7.x line**: `react-router-dom` ends at 7.18.1 and the fix
 lands in `react-router` v8 (≥ 8.2.1) — a different package and a breaking upgrade. That
 exception is removed by the **react-router v8 migration wave** (bundled with the NENE2 RR8
 re-evaluation).
 
-The `brace-expansion` exception is written against a **resolution fact rather than a release
-name**: it goes away when `eslint-plugin-import` / `eslint-plugin-jsx-a11y` stop resolving
-`minimatch@3` and `@redocly/openapi-core` stops resolving `minimatch@5` — i.e. when the guard
-test finds only copies a flat `brace-expansion@^5` override would not break. Check it by
-re-running the guard, not by reading a changelog.
+### Retired exception: GHSA-mh99-v99m-4gvg (`brace-expansion`)
+
+Allowlisted 2026-07-29 with dev-only evidence because the nested copies had no in-line fix;
+**removed 2026-08-04 because they do now** — the entry was retired, not renewed.
+
+What forced the re-check was [GHSA-rgw5-rvv9-x895](https://github.com/advisories/GHSA-rgw5-rvv9-x895),
+published after the 07-29 sweep: a **bypass of the 5.0.8 mitigation**, which made the then-current
+pin vulnerable again. Unlike the original advisory, this one ships a patch in *every* affected
+major line, so each line can be pinned in place:
+
+| Line | Resolves for | Was | Now |
+| --- | --- | --- | --- |
+| `brace-expansion@1` | `minimatch@3` (eslint-plugin-import, eslint-plugin-jsx-a11y) | 1.1.16 | **1.1.18** |
+| `brace-expansion@2` | `minimatch@5` (@redocly/openapi-core) | 2.1.3 | **2.1.4** |
+| `brace-expansion@5` | top level | 5.0.8 | **5.0.9** |
+
+1.1.18 and 2.1.4 also clear GHSA-mh99-v99m-4gvg (patched at 1.1.17 / 2.1.3), so the exception
+had nothing left to excuse. `audit-ci` says so itself — it reports *"Consider not allowlisting
+advisory: GHSA-mh99-v99m-4gvg"* once the entry stops matching anything, which is the signal to
+delete rather than extend.
+
+Note what did **not** change: the override is still per-major and still never flat. Pinning each
+line to its own patch keeps `minimatch@3`/`@5` on a callable `brace-expansion`, so the breakage
+documented above stays impossible. The guard test remains the check —
+`npx vitest run tests/toolchain/brace-expansion-override.test.ts`.
 
 ## Fleet note
 
