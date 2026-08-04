@@ -35,32 +35,21 @@
     // re-argued in a PR — not silently extended.
     "GHSA-qwww-vcr4-c8h2",
 
-    // GHSA-mh99-v99m-4gvg — brace-expansion "DoS via unbounded expansion length causing an
-    // out-of-memory process crash" (high). Fixed in 5.0.8, which this tree DOES take at the
-    // top level (see `overrides` in package.json). What remains are the copies nested under
-    // `minimatch@3` (eslint-plugin-import, eslint-plugin-jsx-a11y → brace-expansion 1.1.16)
-    // and under `minimatch@5` (@redocly/openapi-core → 2.1.3).
+    // NOTE (2026-08-04): GHSA-mh99-v99m-4gvg (brace-expansion) was allowlisted here until today
+    // with dev-only evidence, because the nested copies had no in-line fix. They do now, so the
+    // entry is **removed rather than renewed** — the vulnerability is fixed, not excused.
     //
-    // Why they are not force-upgraded (measured 2026-07-29): a blanket
-    // `"brace-expansion": "^5.0.8"` override hoists v5 into `minimatch@3`, whose CommonJS
-    // `require('brace-expansion')` expects the module itself to be the function. v5 exports
-    // `{ expand }` instead, so the call throws `expand is not a function` — verified in this
-    // tree by requiring `eslint-plugin-import/node_modules/minimatch` and matching a brace
-    // pattern (throws under the blanket override, passes under the scoped one). `npm run lint`
-    // happens not to reach that code path today, which makes the blanket override a latent
-    // landmine rather than a safe fix. The override is therefore scoped to `brace-expansion@5`.
+    // GHSA-rgw5-rvv9-x895 then landed as a bypass of that same mitigation, with a patch in
+    // every affected major line (1.1.18 / 2.1.4 / 5.0.9). `overrides` in package.json now pins
+    // each line to its own patch instead of hoisting one major across the tree:
     //
-    // Why the residue does not apply here (measured 2026-07-29): the affected copies are
-    // **dev-only**. `npm ls --omit=dev --all brace-expansion` is empty, as is the same query
-    // for `minimatch` and `js-yaml` — none of them reach the shipped bundle. The consumers are
-    // lint plugins and the OpenAPI codegen, fed by repo-authored patterns in CI, not by
-    // attacker-controlled input.
+    //     brace-expansion@1 → ^1.1.18   (minimatch@3: eslint-plugin-import, -jsx-a11y)
+    //     brace-expansion@2 → ^2.1.4    (minimatch@5: @redocly/openapi-core)
+    //     brace-expansion@5 → ^5.0.9    (top level)
     //
-    // Expiry: 2026-08-31. The removal condition is a **resolution fact, not a release name**:
-    // this entry goes away when `eslint-plugin-import` and `eslint-plugin-jsx-a11y` stop
-    // resolving `minimatch@3`, and `@redocly/openapi-core` stops resolving `minimatch@5` —
-    // i.e. when `tests/toolchain/brace-expansion-override.test.ts` finds only copies that a
-    // flat `brace-expansion@^5` override would not break. Re-argue, do not extend.
-    "GHSA-mh99-v99m-4gvg",
+    // Staying inside each major is what keeps the fix safe: v1/v2 export the callable itself
+    // while v5 exports `{ expand }`, so a flat `^5` override makes minimatch@3/@5 throw
+    // `expand is not a function` (the 2026-07-29 landmine recorded in
+    // `tests/toolchain/brace-expansion-override.test.ts`, which still guards this).
   ],
 }
