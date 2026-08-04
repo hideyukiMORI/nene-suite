@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NeNeSuite\Tests\Auth;
 
 use Nene2\Auth\LocalBearerTokenVerifier;
+use Nene2\Auth\TokenVerificationException;
+use Nene2\Http\UtcClock;
 use NeNeSuite\Auth\CreateAuthSessionInput;
 use NeNeSuite\Auth\CreateAuthSessionUseCase;
 use NeNeSuite\Auth\InvalidCredentialsException;
@@ -17,6 +19,7 @@ use NeNeSuite\Tenancy\Membership;
 use NeNeSuite\Tenancy\Organization;
 use NeNeSuite\Tenancy\OrganizationStatus;
 use NeNeSuite\Tenancy\Role;
+use NeNeSuite\Tests\Support\FixedClock;
 use NeNeSuite\Tests\Tenancy\InMemoryMembershipRepository;
 use NeNeSuite\Tests\Tenancy\InMemoryOrganizationRepository;
 use PHPUnit\Framework\TestCase;
@@ -130,12 +133,59 @@ final class CreateAuthSessionUseCaseTest extends TestCase
         self::assertSame(0, $attempts->countWithinWindow('ip:203.0.113.7', 900, $now));
     }
 
+    public function testStampsIatAndExpFromTheInjectedClock(): void
+    {
+        $operators = new InMemoryOperatorRepository();
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
+
+        // One clock for issuing *and* verifying: the whole login path closes over a single instant,
+        // so `iat`/`exp` are exact values rather than "somewhere around now".
+        $clock = new FixedClock('2026-08-04T12:00:00Z');
+        $verifier = new LocalBearerTokenVerifier('test-secret', $clock);
+
+        $output = $this->useCase($operators, $verifier, null, null, null, $clock)
+            ->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass'));
+
+        $issuedAt = $clock->timestamp();
+        $claims = $verifier->verify($output->token);
+
+        self::assertSame($issuedAt, $claims['iat']);
+        self::assertSame($issuedAt + 86400, $claims['exp']);
+        // The returned expiry and the claim must be the same number — two wall-clock reads could
+        // straddle a second and desync them.
+        self::assertSame($claims['exp'], $output->expiresAt);
+    }
+
+    public function testTokenIsRejectedOnceTheSharedClockPassesExpiry(): void
+    {
+        $operators = new InMemoryOperatorRepository();
+        $operators->save($this->operator((new PasswordHasher())->hash('s3cret-pass')));
+
+        $clock = new FixedClock('2026-08-04T12:00:00Z');
+        $verifier = new LocalBearerTokenVerifier('test-secret', $clock);
+
+        $output = $this->useCase($operators, $verifier, null, null, null, $clock)
+            ->execute(new CreateAuthSessionInput('operator@example.com', 's3cret-pass'));
+
+        // Still inside the TTL.
+        $clock->advance(86_399);
+        self::assertSame(self::OPERATOR_ID, $verifier->verify($output->token)['sub']);
+
+        // One second past it — expiry is now reachable in a test because the verifier reads the
+        // same injected clock the token was stamped with.
+        $clock->advance(2);
+        $this->expectException(TokenVerificationException::class);
+        $this->expectExceptionMessage('Token has expired.');
+        $verifier->verify($output->token);
+    }
+
     private function useCase(
         InMemoryOperatorRepository $operators,
         LocalBearerTokenVerifier $verifier,
         ?InMemoryMembershipRepository $memberships = null,
         ?InMemoryOrganizationRepository $organizations = null,
         ?LoginRateLimiter $rateLimiter = null,
+        ?FixedClock $clock = null,
     ): CreateAuthSessionUseCase {
         return new CreateAuthSessionUseCase(
             $operators,
@@ -147,6 +197,7 @@ final class CreateAuthSessionUseCaseTest extends TestCase
                 $organizations ?? new InMemoryOrganizationRepository(),
             ),
             $rateLimiter ?? new LoginRateLimiter(new InMemoryLoginAttemptRepository()),
+            $clock ?? new UtcClock(),
         );
     }
 

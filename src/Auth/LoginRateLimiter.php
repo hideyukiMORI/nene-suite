@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeSuite\Auth;
 
+use Nene2\Http\ClockInterface;
+use Nene2\Http\UtcClock;
 use Throwable;
 
 /**
@@ -31,6 +33,9 @@ final readonly class LoginRateLimiter
         private LoginAttemptRepositoryInterface $attempts,
         private int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
         private int $windowSeconds = self::DEFAULT_WINDOW_SECONDS,
+        // Defaulted so existing three-argument construction keeps working; the container passes
+        // the shared clock so the whole runtime reads one instant source.
+        private ClockInterface $clock = new UtcClock(),
     ) {
     }
 
@@ -46,7 +51,7 @@ final readonly class LoginRateLimiter
         }
 
         try {
-            $count = $this->attempts->countWithinWindow($this->key($clientIp), $this->windowSeconds, time());
+            $count = $this->attempts->countWithinWindow($this->key($clientIp), $this->windowSeconds, $this->now());
         } catch (Throwable $exception) {
             $this->failOpen('read', $exception);
 
@@ -65,7 +70,7 @@ final readonly class LoginRateLimiter
         }
 
         try {
-            $this->attempts->recordFailure($this->key($clientIp), $this->windowSeconds, time());
+            $this->attempts->recordFailure($this->key($clientIp), $this->windowSeconds, $this->now());
         } catch (Throwable $exception) {
             $this->failOpen('write', $exception);
         }
@@ -87,6 +92,15 @@ final readonly class LoginRateLimiter
     private function key(string $clientIp): string
     {
         return 'ip:' . $clientIp;
+    }
+
+    /**
+     * Read once per operation. Two reads inside one call can straddle a second boundary and
+     * shift the window under the count that was just taken against it.
+     */
+    private function now(): int
+    {
+        return $this->clock->now()->getTimestamp();
     }
 
     private function failOpen(string $operation, Throwable $exception): void

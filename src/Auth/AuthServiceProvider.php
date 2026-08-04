@@ -12,6 +12,7 @@ use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeSuite\Http\RuntimeServiceProvider;
 use NeNeSuite\SuiteAudit\SuiteAuditRecorderFactoryInterface;
@@ -59,12 +60,22 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 LoginRateLimiter::class,
                 static function (ContainerInterface $container): LoginRateLimiter {
                     $attempts = $container->get(LoginAttemptRepositoryInterface::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$attempts instanceof LoginAttemptRepositoryInterface) {
                         throw new LogicException('Login attempt repository service is invalid.');
                     }
 
-                    return new LoginRateLimiter($attempts);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new LoginRateLimiter(
+                        $attempts,
+                        LoginRateLimiter::DEFAULT_MAX_ATTEMPTS,
+                        LoginRateLimiter::DEFAULT_WINDOW_SECONDS,
+                        $clock,
+                    );
                 },
             )
             ->set(
@@ -79,12 +90,17 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 RevokedTokenRepositoryInterface::class,
                 static function (ContainerInterface $container): RevokedTokenRepositoryInterface {
                     $query = $container->get(DatabaseQueryExecutorInterface::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoRevokedTokenRepository($query);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new PdoRevokedTokenRepository($query, $clock);
                 },
             )
             ->set(
@@ -292,6 +308,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
                     $sessionContext = $container->get(OperatorSessionContextResolver::class);
                     $rateLimiter = $container->get(LoginRateLimiter::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$operators instanceof OperatorRepositoryInterface) {
                         throw new LogicException('Operator repository service is invalid.');
@@ -317,7 +334,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Login rate limiter service is invalid.');
                     }
 
-                    return new CreateAuthSessionUseCase($operators, $hasher, $issuer, $suiteId, $sessionContext, $rateLimiter);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new CreateAuthSessionUseCase($operators, $hasher, $issuer, $suiteId, $sessionContext, $rateLimiter, $clock);
                 },
             )
             ->set(
@@ -391,6 +412,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                     $organizations = $container->get(OrganizationRepositoryInterface::class);
                     $issuer = $container->get(TokenIssuerInterface::class);
                     $suiteId = $container->get(RuntimeServiceProvider::SUITE_ID);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$operators instanceof OperatorRepositoryInterface) {
                         throw new LogicException('Operator repository service is invalid.');
@@ -412,7 +434,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Suite id service is invalid.');
                     }
 
-                    return new SwitchActiveOrganizationUseCase($operators, $memberships, $organizations, $issuer, $suiteId);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new SwitchActiveOrganizationUseCase($operators, $memberships, $organizations, $issuer, $suiteId, $clock);
                 },
             )
             ->set(
