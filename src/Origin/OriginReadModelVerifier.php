@@ -158,11 +158,16 @@ final class OriginReadModelVerifier
         }
 
         // 6/7. Trust fields, then verify the artifact / feed body hash before "apply".
-        return match ($tree) {
+        $outcome = match ($tree) {
             OriginTreeKind::Update => $this->verifyArtifact($store, $targets, $freshness, $warnings),
             OriginTreeKind::Feed => $this->verifyFeedBody($store, $targets, $freshness, $warnings),
             OriginTreeKind::Entitlement => $this->verifyEntitlementPolicy($targets, $freshness, $warnings),
         };
+
+        // Hand the verified generation to the consumer only when the whole walk accepted: the
+        // anti-rollback watermark must never advance past a tree that failed at the artifact / feed
+        // body hop (ADR 0017 §5 — the watermark records what was *accepted*, not what was fetched).
+        return $outcome->accepted ? $outcome->withGen($gen) : $outcome;
     }
 
     /**

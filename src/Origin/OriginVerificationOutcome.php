@@ -10,7 +10,10 @@ namespace NeNeSuite\Origin;
  * carry non-fatal signals (e.g. a `warn`-state freshness notice that does not block acceptance).
  * On accept, `leaf` is the **verified** trusted leaf object (the decoded targets / feed / entitlement)
  * so consumers can read its now-trusted fields (e.g. `latest.version`) without re-verifying; it is
- * null on reject. The corpus parity gate only inspects `accepted` / `reason` / `stage`.
+ * null on reject. `gen` is the verified generation of the accepted tree — the consumer advances its
+ * anti-rollback watermark from it (ADR 0017 §5) without re-reading `current`; it is null on reject,
+ * so "there is a generation to persist" and "the walk fully verified" cannot drift apart.
+ * The corpus parity gate only inspects `accepted` / `reason` / `stage`.
  */
 final readonly class OriginVerificationOutcome
 {
@@ -26,7 +29,17 @@ final readonly class OriginVerificationOutcome
         public array $warnings = [],
         public string $message = '',
         public ?array $leaf = null,
+        public ?int $gen = null,
     ) {
+    }
+
+    /**
+     * The same accepted outcome, carrying the verified generation. Only ever called on an accept —
+     * a rejected outcome has no trusted generation to hand on.
+     */
+    public function withGen(int $gen): self
+    {
+        return new self($this->accepted, $this->reason, $this->stage, $this->freshness, $this->warnings, $this->message, $this->leaf, $gen);
     }
 
     /**
