@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace NeNeSuite\Origin;
 
 use DateTimeImmutable;
+use DateTimeZone;
 
 /**
  * Fans out over a roster of installed products and, for each, fetches + verifies its Origin update
  * tree (using the §2.4 consumer reduction — Suite is an aggregating client) and computes an
  * {@see OriginUpdateSignal}. The anti-rollback `persisted_gen` comes from the O2 watermark (falling
- * back to the build-time `gen` floor on first sight). A per-product verification failure or an
+ * back to the build-time `gen` floor on first sight) and is **advanced here** on every accepted walk
+ * (ADR 0017 §5) — reading it without ever writing it would pin the floor at build time and leave the
+ * client replayable with any generation above it. A per-product verification failure or an
  * unreachable Origin degrades to an `unavailable` signal — it never aborts the whole roster.
  *
  * **Mirror failover** (mirrors.md §4): one product = one walk, and each walk is retried in mirror
@@ -106,6 +109,19 @@ final readonly class OriginUpdateAggregator
                 $attempted ? $lastReason : 'origin_not_configured',
                 $lastFreshness,
                 $mirrorWarnings,
+            );
+        }
+
+        // ADR 0017 §5 anti-rollback: advance the persisted watermark to the generation this walk
+        // accepted. Exactly once per walk, for the mirror that won the cycle (mirrors.md §4.2) —
+        // the loop breaks on the first accept, and rejected mirrors carry no `gen`, so a hostile or
+        // degraded mirror cannot move the watermark. The store is monotonic, so re-accepting the
+        // same generation (the steady state — one poll per `poll_after`) is a no-op write.
+        if ($outcome->gen !== null) {
+            $watermarks->record(
+                $query->product,
+                $outcome->gen,
+                $now->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d\TH:i:s\Z'),
             );
         }
 
