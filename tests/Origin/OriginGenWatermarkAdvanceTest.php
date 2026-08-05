@@ -6,6 +6,9 @@ namespace NeNeSuite\Tests\Origin;
 
 use DateTimeImmutable;
 use NeNeSuite\Origin\FilesystemOriginObjectStore;
+use NeNeSuite\Origin\OriginFeedKind;
+use NeNeSuite\Origin\OriginFeedQuery;
+use NeNeSuite\Origin\OriginFeedReader;
 use NeNeSuite\Origin\OriginReadModelVerifier;
 use NeNeSuite\Origin\OriginTrustAnchor;
 use NeNeSuite\Origin\OriginUpdateAggregator;
@@ -90,6 +93,32 @@ final class OriginGenWatermarkAdvanceTest extends TestCase
         self::assertSame(OriginUpdateStatus::UpdateAvailable, $first->status);
         self::assertSame(OriginUpdateStatus::UpdateAvailable, $second->status);
         self::assertSame(self::CORPUS_GEN, $watermarks->current('nene-invoice'));
+    }
+
+    public function testAnAcceptedFeedWalkDoesNotTouchTheUpdateWatermark(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+        $decoded = json_decode((string) file_get_contents(self::CORPUS . '/trust-anchor.json'), true, flags: JSON_THROW_ON_ERROR);
+
+        $feed = (new OriginFeedReader(new OriginReadModelVerifier()))->read(
+            new OriginFeedQuery('nene-invoice', 'free', 'ja', OriginFeedKind::Announcement),
+            new SingleOriginObjectStoreProvider(new FilesystemOriginObjectStore(self::CORPUS . '/cases/valid-feed')),
+            OriginTrustAnchor::fromArray(is_array($decoded) ? $decoded : []),
+            1,
+            1,
+            new DateTimeImmutable('2026-06-20T00:00:00Z'),
+            $watermarks,
+        );
+
+        self::assertTrue($feed->available, 'precondition: the feed tree verifies');
+        // Origin (spec owner, 2026-08-05): `gen` is counted per tree coordinate, not per product —
+        // update is keyed `{product}/{channel}`, feed `feeds/{product}/{audience}/{locale}`, so the
+        // sequences are coprime. This corpus proves it: the same product is update gen 42 and feed
+        // gen 7. Recording a feed accept into this product-scoped watermark would therefore refuse
+        // the update tree (7 < 42) — or, once the update tree advanced it, refuse every feed.
+        // verification-order §3 says "for this tree" and §7 persists only after a successful apply,
+        // which feeds never do. This assertion pins that ruling so it cannot be "fixed" back.
+        self::assertNull($watermarks->current('nene-invoice'));
     }
 
     private function aggregate(string $case, InMemoryOriginGenWatermarkRepository $watermarks): \NeNeSuite\Origin\OriginUpdateSignal
