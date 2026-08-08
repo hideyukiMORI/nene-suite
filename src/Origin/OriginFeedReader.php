@@ -117,7 +117,13 @@ final readonly class OriginFeedReader
         DateTimeImmutable $now,
         OriginGenWatermarkRepositoryInterface $watermarks,
     ): OriginFeed {
-        $persistedGen = $watermarks->current($query->product) ?? $genFloor;
+        // The coordinate is per (product, audience, locale) and carries `$locale` — the locale being
+        // walked, not `$query->locale`. On the missing-locale fallback the en cycle must compare
+        // against en's own counter; reusing the requested locale's would be the same cross-coordinate
+        // mistake #424 fixed, one level down.
+        $persistedGen = $watermarks->current(
+            OriginGenWatermarkCoordinate::forFeed($query->product, $query->audience, $locale),
+        ) ?? $genFloor;
         $client = new OriginClientState($persistedGen, $rootVersionFloor, $genFloor, $now);
         $request = new OriginVerificationRequest(
             OriginTreeKind::Feed,
