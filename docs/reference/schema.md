@@ -41,7 +41,7 @@ product database, not here.
 ### Origin
 
 - [`installed_app_versions`](#installed_app_versions) — Last-known installed version per suite-managed product, learned from the sibling /health probe (#255, epic #251 prerequisite). Supplies the installed version to the Origin update aggregator so a verified latest version can be diffed (unknown -> up_to_date / update_available / forced) instead of surfaced latest-only. Last-write-wins; absence of a row means the version is unknown.
-- [`origin_gen_watermarks`](#origin_gen_watermarks) — Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per product slug, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
+- [`origin_gen_watermarks`](#origin_gen_watermarks) — Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per tree coordinate, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
 
 ## Relationships
 
@@ -241,12 +241,12 @@ Suite tenancy registry (SSOT). external_id is the federation UUID propagated to 
 
 _Group: Origin_
 
-Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per product slug, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
+Profiled-TUF anti-rollback generation watermark for the Origin read model (ADR 0017 §5). One row per tree coordinate, advanced monotonically; supplies persisted_gen to the consumer verifier so a replayed older current fails closed.
 
 | Column | Type | Null | Key | Description |
 | --- | --- | --- | --- | --- |
-| `product` | `VARCHAR(100)` | NO | PK | Catalog product slug. Product-scoped, cross-channel (one watermark per product). |
-| `gen` | `BIGINT` | NO |  | Highest accepted profiled-TUF generation; advanced monotonically (never regresses). |
+| `coordinate` | `VARCHAR(255)` | NO | PK | Tree coordinate the watermark belongs to: update:{product} \| feed:{product}/{audience}/{locale} \| entitlement:{product}/{audience}. Origin numbers gen independently per coordinate, so one row per product would pin unrelated trees above their own gen and reject them as rollback. |
+| `gen` | `BIGINT` | NO |  | Highest accepted profiled-TUF generation at this coordinate; advanced monotonically (never regresses). |
 | `updated_at` | `VARCHAR(32)` | NO |  | Last advance time, ISO-8601 UTC string. |
 
 ## `revoked_tokens`

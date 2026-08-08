@@ -60,7 +60,10 @@ final readonly class OriginUpdateAggregator
         DateTimeImmutable $now,
         OriginGenWatermarkRepositoryInterface $watermarks,
     ): OriginUpdateSignal {
-        $persistedGen = $watermarks->current($query->product) ?? $genFloor;
+        // Cross-channel by design: `stable` and `beta` share one update counter for a product
+        // (origin #608(a)), which is why the coordinate omits the channel the request path carries.
+        $coordinate = OriginGenWatermarkCoordinate::forUpdate($query->product);
+        $persistedGen = $watermarks->current($coordinate) ?? $genFloor;
         $request = new OriginVerificationRequest(
             OriginTreeKind::Update,
             sprintf('v1/%s/%s/current', $query->product, $query->channel),
@@ -119,7 +122,7 @@ final readonly class OriginUpdateAggregator
         // same generation (the steady state — one poll per `poll_after`) is a no-op write.
         if ($outcome->gen !== null) {
             $watermarks->record(
-                $query->product,
+                $coordinate,
                 $outcome->gen,
                 $now->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d\TH:i:s\Z'),
             );
