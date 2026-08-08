@@ -1,0 +1,20 @@
+{
+    "id": "neg-feed-disallowed-alg",
+    "title": "Feed current.jws uses a disallowed algorithm (\"none\")",
+    "description": "Algorithm-allowlist downgrade on the feed tree: the protected header declares alg \"none\" with an empty signature.",
+    "tree": "feed",
+    "entry": "v1/feeds/nene-invoice/free/ja/current",
+    "delegation_key": "nene-invoice/free/ja/announcement",
+    "reduce": true,
+    "client": {
+        "persisted_gen": 6,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": false,
+        "reason": "alg_not_allowed",
+        "stage": "current"
+    }
+}

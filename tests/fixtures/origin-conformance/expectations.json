@@ -45,6 +45,26 @@
             }
         },
         {
+            "id": "valid-update-channel-switch",
+            "title": "Channel switch does not lower the effective version",
+            "tree": "update",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
+            "id": "valid-feed-en",
+            "title": "Valid en feed (the locale-fallback landing site)",
+            "tree": "feed",
+            "expect": {
+                "accepted": true,
+                "reason": "ok",
+                "stage": "complete"
+            }
+        },
+        {
             "id": "valid-entitlement",
             "title": "Valid entitlement audience policy",
             "tree": "entitlement",
@@ -151,6 +171,26 @@
             "expect": {
                 "accepted": false,
                 "reason": "unsupported_schema_version",
+                "stage": "current"
+            }
+        },
+        {
+            "id": "neg-feed-body-hash-mismatch",
+            "title": "Feed body does not match the signed content_sha256",
+            "tree": "feed",
+            "expect": {
+                "accepted": false,
+                "reason": "content_hash_mismatch",
+                "stage": "feed-body"
+            }
+        },
+        {
+            "id": "neg-feed-disallowed-alg",
+            "title": "Feed current.jws uses a disallowed algorithm (\"none\")",
+            "tree": "feed",
+            "expect": {
+                "accepted": false,
+                "reason": "alg_not_allowed",
                 "stage": "current"
             }
         }

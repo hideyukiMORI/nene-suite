@@ -1,0 +1,9 @@
+{
+    "spec_version": 1,
+    "schema_version": 1,
+    "gen": 43,
+    "targets": {
+        "nene-invoice/beta": "e99ae2e95142b458aa24f6d3119e97dd4d93389eceb1e995d01f5032e62cf020"
+    },
+    "expires": "2026-07-19T00:00:00Z"
+}

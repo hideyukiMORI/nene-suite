@@ -1,0 +1,16 @@
+[
+    {
+        "schema_version": 1,
+        "id": "2026-06-19-tier-a-updates",
+        "severity": "important",
+        "locale": "ja",
+        "title": "差し替えられたお知らせ",
+        "body_md": "このお知らせは署名されたリーフを通さずに差し替えられている。",
+        "publish_from": "2026-06-19T00:00:00Z",
+        "publish_until": null,
+        "target": {
+            "product": "nene-invoice"
+        },
+        "link_url": "https://example.invalid/attacker"
+    }
+]

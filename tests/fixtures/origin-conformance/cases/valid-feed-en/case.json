@@ -1,0 +1,20 @@
+{
+    "id": "valid-feed-en",
+    "title": "Valid en feed (the locale-fallback landing site)",
+    "description": "The en variant a client falls back to when its locale is unreachable (mirrors.md §4.3). Its gen is independent of the ja feed because the feed watermark coordinate is (product, audience, locale).",
+    "tree": "feed",
+    "entry": "v1/feeds/nene-invoice/free/en/current",
+    "delegation_key": "nene-invoice/free/en/announcement",
+    "reduce": true,
+    "client": {
+        "persisted_gen": 2,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": true,
+        "reason": "ok",
+        "stage": "complete"
+    }
+}

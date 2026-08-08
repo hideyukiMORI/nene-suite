@@ -1,0 +1,20 @@
+{
+    "id": "valid-update-channel-switch",
+    "title": "Channel switch does not lower the effective version",
+    "description": "A client that applied stable at gen 42 switches to the beta channel: beta continues the product-scoped sequence at gen 43, so the switch is not read as a rollback (verification-order §3).",
+    "tree": "update",
+    "entry": "v1/nene-invoice/beta/current",
+    "delegation_key": "nene-invoice/beta",
+    "reduce": false,
+    "client": {
+        "persisted_gen": 42,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": true,
+        "reason": "ok",
+        "stage": "complete"
+    }
+}

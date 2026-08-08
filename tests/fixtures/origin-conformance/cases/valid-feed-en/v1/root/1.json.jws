@@ -1,0 +1,12 @@
+{
+    "signatures": [
+        {
+            "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6InJvb3QtMjAyNmEiLCJpYXQiOjE3ODE5MTM2MDAsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19",
+            "signature": "HvaLTNBb_eHDY4OdJc6iQgpKdvNxV2DTj9ApYGj4eOrmjgQS55Zsbs5LlRO44c9JfOTICRczYfEZ5RA9lB4LCQ"
+        },
+        {
+            "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6InJvb3QtMjAyNmIiLCJpYXQiOjE3ODE5MTM2MDAsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19",
+            "signature": "W6bJ_nMr_EnvhaSG5tvval67NoarODcS5tFOwwmsdwUYUyQ6cmyzVcVEroMVNi9_XZnxZ_By3ubYydltbTlmCA"
+        }
+    ]
+}
