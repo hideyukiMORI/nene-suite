@@ -1,0 +1,9 @@
+{
+    "spec_version": 1,
+    "schema_version": 1,
+    "gen": 7,
+    "targets": {
+        "nene-invoice/free/ja/announcement": "1ad9998653f0904767210b3603be7b05610bceec23567b26e1a0941b6f805a65"
+    },
+    "expires": "2026-07-19T00:00:00Z"
+}

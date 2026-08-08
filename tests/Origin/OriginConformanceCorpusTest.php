@@ -26,8 +26,8 @@ final class OriginConformanceCorpusTest extends TestCase
         $expectations = self::readJson(self::CORPUS_DIR . '/expectations.json');
         $expectedCases = is_array($expectations['cases'] ?? null) ? $expectations['cases'] : [];
 
-        self::assertGreaterThanOrEqual(15, count(self::caseDirectories()), 'expected the full vendored corpus');
-        self::assertGreaterThanOrEqual(15, count($expectedCases), 'expected the expectations index');
+        self::assertGreaterThanOrEqual(19, count(self::caseDirectories()), 'expected the full vendored corpus');
+        self::assertGreaterThanOrEqual(19, count($expectedCases), 'expected the expectations index');
     }
 
     #[DataProvider('cases')]

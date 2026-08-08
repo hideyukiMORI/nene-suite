@@ -1,0 +1,20 @@
+{
+    "id": "neg-feed-body-hash-mismatch",
+    "title": "Feed body does not match the signed content_sha256",
+    "description": "The feed leaf is validly signed, but the body it names was altered in place: the content hash binding must fail closed rather than serve the substituted items.",
+    "tree": "feed",
+    "entry": "v1/feeds/nene-invoice/free/ja/current",
+    "delegation_key": "nene-invoice/free/ja/announcement",
+    "reduce": true,
+    "client": {
+        "persisted_gen": 6,
+        "root_version_floor": 1,
+        "gen_floor": 1,
+        "now": "2026-06-20T00:00:00Z"
+    },
+    "expect": {
+        "accepted": false,
+        "reason": "content_hash_mismatch",
+        "stage": "feed-body"
+    }
+}

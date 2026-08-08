@@ -1,0 +1,17 @@
+[
+    {
+        "schema_version": 1,
+        "id": "2026-06-19-tier-a-updates",
+        "severity": "important",
+        "locale": "en",
+        "title": "Tier A automatic updates are now available",
+        "body_md": "Automatic updates (Tier A) are now available for NeNe Invoice.",
+        "publish_from": "2026-06-19T00:00:00Z",
+        "publish_until": null,
+        "target": {
+            "product": "nene-invoice",
+            "version_range": ">=1.2.0"
+        },
+        "link_url": null
+    }
+]

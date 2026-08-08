@@ -1,0 +1,11 @@
+{
+    "spec_version": 1,
+    "schema_version": 1,
+    "product": "nene-invoice",
+    "audience": "free",
+    "locale": "ja",
+    "kind": "announcement",
+    "gen": 7,
+    "content_sha256": "5f5c03a6919d31c4702f6b3129889213ba55aaaa73ec00579596820d3e92dd8f",
+    "count": 2
+}

@@ -1,0 +1,31 @@
+[
+    {
+        "schema_version": 1,
+        "id": "2026-06-19-tier-a-updates",
+        "severity": "important",
+        "locale": "ja",
+        "title": "Tier A 自動更新を有効化しました",
+        "body_md": "NeNe Invoice の自動更新（Tier A）が利用可能になりました。",
+        "publish_from": "2026-06-19T00:00:00Z",
+        "publish_until": null,
+        "target": {
+            "product": "nene-invoice",
+            "version_range": ">=1.2.0"
+        },
+        "link_url": null
+    },
+    {
+        "schema_version": 1,
+        "id": "2026-06-01-welcome",
+        "severity": "info",
+        "locale": "ja",
+        "title": "NeNe Invoice へようこそ",
+        "body_md": "お知らせフィードのサンプルです。",
+        "publish_from": "2026-06-01T00:00:00Z",
+        "publish_until": null,
+        "target": {
+            "product": "nene-invoice"
+        },
+        "link_url": null
+    }
+]

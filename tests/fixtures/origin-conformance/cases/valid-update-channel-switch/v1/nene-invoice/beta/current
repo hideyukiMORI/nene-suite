@@ -1,0 +1,16 @@
+{
+    "spec_version": 1,
+    "schema_version": 1,
+    "gen": 43,
+    "snapshot_sha256": "22a1f9d1668a9abaa48dcac51f37134da523ccce47f6b84b4aa774b921676d19",
+    "targets_sha256": "e99ae2e95142b458aa24f6d3119e97dd4d93389eceb1e995d01f5032e62cf020",
+    "min_valid_generation": 30,
+    "expires": "2026-07-19T00:00:00Z",
+    "min_client_version": "1.2.0",
+    "poll_after": 21600,
+    "urgency": "normal",
+    "history": [
+        "207965d2765682830dc629ce199c8169a5de6e5b5ce0c4fb09886994759f77b1",
+        "dbea3219e20bb4d3c73bb96f6abd68443b43b3776214d40afc01c1b9b884a63d"
+    ]
+}
