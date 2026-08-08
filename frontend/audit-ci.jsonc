@@ -15,39 +15,16 @@
   "high": true,
   "critical": true,
   "allowlist": [
-    // GHSA-qwww-vcr4-c8h2 — react-router "RSC Mode CSRF Bypass Allows Action Execution Before
-    // 400 Response" (high).
+    // NOTE (2026-08-08): GHSA-qwww-vcr4-c8h2 (react-router "RSC Mode CSRF Bypass") was allowlisted
+    // here from 2026-07-29 with measured client-only-bundle evidence. The advisory has since been
+    // **re-scoped**: its vulnerable range moved from `>=7.12.0 <8.3.0` to `>=7.12.0 <7.18.2`,
+    // i.e. the fix was backported into the 7.x line. `react-router-dom` 7.18.2 is inside the
+    // existing `^7.9.6` range, so a lockfile bump closes it. The entry is therefore **removed
+    // rather than renewed** — the vulnerability is fixed, not excused.
     //
-    // Version facts, **re-measured 2026-08-07** (the advisory's range and first-patched version
-    // both moved since this entry was written — re-read them, do not trust the previous text):
-    //   - vulnerable range is now `>=7.12.0 <8.3.0` — first patched moved **8.2.1 → 8.3.0**
-    //   - the 7.x line still has NO fix: `react-router-dom` tops out at **7.18.2**, inside the
-    //     range (this tree is on 7.18.1, likewise inside it)
-    //   - the fix requires `react-router` **>= 8.3.0**, a *different package* — react-router-dom
-    //     publishes no 8.x at all, so this is a package swap plus a breaking upgrade
-    // Every other react-router advisory in this tree IS fixed — 7.18.1 closes the open-redirect,
-    // XSS, SSR-hydration and route-matching DoS ones.
-    //
-    // Why it does not apply here (**re-measured 2026-08-07**, first measured 2026-07-29): the
-    // suite apex shell is a **static SPA built by Vite** and copied into the Apache document root
-    // by the Dockerfile's frontend stage — `node:22-slim` is a build stage only, the runtime image
-    // is `php:8.4-apache`, so there is no Node server in the image at all. `src/app/router.tsx`
-    // uses `createBrowserRouter` with **element-only** routes (`element` / `errorElement`), and
-    // the tree has no `@react-router/dev`, no `react-router/server`, no `createStaticHandler`,
-    // no RSC entry, and no `renderToString` / `hydrateRoot` call. The advisory's attack path
-    // (a server executing a route action before returning 400) has no counterpart in a
-    // client-only bundle.
-    //
-    // Re-measuring note: a bare `grep -E '^\s*(action|loader):' src` now returns 5 hits, and all
-    // 5 are **false positives** — audit-event domain fields (`suite-audit-event` mapper/model,
-    // the audit CSV test, and the generated OpenAPI schema), not route-config keys. Check
-    // `src/app/router.tsx` itself; that is the only file that builds routes.
-    //
-    // Expiry: 2026-08-31. Removed by the react-router v8 migration wave (bundled with the
-    // NENE2 RR8 re-evaluation). If that wave slips past the expiry, the entry must be
-    // re-argued in a PR — not silently extended.
-    "GHSA-qwww-vcr4-c8h2",
-
+    // The 08-07 text in this file asserted "the 7.x line still has NO fix". That was true when
+    // measured and is false now: an advisory's range is a moving fact, so re-read it at every
+    // audit failure instead of trusting the recorded value.
     // NOTE (2026-08-04): GHSA-mh99-v99m-4gvg (brace-expansion) was allowlisted here until today
     // with dev-only evidence, because the nested copies had no in-line fix. They do now, so the
     // entry is **removed rather than renewed** — the vulnerability is fixed, not excused.
