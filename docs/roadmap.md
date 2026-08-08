@@ -80,7 +80,8 @@ Beyond self-hosting, NeNe Suite is heading toward **two editions** (proposed in
 - ✅ Suite Origin **consumption client** — profiled-TUF read model: detached-JWS
   (EdDSA) verification with conformance-corpus parity, a `gen` watermark keyed by
   **tree coordinate** (update `{product}` / feed `{product}/{audience}/{locale}` /
-  entitlement `{product}/{audience}` — #424; feed accepts do not yet advance it, #429),
+  entitlement `{product}/{audience}` — #424), advanced by accepted update and feed
+  walks alike (#421 / #429),
   and the update / announcements / house-ads read APIs + dashboard wiring
   (O0–O5b, epic #230; ADR 0017 consumer). Disabled-degrade until the trust anchor
   is configured.

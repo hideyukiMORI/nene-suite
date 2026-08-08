@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeSuite\Origin;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use JsonException;
 
 /**
@@ -119,11 +120,10 @@ final readonly class OriginFeedReader
     ): OriginFeed {
         // The coordinate is per (product, audience, locale) and carries `$locale` — the locale being
         // walked, not `$query->locale`. On the missing-locale fallback the en cycle must compare
-        // against en's own counter; reusing the requested locale's would be the same cross-coordinate
-        // mistake #424 fixed, one level down.
-        $persistedGen = $watermarks->current(
-            OriginGenWatermarkCoordinate::forFeed($query->product, $query->audience, $locale),
-        ) ?? $genFloor;
+        // against en's own counter, and advance that one; reusing the requested locale's would be the
+        // same cross-coordinate mistake #424 fixed, one level down.
+        $coordinate = OriginGenWatermarkCoordinate::forFeed($query->product, $query->audience, $locale);
+        $persistedGen = $watermarks->current($coordinate) ?? $genFloor;
         $client = new OriginClientState($persistedGen, $rootVersionFloor, $genFloor, $now);
         $request = new OriginVerificationRequest(
             OriginTreeKind::Feed,
@@ -146,6 +146,10 @@ final readonly class OriginFeedReader
         $count = is_int($leaf['count'] ?? null) ? $leaf['count'] : 0;
 
         if ($count === 0) {
+            // A published-empty feed is a fully verified generation, so it advances the watermark
+            // like any other — otherwise publishing an empty feed would silently lower the floor.
+            $this->advance($watermarks, $coordinate, $outcome->gen, $now);
+
             return OriginFeed::available($query, $locale, 0, [], $outcome->freshness, $outcome->warnings);
         }
 
@@ -166,7 +170,36 @@ final readonly class OriginFeedReader
             return OriginFeed::unavailable($query, $locale, 'malformed_object', $outcome->freshness);
         }
 
+        $this->advance($watermarks, $coordinate, $outcome->gen, $now);
+
         return OriginFeed::available($query, $locale, $count, $items, $outcome->freshness, $outcome->warnings);
+    }
+
+    /**
+     * ADR 0017 §5 anti-rollback for the feed tree (#429 — the feed half of #411). Advanced only on
+     * the paths that actually deliver a feed, which is stricter than "the `current` walk verified":
+     * a mirror whose body fails its `content_sha256` or decodes to garbage returns unavailable and
+     * must not be able to move the floor. The store is monotonic, so the steady state — polling an
+     * unchanged feed — is a no-op write.
+     *
+     * `$coordinate` is the walked locale's, so the en fallback advances en's counter and leaves the
+     * requested locale's untouched.
+     */
+    private function advance(
+        OriginGenWatermarkRepositoryInterface $watermarks,
+        OriginGenWatermarkCoordinate $coordinate,
+        ?int $gen,
+        DateTimeImmutable $now,
+    ): void {
+        if ($gen === null) {
+            return;
+        }
+
+        $watermarks->record(
+            $coordinate,
+            $gen,
+            $now->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d\TH:i:s\Z'),
+        );
     }
 
     /**
