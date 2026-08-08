@@ -23,19 +23,26 @@ use PHPUnit\Framework\TestCase;
  * caller for `record()`, so the watermark never advanced and `persisted_gen` fell back to the
  * build-time floor on every poll — the rollback guard was reduced to "not below the build floor".
  *
- * These cases close the loop end to end: an accepted walk **writes** the generation, and a written
- * watermark **refuses** an older one. The corpus tree `valid-update-reduced` is `gen = 42` with
- * `min_valid_generation = 30`.
+ * These cases close the loop end to end **per tree**: an accepted walk writes the generation at its
+ * own coordinate, and a written watermark refuses an older one there. #421 closed the update half,
+ * #429 the feed half; #424 sits between them and is why "at its own coordinate" is load-bearing
+ * rather than decorative — one shared row let an update accept lock out every feed.
  *
- * Why the replay case seeds the store instead of serving a re-signed older tree: the conformance
- * corpus carries no second, older, validly-signed generation for a product, and the corpus is pinned
- * (objects cannot be edited without breaking their detached JWS). Seeding is the faithful stand-in —
- * it reproduces exactly the state the first test proves the client now reaches on its own.
+ * Corpus generations, all for `nene-invoice`, deliberately far apart so a crossed coordinate shows
+ * up as a failure rather than a coincidence: update `valid-update-reduced` = 42 (with
+ * `min_valid_generation = 30`), feed ja = 7, feed en = 3.
+ *
+ * Why the replay cases seed the store instead of serving a re-signed older tree: the conformance
+ * corpus carries no second, older, validly-signed generation for any coordinate, and the corpus is
+ * pinned (objects cannot be edited without breaking their detached JWS). Seeding is the faithful
+ * stand-in — it reproduces exactly the state the accept cases prove the client reaches on its own.
  */
 final class OriginGenWatermarkAdvanceTest extends TestCase
 {
     private const string CORPUS = __DIR__ . '/../fixtures/origin-conformance';
     private const int CORPUS_GEN = 42;
+    private const int FEED_JA_GEN = 7;
+    private const int FEED_EN_GEN = 3;
 
     public function testAnAcceptedWalkAdvancesTheWatermark(): void
     {
@@ -111,9 +118,122 @@ final class OriginGenWatermarkAdvanceTest extends TestCase
         // feeds must not record at all". That inference was wrong in a way worth keeping visible:
         // the premise argued for **separate keys**, not for dropping the write. Reading it as a ban
         // on writing is what left the shared product key in place, and the shared key is what made
-        // an accepted update lock out every feed. Feeds still do not record — that is now a tracked
-        // gap (the feed half of #411), not a ruling.
+        // an accepted update lock out every feed. #429 restored the write at its own coordinate;
+        // what survives from the original ruling is only this — the update counter stays untouched.
         self::assertNull($watermarks->current(self::updateCoordinate()));
+        self::assertSame(self::FEED_JA_GEN, $watermarks->current(self::feedCoordinate('ja')));
+    }
+
+    public function testAnAcceptedFeedWalkAdvancesItsOwnFeedWatermark(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+
+        self::assertNull($watermarks->current(self::feedCoordinate('ja')), 'precondition: nothing persisted yet');
+
+        $feed = $this->readFeed('valid-feed', 'ja', $watermarks);
+
+        self::assertTrue($feed->available);
+        // The feed half of #411: before #429 this stayed null, so `persisted_gen` fell back to the
+        // build floor on every poll and the feed rollback guard was "not below the build floor".
+        self::assertSame(self::FEED_JA_GEN, $watermarks->current(self::feedCoordinate('ja')));
+    }
+
+    public function testARejectedFeedWalkNeverAdvancesTheFeedWatermark(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+
+        $feed = $this->readFeed('neg-feed-disallowed-alg', 'ja', $watermarks);
+
+        self::assertFalse($feed->available);
+        self::assertSame('alg_not_allowed', $feed->reason);
+        self::assertNull($watermarks->current(self::feedCoordinate('ja')));
+    }
+
+    /**
+     * Stricter than "the `current` walk verified": this tree's `current` is validly signed and its
+     * `gen` is 7, but the body does not match the `content_sha256` the leaf commits to. Nothing is
+     * delivered, so nothing may move the floor — otherwise a mirror serving a corrupt body could
+     * push the watermark up and lock the client out of the honest generation that follows.
+     */
+    public function testAFeedWhoseBodyFailsItsHashNeverAdvancesTheWatermark(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+
+        $feed = $this->readFeed('neg-feed-body-hash-mismatch', 'ja', $watermarks);
+
+        self::assertFalse($feed->available);
+        self::assertSame('content_hash_mismatch', $feed->reason);
+        self::assertNull($watermarks->current(self::feedCoordinate('ja')));
+    }
+
+    public function testRepeatedFeedPollsOfTheSameGenerationStayAvailable(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+
+        $first = $this->readFeed('valid-feed', 'ja', $watermarks);
+        $second = $this->readFeed('valid-feed', 'ja', $watermarks);
+
+        // The steady state. Advancing to the generation just accepted must not lock the client out
+        // of that same generation on the next poll.
+        self::assertTrue($first->available);
+        self::assertTrue($second->available);
+        self::assertSame(self::FEED_JA_GEN, $watermarks->current(self::feedCoordinate('ja')));
+    }
+
+    public function testAReplayedOlderFeedGenerationIsRefusedOnceTheFeedWatermarkHasAdvanced(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+        // Stand-in for "this client already accepted gen 8" — the state the accept test proves a
+        // feed walk now reaches by itself. The corpus carries no second, older, validly-signed feed
+        // generation, and its objects cannot be edited without breaking their detached JWS.
+        $watermarks->record(self::feedCoordinate('ja'), self::FEED_JA_GEN + 1, '2026-06-20T00:00:00Z');
+
+        $feed = $this->readFeed('valid-feed', 'ja', $watermarks);
+
+        self::assertFalse($feed->available);
+        self::assertSame('rollback', $feed->reason);
+        // Refusing must not regress what was already persisted.
+        self::assertSame(self::FEED_JA_GEN + 1, $watermarks->current(self::feedCoordinate('ja')));
+    }
+
+    /**
+     * 🔴 The fallback coordinate case. `fr` is unpublished, so the reader falls back to `en` and
+     * serves it — and the generation it persists must be **en's**, at en's coordinate. Writing the
+     * served gen under the requested locale would rebuild #424 one level down: en runs at gen 3 and
+     * ja at gen 7, so an fr→en fallback would drop a 3 onto whichever counter it touched.
+     */
+    public function testTheEnFallbackAdvancesTheEnCoordinateAndNoOther(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+
+        // `valid-feed-en` publishes the en variant only, so fr misses and falls back.
+        $feed = $this->readFeed('valid-feed-en', 'fr', $watermarks);
+
+        self::assertTrue($feed->available, 'precondition: the fallback serves the en feed');
+        self::assertSame('fr', $feed->requestedLocale);
+        self::assertSame('en', $feed->servedLocale);
+
+        self::assertSame(self::FEED_EN_GEN, $watermarks->current(self::feedCoordinate('en')));
+        self::assertNull($watermarks->current(self::feedCoordinate('fr')), 'the requested locale has no generation of its own');
+        self::assertNull($watermarks->current(self::feedCoordinate('ja')), 'an unrelated locale must not move');
+        self::assertNull($watermarks->current(self::updateCoordinate()), 'and neither must the update counter');
+    }
+
+    /**
+     * The two locales of one feed advance independently — en at 3, ja at 7. Sharing a counter here
+     * would make whichever locale was read second fail closed, which is #424 at locale granularity.
+     */
+    public function testFeedLocalesAdvanceIndependently(): void
+    {
+        $watermarks = new InMemoryOriginGenWatermarkRepository();
+
+        $ja = $this->readFeed('valid-feed', 'ja', $watermarks);
+        $en = $this->readFeed('valid-feed-en', 'en', $watermarks);
+
+        self::assertTrue($ja->available);
+        self::assertTrue($en->available, 'the lower-gen locale must still verify after the higher one advanced');
+        self::assertSame(self::FEED_JA_GEN, $watermarks->current(self::feedCoordinate('ja')));
+        self::assertSame(self::FEED_EN_GEN, $watermarks->current(self::feedCoordinate('en')));
     }
 
     /**
@@ -185,5 +305,10 @@ final class OriginGenWatermarkAdvanceTest extends TestCase
     private static function updateCoordinate(): OriginGenWatermarkCoordinate
     {
         return OriginGenWatermarkCoordinate::forUpdate('nene-invoice');
+    }
+
+    private static function feedCoordinate(string $locale): OriginGenWatermarkCoordinate
+    {
+        return OriginGenWatermarkCoordinate::forFeed('nene-invoice', 'free', $locale);
     }
 }
