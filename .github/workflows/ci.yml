@@ -7,11 +7,34 @@ on:
   push:
     branches: [main]
 
+  # Weekly re-run so dependency-audit advisories added upstream (not just at PR
+  # time) are still caught by both the frontend npm audit and the backend
+  # composer audit. Monday 01:15 UTC = 10:15 JST — offset from :00/:30 to
+  # avoid GitHub Actions' documented high-load top-of-hour window, and
+  # staggered from sibling repos' cron minutes to avoid fleet-wide thundering
+  # herd. Frontend audit policy: docs/development/dependency-audit.md.
+  #
+  # NOTE: GitHub auto-disables scheduled workflows after 60 days with no repo
+  # activity. If this repo goes quiet for >60 days, the weekly run silently
+  # stops firing until a push/PR re-enables it.
+  schedule:
+    - cron: '15 1 * * 1'
+
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Intentionally fail the check job, to validate the failure-notification path'
+        type: boolean
+        default: false
+
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # github.event_name is included so a scheduled/dispatched run isn't
+  # cancelled by a concurrent push run (they'd otherwise share the same
+  # ref-based group and the newer push would cancel the older schedule run).
+  group: ci-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -21,6 +44,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Simulate failure (validation only)
+        if: inputs.simulate_failure
+        run: exit 1
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -95,8 +122,40 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # Advisory check against composer.lock. Independent step (not folded into
+      # `composer check`) so a new upstream advisory fails loudly on its own,
+      # separate from lint/test/static-analysis failures. Verified 0 advisories
+      # locally before adding this gate.
+      - name: composer audit
+        run: composer audit --no-interaction
+
       - name: Run checks
         run: composer check
 
       - name: OpenAPI contract validation (PHP)
         run: composer openapi
+
+  notify-failure:
+    name: Open an issue when the scheduled run fails
+    if: failure() && (github.event_name == 'schedule' || inputs.simulate_failure)
+    needs: [docs-and-contract, frontend, backend]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      ISSUE_TITLE: '🔴 Suite: weekly CI (schedule) is failing'
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Create or update the failure issue
+        run: |
+          set -euo pipefail
+          existing="$(gh issue list --state open --limit 100 --json number,title \
+            | jq -r --arg t "$ISSUE_TITLE" 'map(select(.title == $t)) | .[0].number // empty')"
+          body="週次の schedule 実行が失敗しました。 実行: ${RUN_URL}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body "$body"
+          fi
